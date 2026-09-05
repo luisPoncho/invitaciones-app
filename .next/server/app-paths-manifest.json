@@ -1,5 +1,0 @@
-{
-  "/invitacion/[slug]/page": "app/invitacion/[slug]/page.js",
-  "/designer/[slug]/page": "app/designer/[slug]/page.js",
-  "/dashboard/page": "app/dashboard/page.js"
-}
