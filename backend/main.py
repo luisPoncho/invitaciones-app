@@ -11,12 +11,10 @@ import string
 from datetime import datetime, timezone
 
 from contextlib import asynccontextmanager
-from typing import Any, List, Optional
+from typing import Any, List, Optional, cast
 
 # pyrefly: ignore [missing-import]
 from fastapi import FastAPI, Depends, HTTPException, Query
-# pyrefly: ignore [missing-import]
-from fastapi.middleware.cors import CORSMiddleware
 # pyrefly: ignore [missing-import]
 from sqlalchemy.orm import Session
 
@@ -146,7 +144,7 @@ def _generate_admin_token() -> str:
     return "".join(secrets.choice(chars) for _ in range(24))
 
 
-def _safe_json_loads(data: Optional[str], default: Any):
+def _safe_json_loads(data: Any, default: Any):
     if not data:
         return default
     try:
@@ -158,18 +156,18 @@ def _safe_json_loads(data: Optional[str], default: Any):
 def _invitation_to_response(inv: Invitation) -> InvitationResponse:
     """Convert a SQLAlchemy Invitation row to the API response schema."""
     return InvitationResponse(
-        slug=inv.slug,
-        anfitriones=inv.anfitriones,
-        fechaISO=inv.fecha_iso,
-        fechaLegible=inv.fecha_legible,
-        lugarNombre=inv.lugar_nombre,
-        lugarDireccion=inv.lugar_direccion,
-        lugarDireccionUrl=inv.lugar_direccion_url,
-        mensaje=inv.mensaje,
+        slug=cast(str, inv.slug),
+        anfitriones=cast(str, inv.anfitriones),
+        fechaISO=cast(str, inv.fecha_iso),
+        fechaLegible=cast(str, inv.fecha_legible),
+        lugarNombre=cast(str, inv.lugar_nombre),
+        lugarDireccion=cast(str, inv.lugar_direccion),
+        lugarDireccionUrl=cast(Optional[str], inv.lugar_direccion_url),
+        mensaje=cast(str, inv.mensaje),
         fotos=_safe_json_loads(inv.fotos, []),
         theme=_safe_json_loads(inv.theme, {}),
-        adminToken=inv.admin_token,
-        entryAnimation=inv.entry_animation,
+        adminToken=cast(str, inv.admin_token),
+        entryAnimation=cast(str, inv.entry_animation),
         photoConfigs=_safe_json_loads(inv.photo_configs, []),
         freeElements=_safe_json_loads(inv.free_elements, []),
         sections=_safe_json_loads(inv.sections, []),
@@ -358,7 +356,9 @@ def create_rsvp(slug: str, body: RsvpCreate, db: Session = Depends(get_db)):
     db.commit()
 
     return RsvpResponse(
+        # pyrefly: ignore [bad-argument-type]
         nombre=rsvp.nombre,
+        # pyrefly: ignore [bad-argument-type]
         asistencia=rsvp.asistencia,
         timestamp=rsvp.created_at.isoformat(),
     )

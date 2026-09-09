@@ -4,12 +4,14 @@ Complex JSON fields (theme, photoConfigs, sections, etc.) are stored as TEXT
 columns containing JSON strings — no need for individual column queries on them.
 """
 
+from __future__ import annotations
+
 from datetime import datetime, timezone
 
 # pyrefly: ignore [missing-import]
-from sqlalchemy import Column, String, Text, DateTime, ForeignKey
+from sqlalchemy import ForeignKey
 # pyrefly: ignore [missing-import]
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 try:
     from database import Base
@@ -24,35 +26,39 @@ def _utcnow() -> datetime:
 class Invitation(Base):
     __tablename__ = "invitations"
 
-    id = Column(String, primary_key=True)
-    slug = Column(String, unique=True, nullable=False, index=True)
-    anfitriones = Column(String, nullable=False)
-    fecha_iso = Column(String, nullable=False)
-    fecha_legible = Column(String, nullable=False, default="")
-    lugar_nombre = Column(String, nullable=False, default="")
-    lugar_direccion = Column(String, nullable=False, default="")
-    lugar_direccion_url = Column(String, nullable=True)
-    mensaje = Column(Text, nullable=False, default="")
-    fotos = Column(Text, nullable=False, default="[]")  # JSON array of strings
-    theme = Column(Text, nullable=False)  # JSON InvitationTheme
-    admin_token = Column(String, unique=True, nullable=False, index=True)
-    entry_animation = Column(String, nullable=False, default="carta")
-    photo_configs = Column(Text, nullable=False, default="[]")  # JSON PhotoConfig[]
-    free_elements = Column(Text, nullable=False, default="[]")  # JSON FreeElement[]
-    sections = Column(Text, nullable=False, default="[]")  # JSON SectionBlock[]
-    created_at = Column(DateTime, nullable=False, default=_utcnow)
-    updated_at = Column(DateTime, nullable=False, default=_utcnow, onupdate=_utcnow)
+    id: Mapped[str] = mapped_column(primary_key=True)
+    slug: Mapped[str] = mapped_column(unique=True, nullable=False, index=True)
+    anfitriones: Mapped[str] = mapped_column(nullable=False)
+    fecha_iso: Mapped[str] = mapped_column(nullable=False)
+    fecha_legible: Mapped[str] = mapped_column(nullable=False, default="")
+    lugar_nombre: Mapped[str] = mapped_column(nullable=False, default="")
+    lugar_direccion: Mapped[str] = mapped_column(nullable=False, default="")
+    lugar_direccion_url: Mapped[str | None] = mapped_column(nullable=True)
+    mensaje: Mapped[str] = mapped_column(nullable=False, default="")
+    fotos: Mapped[str] = mapped_column(nullable=False, default="[]")
+    theme: Mapped[str] = mapped_column(nullable=False)
+    admin_token: Mapped[str] = mapped_column(unique=True, nullable=False, index=True)
+    entry_animation: Mapped[str] = mapped_column(nullable=False, default="carta")
+    photo_configs: Mapped[str] = mapped_column(nullable=False, default="[]")
+    free_elements: Mapped[str] = mapped_column(nullable=False, default="[]")
+    sections: Mapped[str] = mapped_column(nullable=False, default="[]")
+    created_at: Mapped[datetime] = mapped_column(nullable=False, default=_utcnow)
+    updated_at: Mapped[datetime] = mapped_column(nullable=False, default=_utcnow, onupdate=_utcnow)
 
-    rsvps = relationship("Rsvp", back_populates="invitation", cascade="all, delete-orphan")
+    rsvps: Mapped[list[Rsvp]] = relationship(
+        back_populates="invitation", cascade="all, delete-orphan"
+    )
 
 
 class Rsvp(Base):
     __tablename__ = "rsvps"
 
-    id = Column(String, primary_key=True)
-    nombre = Column(String, nullable=False)
-    asistencia = Column(String, nullable=False)  # "si" | "no"
-    created_at = Column(DateTime, nullable=False, default=_utcnow)
+    id: Mapped[str] = mapped_column(primary_key=True)
+    nombre: Mapped[str] = mapped_column(nullable=False)
+    asistencia: Mapped[str] = mapped_column(nullable=False)
+    created_at: Mapped[datetime] = mapped_column(nullable=False, default=_utcnow)
 
-    invitation_id = Column(String, ForeignKey("invitations.id", ondelete="CASCADE"), nullable=False)
-    invitation = relationship("Invitation", back_populates="rsvps")
+    invitation_id: Mapped[str] = mapped_column(
+        ForeignKey("invitations.id", ondelete="CASCADE"), nullable=False
+    )
+    invitation: Mapped[Invitation] = relationship(back_populates="rsvps")
