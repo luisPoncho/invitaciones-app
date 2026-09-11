@@ -17,22 +17,21 @@ export default function EntryEnvelope({ theme, onOpen }: { theme: InvitationThem
       <div className="relative w-64 h-48 cursor-pointer" onClick={handleClick} style={{ perspective: "1000px" }}>
         {/* Envelope back */}
         <div className="absolute inset-0 shadow-xl" style={{ backgroundColor: theme.secondary, borderRadius: '8px' }}></div>
-        
+
         {/* Letter */}
         <div className="absolute inset-2 flex items-center justify-center shadow-md" style={{
           backgroundColor: theme.paper,
           animation: opened ? "letter-pull 1s 0.5s forwards" : "none"
         }}>
-           <span className="font-display italic text-lg text-center" style={{ color: theme.primary }}>Abrir</span>
         </div>
 
         {/* Envelope front flaps */}
         <div className="absolute inset-0 flex flex-col justify-end pointer-events-none" style={{
-           clipPath: "polygon(0 100%, 50% 40%, 100% 100%, 100% 100%, 0 100%)",
-           backgroundColor: theme.accent,
-           opacity: 0.9,
-           borderBottomLeftRadius: '8px',
-           borderBottomRightRadius: '8px'
+          clipPath: "polygon(0 100%, 50% 40%, 100% 100%, 100% 100%, 0 100%)",
+          backgroundColor: theme.accent,
+          opacity: 0.9,
+          borderBottomLeftRadius: '8px',
+          borderBottomRightRadius: '8px'
         }}></div>
 
         {/* Envelope top flap */}

@@ -237,20 +237,62 @@ export default function DesignerSidebar({
                 Galería (URLs de fotos)
               </p>
               <div className="flex flex-col gap-2">
-                {[0, 1, 2].map((i) => (
-                  <input
-                    key={i}
-                    type="url"
-                    value={config.fotos[i] ?? ""}
-                    onChange={(e) => {
-                      const fotos = [...config.fotos];
-                      fotos[i] = e.target.value;
-                      update({ fotos });
-                    }}
-                    placeholder={`URL foto ${i + 1}`}
-                    className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder:text-white/25 focus:outline-none focus:border-white/30 transition-colors"
-                  />
+                {(config.fotos && config.fotos.length > 0 ? config.fotos : ["", "", ""]).map((url, i) => (
+                  <div key={i} className="flex items-center gap-1.5">
+                    <input
+                      type="url"
+                      value={url ?? ""}
+                      onChange={(e) => {
+                        const newUrl = e.target.value;
+                        const fotos = [...(config.fotos || ["", "", ""])];
+                        fotos[i] = newUrl;
+
+                        const photoConfigs = [...(config.photoConfigs || [])];
+                        while (photoConfigs.length <= i) {
+                          photoConfigs.push({ url: "", scrollBehavior: "normal", displayMode: "galeria" });
+                        }
+                        photoConfigs[i] = {
+                          ...photoConfigs[i],
+                          url: newUrl,
+                          displayMode: photoConfigs[i]?.displayMode || "galeria",
+                          scrollBehavior: photoConfigs[i]?.scrollBehavior || "normal",
+                        };
+
+                        update({ fotos, photoConfigs });
+                      }}
+                      placeholder={`URL foto ${i + 1}`}
+                      className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder:text-white/25 focus:outline-none focus:border-white/30 transition-colors"
+                    />
+                    {(config.fotos?.length || 0) > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const fotos = config.fotos.filter((_, idx) => idx !== i);
+                          const photoConfigs = (config.photoConfigs || []).filter((_, idx) => idx !== i);
+                          update({ fotos, photoConfigs });
+                        }}
+                        className="px-2 py-2 text-xs text-red-400/60 hover:text-red-400 hover:bg-white/5 rounded-lg transition-colors"
+                        title="Eliminar foto"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
                 ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const fotos = [...(config.fotos || []), ""];
+                    const photoConfigs = [
+                      ...(config.photoConfigs || []),
+                      { url: "", scrollBehavior: "normal" as const, displayMode: "galeria" as const }
+                    ];
+                    update({ fotos, photoConfigs });
+                  }}
+                  className="mt-1 w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg py-1.5 text-xs text-white/70 transition-colors"
+                >
+                  + Agregar otra foto
+                </button>
               </div>
             </div>
 

@@ -28,7 +28,7 @@ export default function SectionDesignList({ sections, onChange }: SectionDesignL
   };
 
   const configurableSections = sections.filter(sec => 
-    ["portada", "fecha-lugar", "rsvp", "foto-fondo", "mesa-regalos", "texto-libre"].includes(sec.type)
+    ["portada", "fecha-lugar", "galeria", "rsvp", "foto-fondo", "mesa-regalos", "texto-libre"].includes(sec.type)
   );
 
   if (configurableSections.length === 0) return null;
@@ -40,6 +40,12 @@ export default function SectionDesignList({ sections, onChange }: SectionDesignL
           <p className="text-[11px] font-semibold text-white/70 uppercase tracking-widest border-b border-white/10 pb-2 mb-1">
             {SECTION_LABELS[sec.type] || sec.type}
           </p>
+
+          {sec.type === "galeria" && (
+            <p className="text-xs text-white/50 leading-relaxed">
+              Las fotos de la galería se configuran más abajo en la sección <strong>Galería (URLs de fotos)</strong>.
+            </p>
+          )}
 
           {/* Common Background Config */}
           {["portada", "fecha-lugar", "rsvp", "foto-fondo", "mesa-regalos", "texto-libre"].includes(sec.type) && (

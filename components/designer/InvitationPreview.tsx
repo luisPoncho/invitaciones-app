@@ -120,7 +120,7 @@ export default function InvitationPreview({ config, onChange }: InvitationPrevie
                   case "fecha-lugar":
                     return <FechaLugar key={section.id} event={config} theme={theme} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
                   case "galeria":
-                    return <Galeria key={section.id} photoConfigs={config.photoConfigs || []} theme={theme} />;
+                    return <Galeria key={section.id} photoConfigs={config.photoConfigs || []} fotos={config.fotos || []} theme={theme} />;
                   case "rsvp":
                     return <RSVP key={section.id} slug={config.slug} theme={theme} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
                   case "foto-fondo":

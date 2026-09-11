@@ -66,7 +66,7 @@ export default function InvitacionPage({
               case "fecha-lugar":
                 return <FechaLugar key={section.id} event={event} theme={theme} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
               case "galeria":
-                return <Galeria key={section.id} photoConfigs={photoConfigs} theme={theme} />;
+                return <Galeria key={section.id} photoConfigs={photoConfigs} fotos={event.fotos || []} theme={theme} />;
               case "rsvp":
                 return <RSVP key={section.id} slug={params.slug} theme={theme} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
               case "foto-fondo":
