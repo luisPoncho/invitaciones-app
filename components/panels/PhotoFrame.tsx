@@ -1,5 +1,6 @@
 
 import type { PhotoConfig, InvitationTheme } from "@/lib/mock-data";
+import { formatImageUrl } from "@/lib/image-utils";
 
 export default function PhotoFrame({ config, theme }: { config: PhotoConfig, theme: InvitationTheme }) {
   const sizeClass = 
@@ -25,7 +26,7 @@ export default function PhotoFrame({ config, theme }: { config: PhotoConfig, the
         <div className="relative w-full h-full overflow-hidden border border-gray-100">
            {config.url && (
               <img
-                 src={config.url}
+                 src={formatImageUrl(config.url)}
                  alt=""
                  className="absolute inset-0 w-full h-full object-cover"
                  style={{ objectPosition: config.objectPosition || "center" }}

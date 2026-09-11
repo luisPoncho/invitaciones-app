@@ -1,5 +1,6 @@
 import type { InvitationTheme, PhotoScrollBehavior } from "@/lib/mock-data";
 import { defaultTheme } from "@/lib/mock-data";
+import { formatImageUrl } from "@/lib/image-utils";
 
 interface FotoFondoProps {
   theme?: InvitationTheme;
@@ -12,8 +13,9 @@ interface FotoFondoProps {
 
 export default function FotoFondo({ theme, photoUrl, bgScrollBehavior, bgPositionX, bgPositionY, bgZoom }: FotoFondoProps) {
   const t = { ...defaultTheme, ...theme };
+  const formattedUrl = formatImageUrl(photoUrl);
   
-  if (!photoUrl) {
+  if (!formattedUrl) {
     // Placeholder si no hay foto
     return (
       <section style={{ backgroundColor: t.primary }} className="w-full h-64 flex items-center justify-center opacity-50">
@@ -31,7 +33,7 @@ export default function FotoFondo({ theme, photoUrl, bgScrollBehavior, bgPositio
        <div 
          className="absolute inset-0 w-full h-full bg-center"
          style={{
-            backgroundImage: `url(${photoUrl})`,
+            backgroundImage: `url(${formattedUrl})`,
             backgroundAttachment: isFija ? "fixed" : "scroll",
             backgroundSize: bgSize,
             backgroundPosition: bgPosition

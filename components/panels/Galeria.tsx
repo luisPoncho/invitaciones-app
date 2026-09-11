@@ -1,6 +1,7 @@
 
 import type { PhotoConfig, InvitationTheme } from "@/lib/mock-data";
 import { defaultTheme } from "@/lib/mock-data";
+import { formatImageUrl } from "@/lib/image-utils";
 import PhotoBackground from "./PhotoBackground";
 import PhotoFrame from "./PhotoFrame";
 
@@ -61,7 +62,7 @@ export default function Galeria({ photoConfigs, fotos, theme }: GaleriaProps) {
             {galeriaPhotos.map((p, i) => (
               <div key={i} className="relative aspect-[3/4] overflow-hidden group">
                 <img
-                  src={p.url}
+                  src={formatImageUrl(p.url)}
                   alt=""
                   className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 ${p.scrollBehavior === 'movimiento' ? 'hover:scale-110' : ''}`}
                   style={{ objectPosition: p.objectPosition || "center" }}

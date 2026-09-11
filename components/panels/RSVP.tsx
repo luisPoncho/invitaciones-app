@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { InvitationTheme, PhotoScrollBehavior } from "@/lib/mock-data";
 import { defaultTheme, getFontDisplayVar, getFontBodyVar } from "@/lib/mock-data";
 import { saveRSVP } from "@/lib/storage";
+import { formatImageUrl } from "@/lib/image-utils";
 
 interface RSVPProps {
   slug: string;
@@ -19,6 +20,7 @@ export default function RSVP({ slug, theme, bgUrl, bgScrollBehavior, bgPositionX
   const t = { ...defaultTheme, ...theme };
   const fontDisplay = getFontDisplayVar(t.fontDisplay);
   const fontBody = getFontBodyVar(t.fontBody);
+  const formattedBgUrl = formatImageUrl(bgUrl);
 
   const bgAttachment =
     bgScrollBehavior === "fija" ? "fixed" :
@@ -61,8 +63,8 @@ export default function RSVP({ slug, theme, bgUrl, bgScrollBehavior, bgPositionX
   const sectionStyle = {
     backgroundColor: t.primary,
     color: t.paper,
-    ...(bgUrl ? {
-      backgroundImage: `url(${bgUrl})`,
+    ...(formattedBgUrl ? {
+      backgroundImage: `url(${formattedBgUrl})`,
       backgroundSize: bgSize,
       backgroundPosition: bgPosition,
       backgroundAttachment: bgAttachment,

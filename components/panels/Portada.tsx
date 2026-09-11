@@ -1,5 +1,6 @@
 import type { EventData, InvitationTheme, PhotoScrollBehavior } from "@/lib/mock-data";
 import { defaultTheme, getFontDisplayVar, getFontBodyVar } from "@/lib/mock-data";
+import { formatImageUrl } from "@/lib/image-utils";
 
 interface PortadaProps {
   event: EventData;
@@ -15,6 +16,7 @@ export default function Portada({ event, theme, bgUrl, bgScrollBehavior, bgPosit
   const t = { ...defaultTheme, ...theme };
   const fontDisplay = getFontDisplayVar(t.fontDisplay);
   const fontBody = getFontBodyVar(t.fontBody);
+  const formattedBgUrl = formatImageUrl(bgUrl);
 
   const bgAttachment =
     bgScrollBehavior === "fija" ? "fixed" :
@@ -28,8 +30,8 @@ export default function Portada({ event, theme, bgUrl, bgScrollBehavior, bgPosit
       style={{
         backgroundColor: t.primary,
         color: t.paper,
-        ...(bgUrl ? {
-          backgroundImage: `url(${bgUrl})`,
+        ...(formattedBgUrl ? {
+          backgroundImage: `url(${formattedBgUrl})`,
           backgroundSize: bgSize,
           backgroundPosition: bgPosition,
           backgroundAttachment: bgAttachment,
