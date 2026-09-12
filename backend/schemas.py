@@ -66,6 +66,9 @@ class FreeElement(BaseModel):
     fontSize: Optional[float] = None
     fontFamily: Optional[str] = None
     width: Optional[float] = None
+    height: Optional[float] = None
+    imageX: Optional[float] = None
+    imageY: Optional[float] = None
 
 
 # ── Invitation ───────────────────────────────────────────────────────────────

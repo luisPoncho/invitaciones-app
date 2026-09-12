@@ -30,6 +30,12 @@ export default function InvitationPreview({ config, onChange }: InvitationPrevie
     onChange({ ...config, freeElements: newElements });
   };
 
+  const handleDeleteFreeElement = (id: string) => {
+    if (!onChange) return;
+    const newElements = config.freeElements?.filter(e => e.id !== id) || [];
+    onChange({ ...config, freeElements: newElements });
+  };
+
   return (
     <div className="flex flex-col items-center justify-start py-8 min-h-full w-full">
       <div className="flex items-center gap-4 mb-4">
@@ -110,6 +116,7 @@ export default function InvitationPreview({ config, onChange }: InvitationPrevie
                  elements={config.freeElements || []} 
                  isDesigner={true} 
                  onUpdateElement={handleUpdateFreeElement} 
+                 onDeleteElement={handleDeleteFreeElement}
               />
               {config.sections?.map(section => {
                 switch (section.type) {

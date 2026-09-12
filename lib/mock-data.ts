@@ -55,6 +55,9 @@ export type FreeElement = {
   fontSize?: number; // px
   fontFamily?: string; // font ID (ej. "fraunces", "work-sans")
   width?: number; // px for image width
+  height?: number; // px for image height
+  imageX?: number; // px offset horizontal para encuadre
+  imageY?: number; // px offset vertical para encuadre
 };
 
 export type SectionBackgrounds = {
