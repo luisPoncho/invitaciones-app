@@ -44,6 +44,35 @@ except ImportError:
 Base.metadata.create_all(bind=engine)
 
 
+def auto_migrate_db():
+    """Ensure all new columns exist in SQLite database if created prior to schema updates."""
+    from sqlalchemy import text
+    db: Session = SessionLocal()
+    try:
+        result = db.execute(text("PRAGMA table_info(invitations)")).fetchall()
+        if result:
+            existing_cols = {row[1] for row in result}
+            new_cols = [
+                ("ceremonia_hora", "TEXT DEFAULT ''"),
+                ("ceremonia_lugar", "TEXT DEFAULT ''"),
+                ("ceremonia_direccion", "TEXT DEFAULT ''"),
+                ("ceremonia_url", "TEXT DEFAULT NULL"),
+                ("recepcion_hora", "TEXT DEFAULT ''"),
+                ("recepcion_lugar", "TEXT DEFAULT ''"),
+                ("recepcion_direccion", "TEXT DEFAULT ''"),
+                ("recepcion_url", "TEXT DEFAULT NULL"),
+            ]
+            for col_name, col_type in new_cols:
+                if col_name not in existing_cols:
+                    db.execute(text(f"ALTER TABLE invitations ADD COLUMN {col_name} {col_type}"))
+            db.commit()
+    except Exception as e:
+        db.rollback()
+        print("Migration check notice:", e)
+    finally:
+        db.close()
+
+
 def seed_db():
     db: Session = SessionLocal()
     try:
@@ -103,6 +132,7 @@ def seed_db():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    auto_migrate_db()
     seed_db()
     yield
 
@@ -167,28 +197,28 @@ def _invitation_to_response(inv: Invitation) -> InvitationResponse:
         slug=cast(str, inv.slug),
         anfitriones=cast(str, inv.anfitriones),
         fechaISO=cast(str, inv.fecha_iso),
-        fechaLegible=cast(str, inv.fecha_legible),
-        lugarNombre=cast(str, inv.lugar_nombre),
-        lugarDireccion=cast(str, inv.lugar_direccion),
-        lugarDireccionUrl=cast(Optional[str], inv.lugar_direccion_url),
-        ceremoniaHora=cast(Optional[str], inv.ceremonia_hora or ""),
-        ceremoniaLugar=cast(Optional[str], inv.ceremonia_lugar or ""),
-        ceremoniaDireccion=cast(Optional[str], inv.ceremonia_direccion or ""),
-        ceremoniaUrl=cast(Optional[str], inv.ceremonia_url),
-        recepcionHora=cast(Optional[str], inv.recepcion_hora or ""),
-        recepcionLugar=cast(Optional[str], inv.recepcion_lugar or ""),
-        recepcionDireccion=cast(Optional[str], inv.recepcion_direccion or ""),
-        recepcionUrl=cast(Optional[str], inv.recepcion_url),
-        mensaje=cast(str, inv.mensaje),
-        fotos=_safe_json_loads(inv.fotos, []),
-        theme=_safe_json_loads(inv.theme, {}),
-        adminToken=cast(str, inv.admin_token),
-        entryAnimation=cast(str, inv.entry_animation),
-        photoConfigs=_safe_json_loads(inv.photo_configs, []),
-        freeElements=_safe_json_loads(inv.free_elements, []),
-        sections=_safe_json_loads(inv.sections, []),
-        createdAt=inv.created_at.isoformat() if inv.created_at else "",
-        updatedAt=inv.updated_at.isoformat() if inv.updated_at else "",
+        fechaLegible=cast(str, getattr(inv, "fecha_legible", "") or ""),
+        lugarNombre=cast(str, getattr(inv, "lugar_nombre", "") or ""),
+        lugarDireccion=cast(str, getattr(inv, "lugar_direccion", "") or ""),
+        lugarDireccionUrl=cast(Optional[str], getattr(inv, "lugar_direccion_url", None)),
+        ceremoniaHora=cast(Optional[str], getattr(inv, "ceremonia_hora", "") or ""),
+        ceremoniaLugar=cast(Optional[str], getattr(inv, "ceremonia_lugar", "") or ""),
+        ceremoniaDireccion=cast(Optional[str], getattr(inv, "ceremonia_direccion", "") or ""),
+        ceremoniaUrl=cast(Optional[str], getattr(inv, "ceremonia_url", None)),
+        recepcionHora=cast(Optional[str], getattr(inv, "recepcion_hora", "") or ""),
+        recepcionLugar=cast(Optional[str], getattr(inv, "recepcion_lugar", "") or ""),
+        recepcionDireccion=cast(Optional[str], getattr(inv, "recepcion_direccion", "") or ""),
+        recepcionUrl=cast(Optional[str], getattr(inv, "recepcion_url", None)),
+        mensaje=cast(str, getattr(inv, "mensaje", "") or ""),
+        fotos=_safe_json_loads(getattr(inv, "fotos", "[]"), []),
+        theme=_safe_json_loads(getattr(inv, "theme", "{}"), {}),
+        adminToken=cast(str, getattr(inv, "admin_token", "") or ""),
+        entryAnimation=cast(str, getattr(inv, "entry_animation", "carta") or "carta"),
+        photoConfigs=_safe_json_loads(getattr(inv, "photo_configs", "[]"), []),
+        freeElements=_safe_json_loads(getattr(inv, "free_elements", "[]"), []),
+        sections=_safe_json_loads(getattr(inv, "sections", "[]"), []),
+        createdAt=inv.created_at.isoformat() if getattr(inv, "created_at", None) else "",
+        updatedAt=inv.updated_at.isoformat() if getattr(inv, "updated_at", None) else "",
     )
 
 

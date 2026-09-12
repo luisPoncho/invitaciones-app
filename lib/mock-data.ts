@@ -58,6 +58,7 @@ export type FreeElement = {
   height?: number; // px for image height
   imageX?: number; // px offset horizontal para encuadre
   imageY?: number; // px offset vertical para encuadre
+  zoom?: number; // zoom percentage (e.g. 100 - 300)
 };
 
 export type SectionBackgrounds = {

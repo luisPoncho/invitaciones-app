@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import type { FreeElement } from "@/lib/mock-data";
 import {
   FONT_DISPLAY_OPTIONS,
@@ -32,27 +32,21 @@ export default function DraggableElement({
   onDelete,
 }: DraggableElementProps) {
   const [isSelected, setIsSelected] = useState(false);
-  const [editMode, setEditMode] = useState<"move" | "pan">("move");
 
-  const [isDragging, setIsDragging] = useState(false);
-  const [isResizing, setIsResizing] = useState(false);
-  const [isMovingImage, setIsMovingImage] = useState(false);
-
-  const [pos, setPos] = useState({
-    x: element.x,
-    y: element.y,
-  });
-
+  // States
+  const [pos, setPos] = useState({ x: element.x, y: element.y });
   const [size, setSize] = useState({
-    width: element.width || 200,
-    height: element.height || (element.type === "image" ? 200 : 100),
+    width: element.width || 220,
+    height: element.height || (element.type === "image" ? 220 : 100),
   });
-
   const [imagePos, setImagePos] = useState({
     x: element.imageX ?? 0,
     y: element.imageY ?? 0,
   });
+  const [zoom, setZoom] = useState(element.zoom ?? 120);
 
+  // Active interaction refs
+  const activeActionRef = useRef<"drag" | "resize" | "pan" | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const dragStartRef = useRef({ x: 0, y: 0 });
@@ -63,43 +57,34 @@ export default function DraggableElement({
     height: 0,
     direction: "" as ResizeDirection,
   });
-  const imageStartRef = useRef({
+  const panStartRef = useRef({
     mouseX: 0,
     mouseY: 0,
     imageX: 0,
     imageY: 0,
   });
 
-  // Sync external prop updates when not actively dragging/resizing
+  // Sync with external updates when idle
   useEffect(() => {
-    if (!isDragging) {
+    if (!activeActionRef.current) {
       setPos({ x: element.x, y: element.y });
-    }
-  }, [element.x, element.y, isDragging]);
-
-  useEffect(() => {
-    if (!isResizing) {
       setSize({
-        width: element.width || 200,
-        height: element.height || (element.type === "image" ? 200 : 100),
+        width: element.width || 220,
+        height: element.height || (element.type === "image" ? 220 : 100),
       });
-    }
-  }, [element.width, element.height, isResizing, element.type]);
-
-  useEffect(() => {
-    if (!isMovingImage) {
       setImagePos({
         x: element.imageX ?? 0,
         y: element.imageY ?? 0,
       });
+      setZoom(element.zoom ?? 120);
     }
-  }, [element.imageX, element.imageY, isMovingImage]);
+  }, [element.x, element.y, element.width, element.height, element.imageX, element.imageY, element.zoom, element.type]);
 
   // Click outside to deselect
   useEffect(() => {
     if (!isSelected || !isDesigner) return;
 
-    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+    const handleClickOutside = (e: PointerEvent) => {
       if (
         containerRef.current &&
         !containerRef.current.contains(e.target as Node)
@@ -108,82 +93,122 @@ export default function DraggableElement({
       }
     };
 
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsSelected(false);
+    };
+
     document.addEventListener("pointerdown", handleClickOutside);
+    window.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("pointerdown", handleClickOutside);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isSelected, isDesigner]);
 
   /*
    * =========================
-   * SELECCIONAR Y ARRASTRAR POSICIÓN
+   * GLOBAL POINTER LISTENERS FOR DRAGGING / PANNING / RESIZING
    * =========================
    */
-  const handleContainerPointerDown = (e: React.PointerEvent) => {
-    if (!isDesigner || isResizing || isMovingImage) return;
+  const handleGlobalPointerMove = useCallback((e: PointerEvent) => {
+    const action = activeActionRef.current;
+    if (!action) return;
 
-    // Solo reaccionar a clic izquierdo
-    if (e.button !== undefined && e.button !== 0) return;
+    e.preventDefault();
 
-    e.stopPropagation();
+    if (action === "drag") {
+      const parent = containerRef.current?.parentElement?.parentElement;
+      if (!parent) return;
 
-    // Marcar como seleccionado si no lo estaba
-    if (!isSelected) {
-      setIsSelected(true);
+      const rect = parent.getBoundingClientRect();
+      let newX = ((e.clientX - rect.left) / rect.width) * 100;
+      let newY = ((e.clientY - rect.top) / rect.height) * 100;
+
+      newX = Math.max(0, Math.min(100, newX));
+      newY = Math.max(0, Math.min(100, newY));
+
+      setPos({ x: newX, y: newY });
+    } else if (action === "resize") {
+      const { mouseX, mouseY, width, height, direction } = resizeStartRef.current;
+      const deltaX = e.clientX - mouseX;
+      const deltaY = e.clientY - mouseY;
+
+      let newWidth = width;
+      let newHeight = height;
+
+      if (direction.includes("right")) newWidth = width + deltaX;
+      if (direction.includes("left")) newWidth = width - deltaX;
+      if (direction.includes("bottom")) newHeight = height + deltaY;
+      if (direction.includes("top")) newHeight = height - deltaY;
+
+      newWidth = Math.max(30, newWidth);
+      newHeight = Math.max(30, newHeight);
+
+      setSize({ width: newWidth, height: newHeight });
+    } else if (action === "pan") {
+      const deltaX = e.clientX - panStartRef.current.mouseX;
+      const deltaY = e.clientY - panStartRef.current.mouseY;
+
+      setImagePos({
+        x: panStartRef.current.imageX + deltaX,
+        y: panStartRef.current.imageY + deltaY,
+      });
     }
+  }, []);
 
-    if (editMode === "move") {
-      setIsDragging(true);
-      dragStartRef.current = { x: e.clientX, y: e.clientY };
-      const el = e.currentTarget as HTMLElement;
-      el.setPointerCapture(e.pointerId);
+  const handleGlobalPointerUp = useCallback(() => {
+    const action = activeActionRef.current;
+    if (!action) return;
+
+    activeActionRef.current = null;
+    window.removeEventListener("pointermove", handleGlobalPointerMove);
+    window.removeEventListener("pointerup", handleGlobalPointerUp);
+
+    if (action === "drag") {
+      onUpdate?.({ x: pos.x, y: pos.y });
+    } else if (action === "resize") {
+      onUpdate?.({ width: size.width, height: size.height });
+    } else if (action === "pan") {
+      onUpdate?.({ imageX: imagePos.x, imageY: imagePos.y });
     }
-  };
+  }, [handleGlobalPointerMove, onUpdate, pos.x, pos.y, size.width, size.height, imagePos.x, imagePos.y]);
 
-  const handleContainerPointerMove = (e: React.PointerEvent) => {
-    if (!isDragging || !isDesigner) return;
-
-    const parent = containerRef.current?.parentElement?.parentElement;
-    if (!parent) return;
-
-    const rect = parent.getBoundingClientRect();
-    let newX = ((e.clientX - rect.left) / rect.width) * 100;
-    let newY = ((e.clientY - rect.top) / rect.height) * 100;
-
-    newX = Math.max(0, Math.min(100, newX));
-    newY = Math.max(0, Math.min(100, newY));
-
-    setPos({ x: newX, y: newY });
-  };
-
-  const handleContainerPointerUp = (e: React.PointerEvent) => {
-    if (!isDragging || !isDesigner) return;
-
-    setIsDragging(false);
-    const el = e.currentTarget as HTMLElement;
-    if (el.hasPointerCapture(e.pointerId)) {
-      el.releasePointerCapture(e.pointerId);
-    }
-
-    onUpdate?.({ x: pos.x, y: pos.y });
+  const startAction = (action: "drag" | "resize" | "pan") => {
+    activeActionRef.current = action;
+    window.addEventListener("pointermove", handleGlobalPointerMove, { passive: false });
+    window.addEventListener("pointerup", handleGlobalPointerUp);
   };
 
   /*
    * =========================
-   * REDIMENSIONAR TAMAÑO LIBRE (WIDTH & HEIGHT)
+   * INICIAR ARRASTRE ELEMENTO (x, y)
    * =========================
    */
-  const handleResizeStart = (
-    e: React.PointerEvent,
-    direction: ResizeDirection
-  ) => {
+  const handleDragElementStart = (e: React.PointerEvent) => {
     if (!isDesigner) return;
     if (e.button !== undefined && e.button !== 0) return;
 
     e.preventDefault();
     e.stopPropagation();
 
-    setIsResizing(true);
+    setIsSelected(true);
+    dragStartRef.current = { x: e.clientX, y: e.clientY };
+    startAction("drag");
+  };
+
+  /*
+   * =========================
+   * INICIAR REDIMENSIÓN (8 PUNTOS)
+   * =========================
+   */
+  const handleResizeStart = (e: React.PointerEvent, direction: ResizeDirection) => {
+    if (!isDesigner) return;
+    if (e.button !== undefined && e.button !== 0) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    setIsSelected(true);
     resizeStartRef.current = {
       mouseX: e.clientX,
       mouseY: e.clientY,
@@ -191,111 +216,38 @@ export default function DraggableElement({
       height: size.height,
       direction,
     };
-
-    const target = e.currentTarget as HTMLElement;
-    target.setPointerCapture(e.pointerId);
-  };
-
-  const handleResizeMove = (e: React.PointerEvent) => {
-    if (!isResizing) return;
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    const { mouseX, mouseY, width, height, direction } = resizeStartRef.current;
-    const deltaX = e.clientX - mouseX;
-    const deltaY = e.clientY - mouseY;
-
-    let newWidth = width;
-    let newHeight = height;
-
-    if (direction.includes("right")) {
-      newWidth = width + deltaX;
-    }
-    if (direction.includes("left")) {
-      newWidth = width - deltaX;
-    }
-    if (direction.includes("bottom")) {
-      newHeight = height + deltaY;
-    }
-    if (direction.includes("top")) {
-      newHeight = height - deltaY;
-    }
-
-    newWidth = Math.max(30, newWidth);
-    newHeight = Math.max(30, newHeight);
-
-    setSize({ width: newWidth, height: newHeight });
-  };
-
-  const handleResizeEnd = (e: React.PointerEvent) => {
-    if (!isResizing) return;
-
-    setIsResizing(false);
-    const target = e.currentTarget as HTMLElement;
-    if (target.hasPointerCapture(e.pointerId)) {
-      target.releasePointerCapture(e.pointerId);
-    }
-
-    onUpdate?.({ width: size.width, height: size.height });
+    startAction("resize");
   };
 
   /*
    * =========================
-   * MOVER DISPOSICIÓN / ENCUADRE DE LA IMAGEN
+   * INICIAR ENCUADRE / DISPOSICIÓN IMAGEN (imageX, imageY)
    * =========================
    */
-  const handleImagePointerDown = (e: React.PointerEvent) => {
+  const handleImagePanStart = (e: React.PointerEvent) => {
     if (!isDesigner || element.type !== "image") return;
     if (e.button !== undefined && e.button !== 0) return;
+
+    e.preventDefault();
+    e.stopPropagation();
 
     if (!isSelected) {
       setIsSelected(true);
       return;
     }
 
-    if (editMode === "pan") {
-      e.preventDefault();
-      e.stopPropagation();
-
-      setIsMovingImage(true);
-      imageStartRef.current = {
-        mouseX: e.clientX,
-        mouseY: e.clientY,
-        imageX: imagePos.x,
-        imageY: imagePos.y,
-      };
-
-      const target = e.currentTarget as HTMLElement;
-      target.setPointerCapture(e.pointerId);
-    }
+    panStartRef.current = {
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      imageX: imagePos.x,
+      imageY: imagePos.y,
+    };
+    startAction("pan");
   };
 
-  const handleImagePointerMove = (e: React.PointerEvent) => {
-    if (!isMovingImage) return;
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    const deltaX = e.clientX - imageStartRef.current.mouseX;
-    const deltaY = e.clientY - imageStartRef.current.mouseY;
-
-    setImagePos({
-      x: imageStartRef.current.imageX + deltaX,
-      y: imageStartRef.current.imageY + deltaY,
-    });
-  };
-
-  const handleImagePointerUp = (e: React.PointerEvent) => {
-    if (!isMovingImage) return;
-
-    setIsMovingImage(false);
-    const target = e.currentTarget as HTMLElement;
-    if (target.hasPointerCapture(e.pointerId)) {
-      target.releasePointerCapture(e.pointerId);
-    }
-
-    onUpdate?.({ imageX: imagePos.x, imageY: imagePos.y });
+  const updateZoom = (newZoom: number) => {
+    setZoom(newZoom);
+    onUpdate?.({ zoom: newZoom });
   };
 
   const handleClass =
@@ -314,10 +266,13 @@ export default function DraggableElement({
   return (
     <div
       ref={containerRef}
-      onPointerDown={handleContainerPointerDown}
-      onPointerMove={handleContainerPointerMove}
-      onPointerUp={handleContainerPointerUp}
-      onPointerCancel={handleContainerPointerUp}
+      onPointerDown={(e) => {
+        if (!isDesigner) return;
+        if (e.button !== undefined && e.button !== 0) return;
+        if (!isSelected) {
+          setIsSelected(true);
+        }
+      }}
       className={`absolute select-none group ${
         isDesigner
           ? isSelected
@@ -342,40 +297,56 @@ export default function DraggableElement({
     >
       {/* Barra de herramientas flotante al seleccionar */}
       {isDesigner && isSelected && (
-        <div className="absolute -top-10 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-black/90 text-white border border-white/20 rounded-full px-2 py-1 shadow-2xl z-[110] whitespace-nowrap text-[10px] uppercase font-sans tracking-wider">
+        <div className="absolute -top-12 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-black/95 text-white border border-white/20 rounded-full px-3 py-1 shadow-2xl z-[110] whitespace-nowrap text-[10px] uppercase font-sans tracking-wider">
+          <button
+            type="button"
+            onPointerDown={handleDragElementStart}
+            className="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center gap-1 font-semibold cursor-move"
+            title="Arrastra para mover la posición en la pantalla"
+          >
+            🖐️ Mover
+          </button>
+
           {element.type === "image" && (
-            <>
+            <div className="flex items-center gap-1 border-l border-r border-white/15 px-2">
+              <span className="text-white/60 text-[9px]">Zoom:</span>
               <button
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setEditMode("move");
+                  updateZoom(Math.max(100, zoom - 15));
                 }}
-                className={`px-2 py-0.5 rounded-full transition-colors flex items-center gap-1 ${
-                  editMode === "move"
-                    ? "bg-amber-400 text-black font-semibold"
-                    : "text-white/70 hover:text-white"
-                }`}
-                title="Mover elemento por la pantalla"
+                className="w-5 h-5 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold flex items-center justify-center text-xs"
               >
-                🖐️ Mover
+                -
+              </button>
+              <span className="text-[10px] text-amber-300 font-mono w-7 text-center">
+                {zoom}%
+              </span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updateZoom(Math.min(300, zoom + 15));
+                }}
+                className="w-5 h-5 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold flex items-center justify-center text-xs"
+              >
+                +
               </button>
               <button
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setEditMode("pan");
+                  setImagePos({ x: 0, y: 0 });
+                  updateZoom(120);
+                  onUpdate?.({ imageX: 0, imageY: 0, zoom: 120 });
                 }}
-                className={`px-2 py-0.5 rounded-full transition-colors flex items-center gap-1 ${
-                  editMode === "pan"
-                    ? "bg-amber-400 text-black font-semibold"
-                    : "text-white/70 hover:text-white"
-                }`}
-                title="Ajustar encuadre / disposición de la foto"
+                className="ml-1 text-[9px] text-white/50 hover:text-white underline"
+                title="Restablecer encuadre"
               >
-                🖼️ Disposición
+                Centrar
               </button>
-            </>
+            </div>
           )}
 
           {onDelete && (
@@ -385,7 +356,7 @@ export default function DraggableElement({
                 e.stopPropagation();
                 onDelete();
               }}
-              className="px-2 py-0.5 text-red-400 hover:text-red-300 transition-colors"
+              className="px-2 py-1 text-red-400 hover:text-red-300 transition-colors font-bold"
               title="Eliminar elemento"
             >
               ✕
@@ -394,10 +365,17 @@ export default function DraggableElement({
         </div>
       )}
 
-      {/* Badge cuando el mouse pasa por encima antes de seleccionar */}
+      {/* Indicador sobre la foto cuando está seleccionada */}
+      {isDesigner && isSelected && element.type === "image" && (
+        <div className="absolute top-2 left-2 z-[90] pointer-events-none bg-black/70 text-amber-300 text-[9px] px-2 py-0.5 rounded-full backdrop-blur-sm border border-amber-400/30">
+          🖼️ Clic y arrastra sobre la foto para encuadrar
+        </div>
+      )}
+
+      {/* Badge al pasar cursor encima si NO está seleccionado */}
       {isDesigner && !isSelected && (
-        <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/75 text-white/80 text-[9px] px-2 py-0.5 rounded whitespace-nowrap pointer-events-none">
-          Clic para editar
+        <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 text-white/90 text-[9px] px-2 py-0.5 rounded whitespace-nowrap pointer-events-none">
+          Clic para seleccionar / editar
         </div>
       )}
 
@@ -413,22 +391,19 @@ export default function DraggableElement({
             src={formatImageUrl(element.url)}
             alt=""
             draggable={false}
-            onPointerDown={handleImagePointerDown}
-            onPointerMove={handleImagePointerMove}
-            onPointerUp={handleImagePointerUp}
-            onPointerCancel={handleImagePointerUp}
-            className={`absolute max-w-none ${
-              isDesigner && isSelected && editMode === "pan"
-                ? "cursor-grab active:cursor-grabbing"
+            onPointerDown={handleImagePanStart}
+            className={`absolute max-w-none transition-transform duration-75 ${
+              isDesigner && isSelected
+                ? "cursor-grab active:cursor-grabbing hover:brightness-105"
                 : isDesigner
-                ? "cursor-move"
+                ? "cursor-pointer"
                 : ""
             }`}
             style={{
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              transform: `translate(${imagePos.x}px, ${imagePos.y}px) scale(1.2)`,
+              transform: `translate(${imagePos.x}px, ${imagePos.y}px) scale(${zoom / 100})`,
               touchAction: "none",
               userSelect: "none",
             }}
@@ -440,59 +415,45 @@ export default function DraggableElement({
               <div
                 className={`${handleClass} -top-1.5 -left-1.5 cursor-nwse-resize`}
                 onPointerDown={(e) => handleResizeStart(e, "top-left")}
-                onPointerMove={handleResizeMove}
-                onPointerUp={handleResizeEnd}
               />
               <div
                 className={`${handleClass} -top-1.5 -right-1.5 cursor-nesw-resize`}
                 onPointerDown={(e) => handleResizeStart(e, "top-right")}
-                onPointerMove={handleResizeMove}
-                onPointerUp={handleResizeEnd}
               />
               <div
                 className={`${handleClass} -bottom-1.5 -right-1.5 cursor-nwse-resize`}
                 onPointerDown={(e) => handleResizeStart(e, "bottom-right")}
-                onPointerMove={handleResizeMove}
-                onPointerUp={handleResizeEnd}
               />
               <div
                 className={`${handleClass} -bottom-1.5 -left-1.5 cursor-nesw-resize`}
                 onPointerDown={(e) => handleResizeStart(e, "bottom-left")}
-                onPointerMove={handleResizeMove}
-                onPointerUp={handleResizeEnd}
               />
 
               {/* LADOS */}
               <div
                 className={`${handleClass} top-1/2 -left-1.5 -translate-y-1/2 cursor-ew-resize`}
                 onPointerDown={(e) => handleResizeStart(e, "left")}
-                onPointerMove={handleResizeMove}
-                onPointerUp={handleResizeEnd}
               />
               <div
                 className={`${handleClass} top-1/2 -right-1.5 -translate-y-1/2 cursor-ew-resize`}
                 onPointerDown={(e) => handleResizeStart(e, "right")}
-                onPointerMove={handleResizeMove}
-                onPointerUp={handleResizeEnd}
               />
               <div
                 className={`${handleClass} -top-1.5 left-1/2 -translate-x-1/2 cursor-ns-resize`}
                 onPointerDown={(e) => handleResizeStart(e, "top")}
-                onPointerMove={handleResizeMove}
-                onPointerUp={handleResizeEnd}
               />
               <div
                 className={`${handleClass} -bottom-1.5 left-1/2 -translate-x-1/2 cursor-ns-resize`}
                 onPointerDown={(e) => handleResizeStart(e, "bottom")}
-                onPointerMove={handleResizeMove}
-                onPointerUp={handleResizeEnd}
               />
             </>
           )}
         </div>
       ) : (
         <div className="relative">
-          {element.content}
+          <div onPointerDown={handleDragElementStart} className={isDesigner ? "cursor-move" : ""}>
+            {element.content}
+          </div>
 
           {isDesigner && isSelected && (
             <>
@@ -500,26 +461,18 @@ export default function DraggableElement({
               <div
                 className={`${handleClass} -top-1.5 -left-1.5 cursor-nwse-resize`}
                 onPointerDown={(e) => handleResizeStart(e, "top-left")}
-                onPointerMove={handleResizeMove}
-                onPointerUp={handleResizeEnd}
               />
               <div
                 className={`${handleClass} -top-1.5 -right-1.5 cursor-nesw-resize`}
                 onPointerDown={(e) => handleResizeStart(e, "top-right")}
-                onPointerMove={handleResizeMove}
-                onPointerUp={handleResizeEnd}
               />
               <div
                 className={`${handleClass} -bottom-1.5 -right-1.5 cursor-nwse-resize`}
                 onPointerDown={(e) => handleResizeStart(e, "bottom-right")}
-                onPointerMove={handleResizeMove}
-                onPointerUp={handleResizeEnd}
               />
               <div
                 className={`${handleClass} -bottom-1.5 -left-1.5 cursor-nesw-resize`}
                 onPointerDown={(e) => handleResizeStart(e, "bottom-left")}
-                onPointerMove={handleResizeMove}
-                onPointerUp={handleResizeEnd}
               />
             </>
           )}

@@ -69,6 +69,7 @@ class FreeElement(BaseModel):
     height: Optional[float] = None
     imageX: Optional[float] = None
     imageY: Optional[float] = None
+    zoom: Optional[float] = None
 
 
 # ── Invitation ───────────────────────────────────────────────────────────────
