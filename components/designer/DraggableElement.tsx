@@ -25,6 +25,21 @@ type ResizeDirection =
   | "bottom-left"
   | "left";
 
+
+
+/**
+ * Gets the [data-free-layer] element (FreeElementsLayer container),
+ * which is what x% and y% are relative to.
+ */
+function getFreeLayer(el: HTMLElement | null): HTMLElement | null {
+  let current = el?.parentElement;
+  while (current) {
+    if (current.hasAttribute("data-free-layer")) return current;
+    current = current.parentElement;
+  }
+  return null;
+}
+
 export default function DraggableElement({
   element,
   isDesigner,
@@ -117,10 +132,15 @@ export default function DraggableElement({
     e.preventDefault();
 
     if (action === "drag") {
-      const layer = containerRef.current?.parentElement;
+      const layer = getFreeLayer(containerRef.current);
       if (!layer) return;
 
+      // getBoundingClientRect() already accounts for scroll offset:
+      // if the layer is scrolled up 500px, rect.top becomes negative,
+      // so (e.clientY - rect.top) correctly gives the offset from the
+      // top of the full content.
       const rect = layer.getBoundingClientRect();
+
       let newX = ((e.clientX - rect.left) / rect.width) * 100;
       let newY = ((e.clientY - rect.top) / rect.height) * 100;
 

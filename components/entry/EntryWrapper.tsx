@@ -36,7 +36,7 @@ export default function EntryWrapper({
   };
 
   return (
-    <div className="relative w-full h-full flex flex-col">
+    <div className="relative w-full min-h-full">
       {showAnimation && (
         <div className="absolute inset-0 z-50 overflow-hidden">
            {animation === "carta" && <EntryEnvelope theme={theme} onOpen={handleOpen} />}
@@ -44,7 +44,7 @@ export default function EntryWrapper({
            {animation === "vinilo" && <EntryVinyl theme={theme} onOpen={handleOpen} />}
         </div>
       )}
-      <div className={`relative w-full flex-1 transition-opacity duration-1000 ${opened ? 'opacity-100' : 'opacity-0 max-h-screen overflow-hidden'}`}>
+      <div className={`relative w-full transition-opacity duration-1000 ${opened ? 'opacity-100' : 'opacity-0 max-h-screen overflow-hidden'}`}>
         {children}
       </div>
     </div>

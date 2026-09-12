@@ -20,9 +20,11 @@ export default function FreeElementsLayer({
 
   return (
     <div
-      className={`absolute inset-0 ${
+      data-free-layer
+      className={`absolute top-0 left-0 w-full h-full ${
         isDesigner ? "" : "pointer-events-none"
-      } z-40 overflow-hidden`}
+      } z-40 overflow-visible`}
+      style={{ position: "absolute", minHeight: "100%" }}
     >
       {elements.map((el) => (
         <DraggableElement
