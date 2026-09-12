@@ -117,10 +117,10 @@ export default function DraggableElement({
     e.preventDefault();
 
     if (action === "drag") {
-      const parent = containerRef.current?.parentElement?.parentElement;
-      if (!parent) return;
+      const layer = containerRef.current?.parentElement;
+      if (!layer) return;
 
-      const rect = parent.getBoundingClientRect();
+      const rect = layer.getBoundingClientRect();
       let newX = ((e.clientX - rect.left) / rect.width) * 100;
       let newY = ((e.clientY - rect.top) / rect.height) * 100;
 

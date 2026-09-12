@@ -54,7 +54,7 @@ export default function InvitacionPage({
 
   return (
     <main className="min-h-screen relative overflow-hidden bg-[#111] flex justify-center">
-      <div className="relative w-full max-w-[1200px] sm:max-w-[480px] min-h-screen bg-white overflow-hidden shadow-2xl">
+      <div className="relative w-full max-w-[480px] min-h-screen bg-white overflow-hidden shadow-2xl">
         <EntryWrapper animation={entryAnimation} theme={theme}>
           <FreeElementsLayer elements={freeElements} isDesigner={false} />
           {sections.map(section => {

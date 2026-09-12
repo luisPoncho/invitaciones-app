@@ -68,43 +68,20 @@ export default function InvitationPreview({ config, onChange }: InvitationPrevie
 
       {/* Frame */}
       <div
-        className="relative shadow-2xl overflow-hidden flex-shrink-0 transition-all duration-500"
+        className="relative shadow-2xl overflow-hidden flex-shrink-0 transition-all duration-500 bg-white"
         style={{
-          width: viewMode === "mobile" ? 375 : '95%',
-          maxWidth: viewMode === "mobile" ? 375 : 1200,
-          borderRadius: viewMode === "mobile" ? 36 : 12,
-          boxShadow: `0 0 0 ${viewMode === "mobile" ? '6px' : '2px'} #1a1a1a, 0 0 0 ${viewMode === "mobile" ? '8px' : '4px'} #333, 0 40px 80px rgba(0,0,0,0.6)`,
+          width: viewMode === "mobile" ? 390 : "100%",
+          maxWidth: viewMode === "mobile" ? 390 : 480,
+          borderRadius: viewMode === "mobile" ? 32 : 16,
+          boxShadow: `0 0 0 ${viewMode === "mobile" ? "6px" : "2px"} #1a1a1a, 0 0 0 ${viewMode === "mobile" ? "8px" : "4px"} #333, 0 40px 80px rgba(0,0,0,0.6)`,
         }}
       >
-        {/* Status bar mockup (only for mobile) */}
-        {viewMode === "mobile" && (
-           <div
-             style={{ backgroundColor: theme.primary }}
-             className="flex justify-between items-center px-6 py-2 text-[10px] relative z-10"
-           >
-             <span style={{ color: theme.paper }} className="opacity-70 font-medium">
-               9:41
-             </span>
-             <div
-               className="absolute left-1/2 -translate-x-1/2 top-2 w-24 h-5 rounded-full"
-               style={{ backgroundColor: "#0a0a0a" }}
-             />
-             <div className="flex gap-1 items-center" style={{ color: theme.paper }}>
-               <svg width="12" height="8" fill="currentColor" viewBox="0 0 12 8">
-                 <rect x="0" y="2" width="2" height="6" rx="0.5" opacity="0.4"/>
-                 <rect x="3" y="1" width="2" height="7" rx="0.5" opacity="0.6"/>
-                 <rect x="6" y="0" width="2" height="8" rx="0.5"/>
-                 <rect x="9" y="0" width="3" height="8" rx="1"/>
-               </svg>
-             </div>
-           </div>
-        )}
-
         {/* Scrollable invitation content */}
         <div
           className="overflow-y-auto relative"
           style={{
-            height: viewMode === "mobile" ? 700 : '75vh',
+            height: viewMode === "mobile" ? 720 : "75vh",
+            maxHeight: 850,
             scrollbarWidth: "none",
           }}
         >
