@@ -54,10 +54,18 @@ def seed_db():
                 slug="sofia-y-mateo",
                 anfitriones="Sofía & Mateo",
                 fecha_iso="2026-11-14T18:00:00",
-                fecha_legible="14 de noviembre, 2026 · 6:00 pm",
+                fecha_legible="14 de noviembre, 2026",
                 lugar_nombre="Hacienda Los Encinos",
                 lugar_direccion="Camino a San Isidro 450, Tepatitlán de Morelos, Jal.",
                 lugar_direccion_url=None,
+                ceremonia_hora="4:00 PM",
+                ceremonia_lugar="Parroquia de San José",
+                ceremonia_direccion="Av. Hidalgo #123, Centro Histórico",
+                ceremonia_url="https://maps.google.com/?q=Parroquia+San+Jose",
+                recepcion_hora="7:00 PM",
+                recepcion_lugar="Hacienda Los Encinos",
+                recepcion_direccion="Camino a San Isidro 450, Tepatitlán de Morelos, Jal.",
+                recepcion_url="https://maps.google.com/?q=Hacienda+Los+Encinos",
                 mensaje="Con el corazón lleno de alegría, queremos que nos acompañes a celebrar el inicio de esta nueva etapa.",
                 fotos=json.dumps([
                     "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=800",
@@ -163,6 +171,14 @@ def _invitation_to_response(inv: Invitation) -> InvitationResponse:
         lugarNombre=cast(str, inv.lugar_nombre),
         lugarDireccion=cast(str, inv.lugar_direccion),
         lugarDireccionUrl=cast(Optional[str], inv.lugar_direccion_url),
+        ceremoniaHora=cast(Optional[str], inv.ceremonia_hora or ""),
+        ceremoniaLugar=cast(Optional[str], inv.ceremonia_lugar or ""),
+        ceremoniaDireccion=cast(Optional[str], inv.ceremonia_direccion or ""),
+        ceremoniaUrl=cast(Optional[str], inv.ceremonia_url),
+        recepcionHora=cast(Optional[str], inv.recepcion_hora or ""),
+        recepcionLugar=cast(Optional[str], inv.recepcion_lugar or ""),
+        recepcionDireccion=cast(Optional[str], inv.recepcion_direccion or ""),
+        recepcionUrl=cast(Optional[str], inv.recepcion_url),
         mensaje=cast(str, inv.mensaje),
         fotos=_safe_json_loads(inv.fotos, []),
         theme=_safe_json_loads(inv.theme, {}),
@@ -207,6 +223,14 @@ def create_invitation(body: InvitationCreate, db: Session = Depends(get_db)):
         lugar_nombre=body.lugarNombre,
         lugar_direccion=body.lugarDireccion,
         lugar_direccion_url=body.lugarDireccionUrl,
+        ceremonia_hora=body.ceremoniaHora,
+        ceremonia_lugar=body.ceremoniaLugar,
+        ceremonia_direccion=body.ceremoniaDireccion,
+        ceremonia_url=body.ceremoniaUrl,
+        recepcion_hora=body.recepcionHora,
+        recepcion_lugar=body.recepcionLugar,
+        recepcion_direccion=body.recepcionDireccion,
+        recepcion_url=body.recepcionUrl,
         mensaje=body.mensaje,
         fotos=json.dumps(body.fotos),
         theme=json.dumps(body.theme.model_dump()),
@@ -264,6 +288,22 @@ def update_invitation(slug: str, body: InvitationUpdate, db: Session = Depends(g
         inv.lugar_direccion = body.lugarDireccion
     if body.lugarDireccionUrl is not None:
         inv.lugar_direccion_url = body.lugarDireccionUrl
+    if body.ceremoniaHora is not None:
+        inv.ceremonia_hora = body.ceremoniaHora
+    if body.ceremoniaLugar is not None:
+        inv.ceremonia_lugar = body.ceremoniaLugar
+    if body.ceremoniaDireccion is not None:
+        inv.ceremonia_direccion = body.ceremoniaDireccion
+    if body.ceremoniaUrl is not None:
+        inv.ceremonia_url = body.ceremoniaUrl
+    if body.recepcionHora is not None:
+        inv.recepcion_hora = body.recepcionHora
+    if body.recepcionLugar is not None:
+        inv.recepcion_lugar = body.recepcionLugar
+    if body.recepcionDireccion is not None:
+        inv.recepcion_direccion = body.recepcionDireccion
+    if body.recepcionUrl is not None:
+        inv.recepcion_url = body.recepcionUrl
     if body.mensaje is not None:
         inv.mensaje = body.mensaje
     if body.entryAnimation is not None:

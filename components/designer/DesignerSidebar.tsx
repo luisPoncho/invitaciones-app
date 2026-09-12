@@ -149,23 +149,23 @@ export default function DesignerSidebar({
               <SectionDesignList sections={config.sections || []} onChange={(s) => update({ sections: s })} />
             </div>
 
-            {/* Sección: Datos del evento */}
+            {/* Sección: Datos del evento e Itinerario */}
             <div className="px-5 py-4 border-b border-white/10">
               <p className="text-[11px] font-semibold text-white/40 uppercase tracking-widest mb-3">
-                Datos del evento
+                Datos del evento e Itinerario
               </p>
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-4">
                 <Field
                   label="Nombre de los anfitriones"
                   value={config.anfitriones}
                   onChange={(v) => update({ anfitriones: v })}
-                  placeholder=""
+                  placeholder="Sofía & Mateo"
                 />
                 <Field
                   label="Fecha legible"
                   value={config.fechaLegible}
                   onChange={(v) => update({ fechaLegible: v })}
-                  placeholder=""
+                  placeholder="14 de noviembre, 2026"
                 />
                 <Field
                   label="Fecha ISO (para cuenta regresiva)"
@@ -174,29 +174,71 @@ export default function DesignerSidebar({
                   onChange={(v) => update({ fechaISO: v })}
                   type="date"
                 />
-                <Field
-                  label="Nombre del lugar"
-                  value={config.lugarNombre}
-                  onChange={(v) => update({ lugarNombre: v })}
-                  placeholder=""
-                />
-                <Field
-                  label="Dirección"
-                  value={config.lugarDireccion}
-                  onChange={(v) => update({ lugarDireccion: v })}
-                  placeholder=""
-                />
-                <Field
-                  label="URL de ubicación"
-                  string={config.lugarDireccionUrl}
-                  onChange={(v) => {
-                    const next = { ...config } as any;
-                    next.lugarDireccionUrl = v;
-                    onChange(next);
-                  }}
-                  type="url"
-                  placeholder="https://maps.google.com/..."
-                />
+
+                {/* Subsección: Boda Religiosa / Misa */}
+                <div className="bg-white/5 border border-white/10 rounded-xl p-3 flex flex-col gap-2.5">
+                  <p className="text-[10px] font-bold text-amber-300/80 uppercase tracking-wider">
+                    ⛪ Boda Religiosa (Misa)
+                  </p>
+                  <Field
+                    label="Hora de la Misa"
+                    value={config.ceremoniaHora}
+                    onChange={(v) => update({ ceremoniaHora: v })}
+                    placeholder="4:00 PM"
+                  />
+                  <Field
+                    label="Lugar (Templo / Parroquia)"
+                    value={config.ceremoniaLugar}
+                    onChange={(v) => update({ ceremoniaLugar: v })}
+                    placeholder="Parroquia de San José"
+                  />
+                  <Field
+                    label="Dirección de la Misa"
+                    value={config.ceremoniaDireccion}
+                    onChange={(v) => update({ ceremoniaDireccion: v })}
+                    placeholder="Av. Hidalgo #123, Centro"
+                  />
+                  <Field
+                    label="Link Ubicación Google Maps (Misa)"
+                    string={config.ceremoniaUrl}
+                    onChange={(v) => update({ ceremoniaUrl: v })}
+                    type="url"
+                    placeholder="https://maps.google.com/..."
+                  />
+                </div>
+
+                {/* Subsección: Recepción / Fiesta */}
+                <div className="bg-white/5 border border-white/10 rounded-xl p-3 flex flex-col gap-2.5">
+                  <p className="text-[10px] font-bold text-amber-300/80 uppercase tracking-wider">
+                    🥂 Recepción & Fiesta
+                  </p>
+                  <Field
+                    label="Hora de la Recepción"
+                    value={config.recepcionHora}
+                    onChange={(v) => update({ recepcionHora: v })}
+                    placeholder="7:00 PM"
+                  />
+                  <Field
+                    label="Lugar (Salón / Hacienda)"
+                    value={config.recepcionLugar}
+                    onChange={(v) => update({ recepcionLugar: v })}
+                    placeholder="Hacienda Los Encinos"
+                  />
+                  <Field
+                    label="Dirección de la Recepción"
+                    value={config.recepcionDireccion}
+                    onChange={(v) => update({ recepcionDireccion: v })}
+                    placeholder="Camino a San Isidro 450"
+                  />
+                  <Field
+                    label="Link Ubicación Google Maps (Recepción)"
+                    string={config.recepcionUrl}
+                    onChange={(v) => update({ recepcionUrl: v })}
+                    type="url"
+                    placeholder="https://maps.google.com/..."
+                  />
+                </div>
+
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-medium text-white/50 uppercase tracking-wider">
                     Mensaje de bienvenida

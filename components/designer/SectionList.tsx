@@ -11,7 +11,7 @@ interface SectionListProps {
 const SECTION_LABELS: Record<string, string> = {
   "portada": "Portada",
   "cuenta-regresiva": "Cuenta Regresiva",
-  "fecha-lugar": "Fecha y Lugar",
+  "fecha-lugar": "Itinerario y Ubicación",
   "galeria": "Galería",
   "rsvp": "RSVP",
   "foto-fondo": "Foto de Fondo",

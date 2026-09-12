@@ -7,6 +7,15 @@ export type EventData = {
   lugarNombre: string;
   lugarDireccion: string;
   lugarDireccionUrl?: string;
+  // Itinerario: Boda Religiosa & Recepción
+  ceremoniaHora?: string;
+  ceremoniaLugar?: string;
+  ceremoniaDireccion?: string;
+  ceremoniaUrl?: string;
+  recepcionHora?: string;
+  recepcionLugar?: string;
+  recepcionDireccion?: string;
+  recepcionUrl?: string;
   mensaje: string;
   fotos: string[];
 };
@@ -150,9 +159,17 @@ export const mockEvent: EventData = {
   slug: "sofia-y-mateo",
   anfitriones: "Sofía & Mateo",
   fechaISO: "2026-11-14T18:00:00",
-  fechaLegible: "14 de noviembre, 2026 · 6:00 pm",
+  fechaLegible: "14 de noviembre, 2026",
   lugarNombre: "Hacienda Los Encinos",
   lugarDireccion: "Camino a San Isidro 450, Tepatitlán de Morelos, Jal.",
+  ceremoniaHora: "4:00 PM",
+  ceremoniaLugar: "Parroquia de San José",
+  ceremoniaDireccion: "Av. Hidalgo #123, Centro Histórico",
+  ceremoniaUrl: "https://maps.google.com/?q=Parroquia+San+Jose",
+  recepcionHora: "7:00 PM",
+  recepcionLugar: "Hacienda Los Encinos",
+  recepcionDireccion: "Camino a San Isidro 450, Tepatitlán de Morelos, Jal.",
+  recepcionUrl: "https://maps.google.com/?q=Hacienda+Los+Encinos",
   mensaje:
     "Con el corazón lleno de alegría, queremos que nos acompañes a celebrar el inicio de esta nueva etapa.",
   fotos: [
