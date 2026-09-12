@@ -6,6 +6,7 @@ import {
   FONT_DISPLAY_OPTIONS,
   FONT_BODY_OPTIONS,
 } from "@/lib/mock-data";
+import { formatImageUrl } from "@/lib/image-utils";
 
 interface DraggableElementProps {
   element: FreeElement;
@@ -394,7 +395,7 @@ export default function DraggableElement({
           }}
         >
           <img
-            src={element.url}
+            src={formatImageUrl(element.url)}
             alt=""
             draggable={false}
             onPointerDown={handleImagePointerDown}

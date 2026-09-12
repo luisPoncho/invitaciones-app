@@ -1,5 +1,6 @@
 import type { InvitationTheme, PhotoScrollBehavior } from "@/lib/mock-data";
 import { defaultTheme, getFontDisplayVar, getFontBodyVar } from "@/lib/mock-data";
+import { formatImageUrl } from "@/lib/image-utils";
 
 interface TextoLibrePanelProps {
   theme?: InvitationTheme;
@@ -16,6 +17,7 @@ export default function TextoLibrePanel({ theme, title, body, bgUrl, bgScrollBeh
   const t = { ...defaultTheme, ...theme };
   const fontDisplay = getFontDisplayVar(t.fontDisplay);
   const fontBody = getFontBodyVar(t.fontBody);
+  const formattedBgUrl = formatImageUrl(bgUrl);
 
   const bgAttachment =
     bgScrollBehavior === "fija" ? "fixed" :
@@ -29,8 +31,8 @@ export default function TextoLibrePanel({ theme, title, body, bgUrl, bgScrollBeh
       style={{
         backgroundColor: t.paper,
         color: t.primary,
-        ...(bgUrl ? {
-          backgroundImage: `url(${bgUrl})`,
+        ...(formattedBgUrl ? {
+          backgroundImage: `url(${formattedBgUrl})`,
           backgroundSize: bgSize,
           backgroundPosition: bgPosition,
           backgroundAttachment: bgAttachment,
@@ -38,8 +40,8 @@ export default function TextoLibrePanel({ theme, title, body, bgUrl, bgScrollBeh
       }}
       className="relative text-center py-20 px-6"
     >
-      {bgUrl && <div className="absolute inset-0 bg-black/40 z-0" />}
-      <div className={`relative z-10 max-w-lg mx-auto space-y-6 ${bgUrl ? 'text-white' : ''}`}>
+      {formattedBgUrl && <div className="absolute inset-0 bg-black/40 z-0" />}
+      <div className={`relative z-10 max-w-lg mx-auto space-y-6 ${formattedBgUrl ? 'text-white' : ''}`}>
         {title && (
           <h2 style={{ fontFamily: fontDisplay }} className="italic text-3xl">
             {title}
