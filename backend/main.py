@@ -45,32 +45,42 @@ Base.metadata.create_all(bind=engine)
 
 
 def auto_migrate_db():
-    """Ensure all new columns exist in SQLite database if created prior to schema updates."""
-    from sqlalchemy import text
-    db: Session = SessionLocal()
+    """Ensure all new columns exist in the invitations table."""
+
+    from sqlalchemy import inspect, text
+
     try:
-        result = db.execute(text("PRAGMA table_info(invitations)")).fetchall()
-        if result:
-            existing_cols = {row[1] for row in result}
-            new_cols = [
-                ("ceremonia_hora", "TEXT DEFAULT ''"),
-                ("ceremonia_lugar", "TEXT DEFAULT ''"),
-                ("ceremonia_direccion", "TEXT DEFAULT ''"),
-                ("ceremonia_url", "TEXT DEFAULT NULL"),
-                ("recepcion_hora", "TEXT DEFAULT ''"),
-                ("recepcion_lugar", "TEXT DEFAULT ''"),
-                ("recepcion_direccion", "TEXT DEFAULT ''"),
-                ("recepcion_url", "TEXT DEFAULT NULL"),
-            ]
+        inspector = inspect(engine)
+
+        # Get existing columns from SQLite or PostgreSQL
+        columns = inspector.get_columns("invitations")
+        existing_cols = {column["name"] for column in columns}
+
+        new_cols = [
+            ("ceremonia_hora", "TEXT DEFAULT ''"),
+            ("ceremonia_lugar", "TEXT DEFAULT ''"),
+            ("ceremonia_direccion", "TEXT DEFAULT ''"),
+            ("ceremonia_url", "TEXT DEFAULT NULL"),
+            ("recepcion_hora", "TEXT DEFAULT ''"),
+            ("recepcion_lugar", "TEXT DEFAULT ''"),
+            ("recepcion_direccion", "TEXT DEFAULT ''"),
+            ("recepcion_url", "TEXT DEFAULT NULL"),
+        ]
+
+        with engine.begin() as connection:
             for col_name, col_type in new_cols:
                 if col_name not in existing_cols:
-                    db.execute(text(f"ALTER TABLE invitations ADD COLUMN {col_name} {col_type}"))
-            db.commit()
+                    connection.execute(
+                        text(
+                            f"ALTER TABLE invitations "
+                            f"ADD COLUMN {col_name} {col_type}"
+                        )
+                    )
+
+        print("Database migration check completed.")
+
     except Exception as e:
-        db.rollback()
         print("Migration check notice:", e)
-    finally:
-        db.close()
 
 
 def seed_db():
