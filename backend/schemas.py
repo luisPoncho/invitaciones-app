@@ -182,9 +182,11 @@ class RsvpCreate(BaseModel):
     """Body for POST /api/invitations/{slug}/rsvp"""
     nombre: str
     asistencia: str  # "si" | "no"
+    pases: Optional[int] = 1
 
 
 class RsvpResponse(BaseModel):
     nombre: str
     asistencia: str
+    pases: int = 1
     timestamp: str

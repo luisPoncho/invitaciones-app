@@ -66,6 +66,7 @@ class Rsvp(Base):
     id: Mapped[str] = mapped_column(primary_key=True)
     nombre: Mapped[str] = mapped_column(nullable=False)
     asistencia: Mapped[str] = mapped_column(nullable=False)
+    pases: Mapped[int] = mapped_column(nullable=False, default=1)
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=_utcnow)
 
     invitation_id: Mapped[str] = mapped_column(

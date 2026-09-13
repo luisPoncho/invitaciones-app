@@ -79,6 +79,15 @@ def auto_migrate_db():
                         )
                     )
 
+        # Check rsvps table columns
+        rsvp_columns = inspector.get_columns("rsvps")
+        existing_rsvp_cols = {column["name"] for column in rsvp_columns}
+        if "pases" not in existing_rsvp_cols:
+            with engine.begin() as connection:
+                connection.execute(
+                    text("ALTER TABLE rsvps ADD COLUMN pases INTEGER DEFAULT 1")
+                )
+
         print("Database migration check completed.")
 
     except Exception as e:
@@ -421,6 +430,7 @@ def list_rsvps(
         RsvpResponse(
             nombre=r.nombre,
             asistencia=r.asistencia,
+            pases=getattr(r, "pases", 1) or 1,
             timestamp=r.created_at.isoformat() if r.created_at else "",
         )
         for r in inv.rsvps
@@ -438,10 +448,12 @@ def create_rsvp(slug: str, body: RsvpCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=422, detail="asistencia debe ser 'si' o 'no'.")
 
     now = datetime.now(timezone.utc)
+    pases_count = max(1, body.pases or 1) if body.asistencia == "si" else 0
     rsvp = Rsvp(
         id=_generate_id(),
         nombre=body.nombre.strip(),
         asistencia=body.asistencia,
+        pases=pases_count,
         invitation_id=inv.id,
         created_at=now,
     )
@@ -449,10 +461,9 @@ def create_rsvp(slug: str, body: RsvpCreate, db: Session = Depends(get_db)):
     db.commit()
 
     return RsvpResponse(
-        # pyrefly: ignore [bad-argument-type]
-        nombre=rsvp.nombre,
-        # pyrefly: ignore [bad-argument-type]
-        asistencia=rsvp.asistencia,
+        nombre=cast(str, rsvp.nombre),
+        asistencia=cast(str, rsvp.asistencia),
+        pases=cast(int, getattr(rsvp, "pases", 1) or 1),
         timestamp=rsvp.created_at.isoformat(),
     )
 

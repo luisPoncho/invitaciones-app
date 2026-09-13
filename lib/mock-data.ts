@@ -166,6 +166,7 @@ export type FullInvitationConfig = EventData & {
 export type RSVPEntry = {
   nombre: string;
   asistencia: "si" | "no";
+  pases?: number;
   timestamp: string;
 };
 

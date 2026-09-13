@@ -106,6 +106,7 @@ export async function saveRSVP(slug: string, entry: RSVPEntry): Promise<void> {
     body: JSON.stringify({
       nombre: entry.nombre,
       asistencia: entry.asistencia,
+      pases: entry.pases ?? 1,
     }),
   });
 }

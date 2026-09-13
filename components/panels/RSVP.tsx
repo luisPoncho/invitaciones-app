@@ -43,6 +43,7 @@ export default function RSVP({
 
   const [nombre, setNombre] = useState("");
   const [asistencia, setAsistencia] = useState<"si" | "no" | "">("");
+  const [pases, setPases] = useState<number>(1);
   const [enviado, setEnviado] = useState(false);
   const [error, setError] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -60,6 +61,7 @@ export default function RSVP({
       await saveRSVP(slug, {
         nombre: nombre.trim(),
         asistencia,
+        pases: asistencia === "si" ? Math.max(1, pases) : 0,
         timestamp: new Date().toISOString(),
       });
       setEnviado(true);
@@ -93,7 +95,9 @@ export default function RSVP({
             </p>
             <LeafDivider color={t.accent} />
             <p style={{ color: `${t.primary}cc`, fontFamily: fontBody }} className="text-sm mt-3">
-              Tu confirmación de asistencia ha sido registrada con éxito.
+              {asistencia === "si"
+                ? `Tu confirmación para ${pases} ${pases === 1 ? 'persona (1 pase)' : `personas (${pases} pases)`} ha sido registrada con éxito.`
+                : "Lamentamos que no puedas acompañarnos, gracias por avisarnos."}
             </p>
           </div>
         </section>
@@ -166,6 +170,59 @@ export default function RSVP({
               </div>
             </div>
 
+            {/* Selector de Pases (cuando confirma que sí asiste) */}
+            {asistencia === "si" && (
+              <div className="flex flex-col gap-2 text-left bg-white/80 p-4 rounded-2xl border border-amber-200/60 transition-all animate-fadeIn">
+                <div className="flex items-center justify-between">
+                  <label style={{ fontFamily: fontBody, color: t.primary }} className="text-xs uppercase tracking-wider font-semibold">
+                    Pases / Personas
+                  </label>
+                  <span style={{ color: t.accent, fontFamily: fontBody }} className="text-xs font-bold">
+                    {pases} {pases === 1 ? 'pase' : 'pases'}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setPases(prev => Math.max(1, prev - 1))}
+                    disabled={pases <= 1}
+                    style={{ borderColor: `${t.accent}40`, color: t.accent }}
+                    className="w-9 h-9 rounded-xl border bg-white flex items-center justify-center text-base font-bold shadow-xs hover:bg-amber-50 transition-colors disabled:opacity-40"
+                  >
+                    -
+                  </button>
+
+                  <div className="flex-1 flex gap-1.5 justify-center overflow-x-auto py-0.5">
+                    {[1, 2, 3, 4, 5].map(num => (
+                      <button
+                        key={num}
+                        type="button"
+                        onClick={() => setPases(num)}
+                        style={
+                          pases === num
+                            ? { backgroundColor: t.accent, color: "#FFFFFF", borderColor: t.accent }
+                            : { borderColor: `${t.accent}30`, color: t.primary, backgroundColor: "white" }
+                        }
+                        className="w-8 h-8 rounded-lg border text-xs font-semibold flex items-center justify-center transition-all shadow-xs"
+                      >
+                        {num}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setPases(prev => Math.min(20, prev + 1))}
+                    style={{ borderColor: `${t.accent}40`, color: t.accent }}
+                    className="w-9 h-9 rounded-xl border bg-white flex items-center justify-center text-base font-bold shadow-xs hover:bg-amber-50 transition-colors"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            )}
+
             {error && (
               <p className="text-red-600 text-xs font-medium" role="alert">
                 {error}
@@ -204,7 +261,9 @@ export default function RSVP({
         <div className="relative z-10 py-20 px-6">
           <p style={{ fontFamily: fontDisplay }} className="italic text-2xl">¡Gracias, {nombre}!</p>
           <p style={{ color: `${t.paper}b3`, fontFamily: fontBody }} className="text-sm mt-2">
-            Tu respuesta fue registrada.
+            {asistencia === "si"
+              ? `Tu confirmación para ${pases} ${pases === 1 ? 'persona (1 pase)' : `personas (${pases} pases)`} ha sido registrada.`
+              : "Tu respuesta fue registrada."}
           </p>
         </div>
       </section>
@@ -215,7 +274,7 @@ export default function RSVP({
     <section style={sectionStyle} className="relative">
       {bgUrl && <div className="absolute inset-0 bg-black/50 z-0" />}
       <div className="relative z-10 py-20 px-6">
-        <h2 style={{ fontFamily: fontDisplay }} className="italic text-3xl text-center mb-10">
+        <h2 style={{ fontFamily: fontDisplay }} className="italic text-3xl text-center mb-8">
           Confirma tu asistencia
         </h2>
         <form onSubmit={handleSubmit} className="max-w-xs mx-auto flex flex-col gap-4">
@@ -250,6 +309,55 @@ export default function RSVP({
               </button>
             ))}
           </div>
+
+          {/* Selector de Pases Clásico */}
+          {asistencia === "si" && (
+            <div className="flex flex-col gap-2 text-left bg-white/5 p-3 rounded-lg border border-white/10 transition-all animate-fadeIn">
+              <div className="flex items-center justify-between text-xs text-white/70">
+                <span className="uppercase tracking-wider">Pases a confirmar:</span>
+                <span style={{ color: t.accentLight }} className="font-bold">
+                  {pases} {pases === 1 ? 'pase' : 'pases'}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPases(prev => Math.max(1, prev - 1))}
+                  disabled={pases <= 1}
+                  className="w-8 h-8 rounded border border-white/20 bg-white/5 flex items-center justify-center text-sm font-bold text-white hover:bg-white/10 disabled:opacity-30"
+                >
+                  -
+                </button>
+
+                <div className="flex-1 flex gap-1 justify-center overflow-x-auto py-0.5">
+                  {[1, 2, 3, 4, 5].map(num => (
+                    <button
+                      key={num}
+                      type="button"
+                      onClick={() => setPases(num)}
+                      style={
+                        pases === num
+                          ? { backgroundColor: t.accentLight, color: t.secondary, borderColor: t.accentLight }
+                          : { borderColor: "rgba(255,255,255,0.15)", color: t.paper }
+                      }
+                      className="w-7 h-7 rounded border text-xs font-medium flex items-center justify-center transition-colors"
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setPases(prev => Math.min(20, prev + 1))}
+                  className="w-8 h-8 rounded border border-white/20 bg-white/5 flex items-center justify-center text-sm font-bold text-white hover:bg-white/10"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          )}
 
           {error && (
             <p className="text-red-300 text-xs" role="alert">

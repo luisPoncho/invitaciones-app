@@ -8,18 +8,27 @@ import { loadInvitation, getRSVPs } from "@/lib/storage";
 function StatCard({
   label,
   value,
+  sublabel,
   color,
 }: {
   label: string;
   value: number | string;
+  sublabel?: string;
   color: string;
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-5">
-      <p className="text-xs text-white/40 uppercase tracking-widest mb-1">{label}</p>
-      <p className="text-3xl font-bold" style={{ color }}>
-        {value}
-      </p>
+    <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-5 flex flex-col justify-between">
+      <div>
+        <p className="text-xs text-white/40 uppercase tracking-widest mb-1">{label}</p>
+        <p className="text-3xl font-bold" style={{ color }}>
+          {value}
+        </p>
+      </div>
+      {sublabel && (
+        <p className="text-[11px] text-white/50 mt-2 font-medium">
+          {sublabel}
+        </p>
+      )}
     </div>
   );
 }
@@ -90,6 +99,8 @@ export default function AdminPageClient({ slug }: { slug: string }) {
 
   const confirmados = rsvps.filter((r) => r.asistencia === "si");
   const declinados = rsvps.filter((r) => r.asistencia === "no");
+  const totalPasesConfirmados = confirmados.reduce((sum, r) => sum + (r.pases ?? 1), 0);
+
   const filteredRsvps = rsvps
     .filter((r) => (filter === "todos" ? true : r.asistencia === filter))
     .filter((r) => r.nombre.toLowerCase().includes(search.toLowerCase()));
@@ -127,12 +138,13 @@ export default function AdminPageClient({ slug }: { slug: string }) {
       <main className="max-w-5xl mx-auto px-6 py-8 space-y-8">
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <StatCard label="Total respuestas" value={rsvps.length} color="#ffffff" />
-          <StatCard label="Confirman asistencia" value={confirmados.length} color="#4ade80" />
-          <StatCard label="No podrán asistir" value={declinados.length} color="#f87171" />
+          <StatCard label="Total respuestas" value={rsvps.length} sublabel={`${confirmados.length} asisten · ${declinados.length} no`} color="#ffffff" />
+          <StatCard label="Pases confirmados" value={totalPasesConfirmados} sublabel={`en ${confirmados.length} confirmaciones`} color="#4ade80" />
+          <StatCard label="No podrán asistir" value={declinados.length} sublabel="respuestas declinadas" color="#f87171" />
           <StatCard
             label="Tasa de confirmación"
             value={rsvps.length ? `${Math.round((confirmados.length / rsvps.length) * 100)}%` : "—"}
+            sublabel="de respuestas recibidas"
             color="#d9c48b"
           />
         </div>
@@ -141,7 +153,7 @@ export default function AdminPageClient({ slug }: { slug: string }) {
         {rsvps.length > 0 && (
           <div>
             <div className="flex justify-between text-xs text-white/40 mb-1.5">
-              <span>{confirmados.length} confirmados</span>
+              <span>{confirmados.length} confirmaron ({totalPasesConfirmados} pases)</span>
               <span>{declinados.length} declinaron</span>
             </div>
             <div className="h-2 rounded-full bg-white/10 overflow-hidden">
@@ -202,8 +214,9 @@ export default function AdminPageClient({ slug }: { slug: string }) {
         ) : (
           <div className="rounded-2xl border border-white/10 overflow-hidden">
             {/* Table header */}
-            <div className="grid grid-cols-[1fr_auto_auto] gap-4 px-5 py-3 bg-white/5 border-b border-white/10">
-              <span className="text-[11px] text-white/40 uppercase tracking-widest">Nombre</span>
+            <div className="grid grid-cols-[1fr_auto_auto_auto] gap-4 px-5 py-3 bg-white/5 border-b border-white/10 items-center">
+              <span className="text-[11px] text-white/40 uppercase tracking-widest">Nombre del invitado</span>
+              <span className="text-[11px] text-white/40 uppercase tracking-widest text-center">Pases</span>
               <span className="text-[11px] text-white/40 uppercase tracking-widest text-center">Asistencia</span>
               <span className="text-[11px] text-white/40 uppercase tracking-widest text-right">Fecha y hora</span>
             </div>
@@ -213,7 +226,7 @@ export default function AdminPageClient({ slug }: { slug: string }) {
               {filteredRsvps.map((rsvp, i) => (
                 <div
                   key={i}
-                  className="grid grid-cols-[1fr_auto_auto] gap-4 px-5 py-4 hover:bg-white/5 transition-colors items-center"
+                  className="grid grid-cols-[1fr_auto_auto_auto] gap-4 px-5 py-4 hover:bg-white/5 transition-colors items-center"
                 >
                   <div className="flex items-center gap-3">
                     <div
@@ -228,6 +241,18 @@ export default function AdminPageClient({ slug }: { slug: string }) {
                     <span className="text-sm text-white font-medium">{rsvp.nombre}</span>
                   </div>
 
+                  {/* Pases */}
+                  <div className="flex justify-center">
+                    {rsvp.asistencia === "si" ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-400/10 text-amber-300 border border-amber-400/30">
+                        🎟️ {rsvp.pases ?? 1} {(rsvp.pases ?? 1) === 1 ? "pase" : "pases"}
+                      </span>
+                    ) : (
+                      <span className="text-white/30 text-xs">—</span>
+                    )}
+                  </div>
+
+                  {/* Asistencia */}
                   <div className="flex justify-center">
                     <span
                       className="px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide"
@@ -240,6 +265,7 @@ export default function AdminPageClient({ slug }: { slug: string }) {
                     </span>
                   </div>
 
+                  {/* Timestamp */}
                   <span className="text-xs text-white/30 text-right whitespace-nowrap">
                     {formatDate(rsvp.timestamp)}
                   </span>
