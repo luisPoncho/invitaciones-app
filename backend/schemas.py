@@ -25,6 +25,16 @@ class InvitationTheme(BaseModel):
     fontBody: Optional[str] = "work-sans"
 
 
+# ── Itinerary Item ───────────────────────────────────────────────────────────
+
+class ItineraryItem(BaseModel):
+    id: str
+    time: str
+    title: str
+    description: Optional[str] = None
+    icon: Optional[str] = None
+
+
 # ── Section Block ────────────────────────────────────────────────────────────
 
 class SectionBlock(BaseModel):
@@ -40,6 +50,9 @@ class SectionBlock(BaseModel):
     customTitle: Optional[str] = None
     customBody: Optional[str] = None
     photoUrl: Optional[str] = None
+    itineraryTitle: Optional[str] = None
+    itinerarySubtitle: Optional[str] = None
+    itineraryItems: Optional[List[ItineraryItem]] = None
 
 
 # ── Photo Config ─────────────────────────────────────────────────────────────
@@ -100,6 +113,7 @@ class InvitationCreate(BaseModel):
     freeElements: List[FreeElement] = []
     sections: List[SectionBlock] = []
     stylePreset: str = "clasico"
+    itinerary: Optional[List[ItineraryItem]] = None
 
 
 class InvitationUpdate(BaseModel):
@@ -128,6 +142,7 @@ class InvitationUpdate(BaseModel):
     freeElements: Optional[List[FreeElement]] = None
     sections: Optional[List[SectionBlock]] = None
     stylePreset: Optional[str] = None
+    itinerary: Optional[List[ItineraryItem]] = None
 
 
 class InvitationResponse(BaseModel):
@@ -156,6 +171,7 @@ class InvitationResponse(BaseModel):
     freeElements: List[FreeElement]
     sections: List[SectionBlock]
     stylePreset: str = "clasico"
+    itinerary: Optional[List[ItineraryItem]] = None
     createdAt: str
     updatedAt: str
 

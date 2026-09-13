@@ -9,7 +9,8 @@ interface SectionCatalogProps {
 const AVAILABLE_SECTIONS: { type: SectionBlockType; label: string; desc: string }[] = [
   { type: "portada", label: "Portada", desc: "Bienvenida y nombres" },
   { type: "cuenta-regresiva", label: "Cuenta Regresiva", desc: "Temporizador al evento" },
-  { type: "fecha-lugar", label: "Itinerario y Ubicación", desc: "Misa religiosa, Recepción y sus botones de mapa" },
+  { type: "itinerario", label: "Itinerario", desc: "Timeline de eventos con horario libre" },
+  { type: "fecha-lugar", label: "Ubicación", desc: "Misa religiosa, Recepción y sus botones de mapa" },
   { type: "galeria", label: "Galería", desc: "Grid de fotos" },
   { type: "rsvp", label: "Confirmación (RSVP)", desc: "Formulario de asistencia" },
   { type: "foto-fondo", label: "Foto de Fondo", desc: "Imagen a pantalla completa" },

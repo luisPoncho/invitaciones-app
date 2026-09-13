@@ -101,10 +101,27 @@ export function getFontBodyVar(id?: string): string {
   return FONT_BODY_OPTIONS.find(f => f.id === id)?.cssVar ?? "var(--font-work-sans)";
 }
 
+export type ItineraryItem = {
+  id: string;
+  time: string;
+  title: string;
+  description?: string;
+  icon?: string;
+};
+
+export const DEFAULT_ITINERARY_ITEMS: ItineraryItem[] = [
+  { id: "1", time: "4:00 PM", title: "Ceremonia Religiosa", description: "Parroquia de San José", icon: "⛪" },
+  { id: "2", time: "6:00 PM", title: "Cóctel de Bienvenida", description: "Jardín Central", icon: "🥂" },
+  { id: "3", time: "7:30 PM", title: "Banquete & Brindis", description: "Salón Principal", icon: "🍽️" },
+  { id: "4", time: "9:00 PM", title: "Vals de los Novios", description: "Pista de Baile", icon: "💃" },
+  { id: "5", time: "10:00 PM", title: "Fiesta & Música", description: "Celebración con DJ", icon: "🎵" },
+];
+
 export type SectionBlockType = 
   | "portada"
   | "cuenta-regresiva"
   | "fecha-lugar"
+  | "itinerario"
   | "galeria"
   | "rsvp"
   | "foto-fondo"
@@ -125,6 +142,9 @@ export type SectionBlock = {
   customTitle?: string;
   customBody?: string;
   photoUrl?: string;
+  itineraryTitle?: string;
+  itinerarySubtitle?: string;
+  itineraryItems?: ItineraryItem[];
 };
 
 // Config completa: datos + tema + metadatos
@@ -139,6 +159,7 @@ export type FullInvitationConfig = EventData & {
   freeElements: FreeElement[];
   sectionBackgrounds?: SectionBackgrounds; // DEPRECATED: Se mantiene por compatibilidad hacia atrás, migrar a sections
   sections?: SectionBlock[];
+  itinerary?: ItineraryItem[];
 };
 
 // Respuesta de un invitado al RSVP

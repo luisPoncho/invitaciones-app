@@ -51,6 +51,7 @@ class Invitation(Base):
     free_elements: Mapped[str] = mapped_column(nullable=False, default="[]")
     sections: Mapped[str] = mapped_column(nullable=False, default="[]")
     style_preset: Mapped[str] = mapped_column(nullable=False, default="clasico")
+    itinerary: Mapped[str] = mapped_column(nullable=False, default="[]")
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(nullable=False, default=_utcnow, onupdate=_utcnow)
 

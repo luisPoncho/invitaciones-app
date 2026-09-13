@@ -76,7 +76,7 @@ export default function FechaLugar({
             style={{ color: t.accent, fontFamily: fontBody }}
             className="text-xs uppercase tracking-[0.25em] mb-2 font-medium"
           >
-            Itinerario del Evento
+            Ubicación
           </p>
 
           <h2 style={{ fontFamily: fontDisplay, color: t.primary }} className="italic text-4xl mb-2 font-normal">
@@ -241,7 +241,7 @@ export default function FechaLugar({
           style={{ color: t.accentLight, fontFamily: fontBody }}
           className="text-xs uppercase tracking-[0.25em] mb-2 font-medium"
         >
-          Itinerario y Ubicación
+          Ubicación
         </p>
 
         <h2 style={{ fontFamily: fontDisplay }} className="italic text-4xl mb-4">

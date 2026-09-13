@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { SectionBlock, PhotoScrollBehavior } from "@/lib/mock-data";
+import type { SectionBlock, PhotoScrollBehavior, ItineraryItem } from "@/lib/mock-data";
+import { DEFAULT_ITINERARY_ITEMS } from "@/lib/mock-data";
 
 interface SectionDesignListProps {
   sections: SectionBlock[];
@@ -11,7 +12,8 @@ interface SectionDesignListProps {
 const SECTION_LABELS: Record<string, string> = {
   "portada": "Portada",
   "cuenta-regresiva": "Cuenta Regresiva",
-  "fecha-lugar": "Itinerario y Ubicación",
+  "itinerario": "Itinerario",
+  "fecha-lugar": "Ubicación",
   "galeria": "Galería",
   "rsvp": "RSVP",
   "foto-fondo": "Foto de Fondo",
@@ -19,6 +21,8 @@ const SECTION_LABELS: Record<string, string> = {
   "separador": "Separador",
   "texto-libre": "Texto Libre"
 };
+
+const QUICK_ICONS = ["⛪", "🥂", "🍽️", "💃", "🎵", "💐", "🍰", "✨", "📷", "🎆", "💍", "🚗"];
 
 export default function SectionDesignList({ sections, onChange }: SectionDesignListProps) {
   const [editingBackground, setEditingBackground] = useState<Record<string, boolean>>({});
@@ -28,7 +32,7 @@ export default function SectionDesignList({ sections, onChange }: SectionDesignL
   };
 
   const configurableSections = sections.filter(sec => 
-    ["portada", "fecha-lugar", "galeria", "rsvp", "foto-fondo", "mesa-regalos", "texto-libre"].includes(sec.type)
+    ["portada", "fecha-lugar", "itinerario", "galeria", "rsvp", "foto-fondo", "mesa-regalos", "texto-libre"].includes(sec.type)
   );
 
   if (configurableSections.length === 0) return null;
@@ -48,7 +52,7 @@ export default function SectionDesignList({ sections, onChange }: SectionDesignL
           )}
 
           {/* Common Background Config */}
-          {["portada", "fecha-lugar", "rsvp", "foto-fondo", "mesa-regalos", "texto-libre"].includes(sec.type) && (
+          {["portada", "fecha-lugar", "itinerario", "rsvp", "foto-fondo", "mesa-regalos", "texto-libre"].includes(sec.type) && (
             <>
               <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] text-white/50 uppercase">URL Imagen de Fondo</label>
@@ -123,6 +127,139 @@ export default function SectionDesignList({ sections, onChange }: SectionDesignL
                 )}
               </div>
             </>
+          )}
+
+          {/* Itinerario Specific Config */}
+          {sec.type === "itinerario" && (
+            <div className="flex flex-col gap-3 mt-2 border-t border-white/10 pt-3">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] text-white/50 uppercase">Título del Panel</label>
+                <input
+                  type="text"
+                  value={sec.itineraryTitle ?? "Itinerario"}
+                  onChange={(e) => updateSection(sec.id, { itineraryTitle: e.target.value })}
+                  placeholder="Itinerario"
+                  className="bg-black/30 border border-white/10 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-white/30"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] text-white/50 uppercase">Subtítulo</label>
+                <input
+                  type="text"
+                  value={sec.itinerarySubtitle ?? "Cronograma del Gran Día"}
+                  onChange={(e) => updateSection(sec.id, { itinerarySubtitle: e.target.value })}
+                  placeholder="Cronograma del Gran Día"
+                  className="bg-black/30 border border-white/10 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-white/30"
+                />
+              </div>
+
+              {/* Eventos del Itinerario */}
+              <div className="flex flex-col gap-2 mt-2">
+                <label className="text-[10px] text-white/50 uppercase font-semibold">Eventos / Horarios</label>
+                
+                {((sec.itineraryItems && sec.itineraryItems.length > 0) ? sec.itineraryItems : DEFAULT_ITINERARY_ITEMS).map((item, itemIdx, arr) => (
+                  <div
+                    key={item.id || itemIdx}
+                    className="flex flex-col gap-2 bg-black/40 border border-white/10 rounded-lg p-2.5 relative"
+                  >
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={item.icon || "✨"}
+                        onChange={(e) => {
+                          const newItems = [...arr];
+                          newItems[itemIdx] = { ...newItems[itemIdx], icon: e.target.value };
+                          updateSection(sec.id, { itineraryItems: newItems });
+                        }}
+                        className="w-10 text-center bg-white/10 border border-white/10 rounded px-1 py-1 text-sm text-white focus:outline-none"
+                        title="Emoji o ícono"
+                      />
+                      <input
+                        type="text"
+                        value={item.time}
+                        onChange={(e) => {
+                          const newItems = [...arr];
+                          newItems[itemIdx] = { ...newItems[itemIdx], time: e.target.value };
+                          updateSection(sec.id, { itineraryItems: newItems });
+                        }}
+                        placeholder="4:00 PM"
+                        className="w-24 bg-white/5 border border-white/10 rounded px-2 py-1 text-xs text-white font-medium focus:outline-none"
+                      />
+                      <input
+                        type="text"
+                        value={item.title}
+                        onChange={(e) => {
+                          const newItems = [...arr];
+                          newItems[itemIdx] = { ...newItems[itemIdx], title: e.target.value };
+                          updateSection(sec.id, { itineraryItems: newItems });
+                        }}
+                        placeholder="Qué se va a hacer (Actividad)"
+                        className="flex-1 bg-white/5 border border-white/10 rounded px-2 py-1 text-xs text-white focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newItems = arr.filter((_, idx) => idx !== itemIdx);
+                          updateSection(sec.id, { itineraryItems: newItems });
+                        }}
+                        className="text-red-400/60 hover:text-red-400 hover:bg-white/10 rounded p-1 text-xs transition-colors"
+                        title="Eliminar evento"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    <input
+                      type="text"
+                      value={item.description || ""}
+                      onChange={(e) => {
+                        const newItems = [...arr];
+                        newItems[itemIdx] = { ...newItems[itemIdx], description: e.target.value };
+                        updateSection(sec.id, { itineraryItems: newItems });
+                      }}
+                      placeholder="Lugar o descripción opcional (ej: Salón Principal)"
+                      className="bg-white/5 border border-white/10 rounded px-2 py-1 text-[11px] text-white/70 focus:outline-none"
+                    />
+
+                    {/* Quick emoji selection */}
+                    <div className="flex flex-wrap gap-1 pt-1 border-t border-white/5">
+                      {QUICK_ICONS.map((emoji) => (
+                        <button
+                          key={emoji}
+                          type="button"
+                          onClick={() => {
+                            const newItems = [...arr];
+                            newItems[itemIdx] = { ...newItems[itemIdx], icon: emoji };
+                            updateSection(sec.id, { itineraryItems: newItems });
+                          }}
+                          className={`text-xs px-1.5 py-0.5 rounded hover:bg-white/10 transition-colors ${item.icon === emoji ? 'bg-white/20' : ''}`}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const currentItems = (sec.itineraryItems && sec.itineraryItems.length > 0) ? sec.itineraryItems : DEFAULT_ITINERARY_ITEMS;
+                    const newItem: ItineraryItem = {
+                      id: `it-${Date.now()}`,
+                      time: "8:00 PM",
+                      title: "Nuevo Evento",
+                      description: "",
+                      icon: "✨"
+                    };
+                    updateSection(sec.id, { itineraryItems: [...currentItems, newItem] });
+                  }}
+                  className="w-full bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg py-2 text-xs text-white font-medium transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <span>+</span> Agregar Evento al Itinerario
+                </button>
+              </div>
+            </div>
           )}
 
           {/* Texto Libre Specific Config */}

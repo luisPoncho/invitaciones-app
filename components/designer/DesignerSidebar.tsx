@@ -164,10 +164,10 @@ export default function DesignerSidebar({
               <SectionDesignList sections={config.sections || []} onChange={(s) => update({ sections: s })} />
             </div>
 
-            {/* Sección: Datos del evento e Itinerario */}
+            {/* Sección: Datos del evento y Ubicación */}
             <div className="px-5 py-4 border-b border-white/10">
               <p className="text-[11px] font-semibold text-white/40 uppercase tracking-widest mb-3">
-                Datos del evento e Itinerario
+                Datos del evento y Ubicación
               </p>
               <div className="flex flex-col gap-4">
                 <Field

@@ -8,6 +8,7 @@ import Galeria from "@/components/panels/Galeria";
 import RSVP from "@/components/panels/RSVP";
 import MesaRegalos from "@/components/panels/MesaRegalos";
 import TextoLibrePanel from "@/components/panels/TextoLibrePanel";
+import Itinerario from "@/components/panels/Itinerario";
 import FotoFondo from "@/components/panels/FotoFondo";
 import Separador from "@/components/panels/Separador";
 import EntryWrapper from "@/components/entry/EntryWrapper";
@@ -66,6 +67,8 @@ export default function InvitacionPage({
                 return <CuentaRegresiva key={section.id} fechaISO={event.fechaISO} theme={theme} stylePreset={stylePreset} />;
               case "fecha-lugar":
                 return <FechaLugar key={section.id} event={event} theme={theme} stylePreset={stylePreset} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+              case "itinerario":
+                return <Itinerario key={section.id} theme={theme} stylePreset={stylePreset} title={section.itineraryTitle} subtitle={section.itinerarySubtitle} items={section.itineraryItems && section.itineraryItems.length > 0 ? section.itineraryItems : (event as any).itinerary} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
               case "galeria":
                 return <Galeria key={section.id} photoConfigs={photoConfigs} fotos={event.fotos || []} theme={theme} stylePreset={stylePreset} />;
               case "rsvp":

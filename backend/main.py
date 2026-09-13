@@ -66,6 +66,7 @@ def auto_migrate_db():
             ("recepcion_direccion", "TEXT DEFAULT ''"),
             ("recepcion_url", "TEXT DEFAULT NULL"),
             ("style_preset", "TEXT DEFAULT 'clasico'"),
+            ("itinerary", "TEXT DEFAULT '[]'"),
         ]
 
         with engine.begin() as connection:
@@ -129,10 +130,12 @@ def seed_db():
                 sections=json.dumps([
                     {"id": "sec-1", "type": "portada"},
                     {"id": "sec-2", "type": "cuenta-regresiva"},
-                    {"id": "sec-3", "type": "fecha-lugar"},
-                    {"id": "sec-4", "type": "galeria"},
-                    {"id": "sec-5", "type": "rsvp"},
+                    {"id": "sec-3", "type": "itinerario"},
+                    {"id": "sec-4", "type": "fecha-lugar"},
+                    {"id": "sec-5", "type": "galeria"},
+                    {"id": "sec-6", "type": "rsvp"},
                 ]),
+                itinerary=json.dumps([]),
                 created_at=now,
                 updated_at=now,
             )
@@ -230,6 +233,7 @@ def _invitation_to_response(inv: Invitation) -> InvitationResponse:
         freeElements=_safe_json_loads(getattr(inv, "free_elements", "[]"), []),
         sections=_safe_json_loads(getattr(inv, "sections", "[]"), []),
         stylePreset=cast(str, getattr(inv, "style_preset", "clasico") or "clasico"),
+        itinerary=_safe_json_loads(getattr(inv, "itinerary", "[]"), []),
         createdAt=inv.created_at.isoformat() if getattr(inv, "created_at", None) else "",
         updatedAt=inv.updated_at.isoformat() if getattr(inv, "updated_at", None) else "",
     )
@@ -283,6 +287,7 @@ def create_invitation(body: InvitationCreate, db: Session = Depends(get_db)):
         free_elements=json.dumps([fe.model_dump() for fe in body.freeElements]),
         sections=json.dumps([s.model_dump() for s in body.sections]),
         style_preset=body.stylePreset,
+        itinerary=json.dumps([i.model_dump() for i in body.itinerary]) if body.itinerary else json.dumps([]),
         created_at=now,
         updated_at=now,
     )
@@ -366,6 +371,8 @@ def update_invitation(slug: str, body: InvitationUpdate, db: Session = Depends(g
         inv.free_elements = json.dumps([fe.model_dump() for fe in body.freeElements])
     if body.sections is not None:
         inv.sections = json.dumps([s.model_dump() for s in body.sections])
+    if body.itinerary is not None:
+        inv.itinerary = json.dumps([i.model_dump() for i in body.itinerary])
 
     inv.updated_at = datetime.now(timezone.utc)
 
