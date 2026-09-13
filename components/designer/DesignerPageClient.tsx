@@ -24,6 +24,7 @@ function makeBlank(): FullInvitationConfig {
     createdAt: "",
     updatedAt: "",
     entryAnimation: "carta",
+    stylePreset: "clasico",
     photoConfigs: [
       { url: "", scrollBehavior: "normal", displayMode: "galeria" },
       { url: "", scrollBehavior: "normal", displayMode: "galeria" },

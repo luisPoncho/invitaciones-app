@@ -1,14 +1,25 @@
-import type { InvitationTheme } from "@/lib/mock-data";
+import type { InvitationTheme, StylePreset } from "@/lib/mock-data";
 import { defaultTheme } from "@/lib/mock-data";
+import { LeafDivider } from "./Ornaments";
 
 interface SeparadorProps {
   theme?: InvitationTheme;
-  bgColor?: string; // Optional override for background
+  stylePreset?: StylePreset;
+  bgColor?: string;
 }
 
-export default function Separador({ theme, bgColor }: SeparadorProps) {
+export default function Separador({ theme, stylePreset = "clasico", bgColor }: SeparadorProps) {
   const t = { ...defaultTheme, ...theme };
-  
+  const isRomantico = stylePreset === "romantico";
+
+  if (isRomantico) {
+    return (
+      <section style={{ backgroundColor: bgColor || t.paper || "transparent" }} className="py-8 flex justify-center items-center w-full">
+        <LeafDivider color={t.accent} />
+      </section>
+    );
+  }
+
   return (
     <section style={{ backgroundColor: bgColor || 'transparent' }} className="py-12 flex justify-center items-center w-full">
       <svg width="140" height="28" viewBox="0 0 140 28" fill="none" aria-hidden="true">

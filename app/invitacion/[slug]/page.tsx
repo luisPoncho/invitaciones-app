@@ -10,11 +10,10 @@ import MesaRegalos from "@/components/panels/MesaRegalos";
 import TextoLibrePanel from "@/components/panels/TextoLibrePanel";
 import FotoFondo from "@/components/panels/FotoFondo";
 import Separador from "@/components/panels/Separador";
-import Divider from "@/components/Divider";
 import EntryWrapper from "@/components/entry/EntryWrapper";
 import FreeElementsLayer from "@/components/designer/FreeElementsLayer";
 import { mockEvent, defaultTheme } from "@/lib/mock-data";
-import type { EventData, InvitationTheme, FullInvitationConfig, PhotoConfig, EntryAnimation, FreeElement, SectionBlock } from "@/lib/mock-data";
+import type { EventData, InvitationTheme, FullInvitationConfig, PhotoConfig, EntryAnimation, FreeElement, SectionBlock, StylePreset } from "@/lib/mock-data";
 import { loadInvitation } from "@/lib/storage";
 
 export default function InvitacionPage({
@@ -24,6 +23,7 @@ export default function InvitacionPage({
 }) {
   const [event, setEvent] = useState<EventData>(mockEvent);
   const [theme, setTheme] = useState<InvitationTheme>(defaultTheme);
+  const [stylePreset, setStylePreset] = useState<StylePreset>("clasico");
   const [photoConfigs, setPhotoConfigs] = useState<PhotoConfig[]>([]);
   const [entryAnimation, setEntryAnimation] = useState<EntryAnimation>("carta");
   const [freeElements, setFreeElements] = useState<FreeElement[]>([]);
@@ -35,6 +35,7 @@ export default function InvitacionPage({
       if (saved) {
         setEvent(saved);
         setTheme(saved.theme);
+        setStylePreset(saved.stylePreset || "clasico");
         setPhotoConfigs(saved.photoConfigs || []);
         setEntryAnimation(saved.entryAnimation || "carta");
         setFreeElements(saved.freeElements || []);
@@ -60,23 +61,23 @@ export default function InvitacionPage({
           {sections.map(section => {
             switch (section.type) {
               case "portada":
-                return <Portada key={section.id} event={event} theme={theme} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+                return <Portada key={section.id} event={event} theme={theme} stylePreset={stylePreset} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
               case "cuenta-regresiva":
-                return <CuentaRegresiva key={section.id} fechaISO={event.fechaISO} theme={theme} />;
+                return <CuentaRegresiva key={section.id} fechaISO={event.fechaISO} theme={theme} stylePreset={stylePreset} />;
               case "fecha-lugar":
-                return <FechaLugar key={section.id} event={event} theme={theme} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+                return <FechaLugar key={section.id} event={event} theme={theme} stylePreset={stylePreset} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
               case "galeria":
-                return <Galeria key={section.id} photoConfigs={photoConfigs} fotos={event.fotos || []} theme={theme} />;
+                return <Galeria key={section.id} photoConfigs={photoConfigs} fotos={event.fotos || []} theme={theme} stylePreset={stylePreset} />;
               case "rsvp":
-                return <RSVP key={section.id} slug={params.slug} theme={theme} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+                return <RSVP key={section.id} slug={params.slug} theme={theme} stylePreset={stylePreset} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
               case "foto-fondo":
                 return <FotoFondo key={section.id} theme={theme} photoUrl={section.photoUrl || section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
               case "mesa-regalos":
-                return <MesaRegalos key={section.id} theme={theme} title={section.giftRegistryTitle} url={section.giftRegistryUrl} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+                return <MesaRegalos key={section.id} theme={theme} stylePreset={stylePreset} title={section.giftRegistryTitle} url={section.giftRegistryUrl} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
               case "separador":
-                return <Separador key={section.id} theme={theme} />;
+                return <Separador key={section.id} theme={theme} stylePreset={stylePreset} />;
               case "texto-libre":
-                return <TextoLibrePanel key={section.id} theme={theme} title={section.customTitle} body={section.customBody} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+                return <TextoLibrePanel key={section.id} theme={theme} stylePreset={stylePreset} title={section.customTitle} body={section.customBody} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
               default:
                 return null;
             }

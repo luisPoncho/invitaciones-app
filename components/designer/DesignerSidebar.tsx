@@ -7,6 +7,7 @@ import ColorPicker from "./ColorPicker";
 import SectionCatalog from "./SectionCatalog";
 import SectionList from "./SectionList";
 import SectionDesignList from "./SectionDesignList";
+import StylesPanel from "./StylesPanel";
 
 interface DesignerSidebarProps {
   config: FullInvitationConfig;
@@ -86,7 +87,7 @@ export default function DesignerSidebar({
 
   const slugValid = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(config.slug);
 
-  const [activeTab, setActiveTab] = useState<"sections" | "design">("sections");
+  const [activeTab, setActiveTab] = useState<"sections" | "styles" | "design">("sections");
 
   const addSection = (type: SectionBlockType) => {
     const newSection: SectionBlock = {
@@ -99,18 +100,28 @@ export default function DesignerSidebar({
   return (
     <div className="flex flex-col h-full overflow-y-hidden">
       {/* Tabs Header */}
-      <div className="flex px-5 pt-4 border-b border-white/10 shrink-0">
+      <div className="flex px-4 pt-4 border-b border-white/10 shrink-0 gap-1">
         <button
           onClick={() => setActiveTab("sections")}
-          className={`flex-1 pb-3 text-xs uppercase tracking-widest font-medium transition-colors border-b-2 ${activeTab === "sections" ? "border-white text-white" : "border-transparent text-white/40 hover:text-white/70"
-            }`}
+          className={`flex-1 pb-3 text-xs uppercase tracking-widest font-medium transition-colors border-b-2 ${
+            activeTab === "sections" ? "border-white text-white" : "border-transparent text-white/40 hover:text-white/70"
+          }`}
         >
           Paneles
         </button>
         <button
+          onClick={() => setActiveTab("styles")}
+          className={`flex-1 pb-3 text-xs uppercase tracking-widest font-medium transition-colors border-b-2 ${
+            activeTab === "styles" ? "border-amber-400 text-amber-300" : "border-transparent text-white/40 hover:text-white/70"
+          }`}
+        >
+          Estilos
+        </button>
+        <button
           onClick={() => setActiveTab("design")}
-          className={`flex-1 pb-3 text-xs uppercase tracking-widest font-medium transition-colors border-b-2 ${activeTab === "design" ? "border-white text-white" : "border-transparent text-white/40 hover:text-white/70"
-            }`}
+          className={`flex-1 pb-3 text-xs uppercase tracking-widest font-medium transition-colors border-b-2 ${
+            activeTab === "design" ? "border-white text-white" : "border-transparent text-white/40 hover:text-white/70"
+          }`}
         >
           Diseño
         </button>
@@ -137,6 +148,10 @@ export default function DesignerSidebar({
               <SectionCatalog onAdd={addSection} />
             </div>
           </div>
+        )}
+
+        {activeTab === "styles" && (
+          <StylesPanel config={config} onChange={onChange} />
         )}
 
         {activeTab === "design" && (

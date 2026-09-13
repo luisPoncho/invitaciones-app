@@ -1,23 +1,26 @@
-
-import type { PhotoConfig, InvitationTheme } from "@/lib/mock-data";
-import { defaultTheme } from "@/lib/mock-data";
+import type { PhotoConfig, InvitationTheme, StylePreset } from "@/lib/mock-data";
+import { defaultTheme, getFontDisplayVar, getFontBodyVar } from "@/lib/mock-data";
 import { formatImageUrl } from "@/lib/image-utils";
 import PhotoBackground from "./PhotoBackground";
 import PhotoFrame from "./PhotoFrame";
+import { LeafDivider } from "./Ornaments";
 
 interface GaleriaProps {
   photoConfigs?: PhotoConfig[];
   fotos?: string[];
   theme?: InvitationTheme;
+  stylePreset?: StylePreset;
 }
 
-export default function Galeria({ photoConfigs, fotos, theme }: GaleriaProps) {
+export default function Galeria({ photoConfigs, fotos, theme, stylePreset = "clasico" }: GaleriaProps) {
   const t = { ...defaultTheme, ...theme };
+  const fontDisplay = getFontDisplayVar(t.fontDisplay);
+  const fontBody = getFontBodyVar(t.fontBody);
+  const isRomantico = stylePreset === "romantico";
 
   // Sincronizar / obtener photoConfigs efectivas
   let effectiveConfigs: PhotoConfig[] = photoConfigs ? [...photoConfigs] : [];
 
-  // Si effectiveConfigs no tiene URLs válidas pero tenemos el arreglo fotos, usar fotos
   const hasConfigUrls = effectiveConfigs.some(p => p && p.url && p.url.trim() !== "");
   if (!hasConfigUrls && fotos && fotos.length > 0) {
     effectiveConfigs = fotos
@@ -47,24 +50,55 @@ export default function Galeria({ photoConfigs, fotos, theme }: GaleriaProps) {
       ))}
 
       <section
-        style={{ backgroundColor: t.paper }}
+        style={{ backgroundColor: t.paper || "#FAF6EE" }}
         className="py-20 px-6"
       >
-        <h2
-          style={{ color: t.primary }}
-          className="font-display italic text-3xl text-center mb-10"
-        >
-          Nuestros momentos
-        </h2>
+        {isRomantico ? (
+          <div className="text-center mb-10">
+            <p
+              style={{ color: t.accent, fontFamily: fontBody }}
+              className="text-xs uppercase tracking-[0.25em] mb-1 font-medium"
+            >
+              Nuestra Historia en Fotos
+            </p>
+            <h2
+              style={{ color: t.primary, fontFamily: fontDisplay }}
+              className="italic text-4xl font-normal"
+            >
+              Nuestros Momentos
+            </h2>
+            <div className="my-3">
+              <LeafDivider color={t.accent} />
+            </div>
+          </div>
+        ) : (
+          <h2
+            style={{ color: t.primary }}
+            className="font-display italic text-3xl text-center mb-10"
+          >
+            Nuestros momentos
+          </h2>
+        )}
 
         {hasPhotos ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-w-2xl mx-auto">
+          <div className={`grid grid-cols-2 md:grid-cols-3 gap-3 max-w-2xl mx-auto ${isRomantico ? 'p-2' : ''}`}>
             {galeriaPhotos.map((p, i) => (
-              <div key={i} className="relative aspect-[3/4] overflow-hidden group">
+              <div
+                key={i}
+                style={isRomantico ? {
+                  borderColor: `${t.accent}40`,
+                  boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
+                } : undefined}
+                className={`relative aspect-[3/4] overflow-hidden group ${
+                  isRomantico ? "rounded-2xl border-[1.5px] p-1 bg-white" : ""
+                }`}
+              >
                 <img
                   src={formatImageUrl(p.url)}
                   alt=""
-                  className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 ${p.scrollBehavior === 'movimiento' ? 'hover:scale-110' : ''}`}
+                  className={`w-full h-full object-cover transition-transform duration-700 ${
+                    isRomantico ? "rounded-xl" : ""
+                  } ${p.scrollBehavior === 'movimiento' ? 'hover:scale-110' : ''}`}
                   style={{ objectPosition: p.objectPosition || "center" }}
                 />
               </div>

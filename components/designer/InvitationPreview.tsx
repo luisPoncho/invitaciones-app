@@ -98,23 +98,23 @@ export default function InvitationPreview({ config, onChange }: InvitationPrevie
               {config.sections?.map(section => {
                 switch (section.type) {
                   case "portada":
-                    return <Portada key={section.id} event={config} theme={theme} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+                    return <Portada key={section.id} event={config} theme={theme} stylePreset={config.stylePreset} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
                   case "cuenta-regresiva":
-                    return <CuentaRegresiva key={section.id} fechaISO={config.fechaISO} theme={theme} />;
+                    return <CuentaRegresiva key={section.id} fechaISO={config.fechaISO} theme={theme} stylePreset={config.stylePreset} />;
                   case "fecha-lugar":
-                    return <FechaLugar key={section.id} event={config} theme={theme} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+                    return <FechaLugar key={section.id} event={config} theme={theme} stylePreset={config.stylePreset} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
                   case "galeria":
-                    return <Galeria key={section.id} photoConfigs={config.photoConfigs || []} fotos={config.fotos || []} theme={theme} />;
+                    return <Galeria key={section.id} photoConfigs={config.photoConfigs || []} fotos={config.fotos || []} theme={theme} stylePreset={config.stylePreset} />;
                   case "rsvp":
-                    return <RSVP key={section.id} slug={config.slug} theme={theme} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+                    return <RSVP key={section.id} slug={config.slug} theme={theme} stylePreset={config.stylePreset} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
                   case "foto-fondo":
                     return <FotoFondo key={section.id} theme={theme} photoUrl={section.photoUrl || section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
                   case "mesa-regalos":
-                    return <MesaRegalos key={section.id} theme={theme} title={section.giftRegistryTitle} url={section.giftRegistryUrl} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+                    return <MesaRegalos key={section.id} theme={theme} stylePreset={config.stylePreset} title={section.giftRegistryTitle} url={section.giftRegistryUrl} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
                   case "separador":
-                    return <Separador key={section.id} theme={theme} />;
+                    return <Separador key={section.id} theme={theme} stylePreset={config.stylePreset} />;
                   case "texto-libre":
-                    return <TextoLibrePanel key={section.id} theme={theme} title={section.customTitle} body={section.customBody} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+                    return <TextoLibrePanel key={section.id} theme={theme} stylePreset={config.stylePreset} title={section.customTitle} body={section.customBody} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
                   default:
                     return null;
                 }

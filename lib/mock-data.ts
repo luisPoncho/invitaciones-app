@@ -32,6 +32,7 @@ export type InvitationTheme = {
 };
 
 export type EntryAnimation = "carta" | "disco" | "vinilo" | "none";
+export type StylePreset = "clasico" | "romantico";
 export type PhotoScrollBehavior = "fija" | "movimiento" | "normal";
 export type PhotoDisplayMode = "fondo" | "cuadro" | "galeria";
 
@@ -133,6 +134,7 @@ export type FullInvitationConfig = EventData & {
   createdAt: string;
   updatedAt: string;
   entryAnimation: EntryAnimation;
+  stylePreset: StylePreset;
   photoConfigs: PhotoConfig[];
   freeElements: FreeElement[];
   sectionBackgrounds?: SectionBackgrounds; // DEPRECATED: Se mantiene por compatibilidad hacia atrás, migrar a sections
@@ -156,6 +158,48 @@ export const defaultTheme: InvitationTheme = {
   fontDisplay: "fraunces",
   fontBody: "work-sans",
 };
+
+export const STYLE_PRESETS: {
+  id: StylePreset;
+  name: string;
+  desc: string;
+  description: string;
+  theme: InvitationTheme;
+  preview: { bg: string; text: string; accent: string };
+}[] = [
+  {
+    id: "clasico",
+    name: "Clásico Elegante",
+    desc: "Fondos oscuros, tipografía serif, minimalista y sofisticado",
+    description: "Fondos oscuros, tipografía serif, minimalista y sofisticado",
+    theme: {
+      primary: "#22342A",
+      secondary: "#182620",
+      paper: "#F4EFE4",
+      accent: "#B08D3F",
+      accentLight: "#D9C48B",
+      fontDisplay: "fraunces",
+      fontBody: "work-sans",
+    },
+    preview: { bg: "#22342A", text: "#F4EFE4", accent: "#B08D3F" },
+  },
+  {
+    id: "romantico",
+    name: "Romántico Floral",
+    desc: "Fondos claros, ornamentos florales, tipografía script, luminoso",
+    description: "Fondos claros, ornamentos florales, tipografía script, diseño inspirado en Canva",
+    theme: {
+      primary: "#4A3728",
+      secondary: "#3D2E22",
+      paper: "#FFF9F0",
+      accent: "#C4897D",
+      accentLight: "#E8C4B8",
+      fontDisplay: "great-vibes",
+      fontBody: "josefin",
+    },
+    preview: { bg: "#FFF9F0", text: "#4A3728", accent: "#C4897D" },
+  },
+];
 
 
 // Datos de ejemplo para pruebas sin Supabase

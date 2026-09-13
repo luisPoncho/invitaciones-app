@@ -65,6 +65,7 @@ def auto_migrate_db():
             ("recepcion_lugar", "TEXT DEFAULT ''"),
             ("recepcion_direccion", "TEXT DEFAULT ''"),
             ("recepcion_url", "TEXT DEFAULT NULL"),
+            ("style_preset", "TEXT DEFAULT 'clasico'"),
         ]
 
         with engine.begin() as connection:
@@ -122,6 +123,7 @@ def seed_db():
                 }),
                 admin_token="demo-token-123",
                 entry_animation="carta",
+                style_preset="clasico",
                 photo_configs=json.dumps([]),
                 free_elements=json.dumps([]),
                 sections=json.dumps([
@@ -227,6 +229,7 @@ def _invitation_to_response(inv: Invitation) -> InvitationResponse:
         photoConfigs=_safe_json_loads(getattr(inv, "photo_configs", "[]"), []),
         freeElements=_safe_json_loads(getattr(inv, "free_elements", "[]"), []),
         sections=_safe_json_loads(getattr(inv, "sections", "[]"), []),
+        stylePreset=cast(str, getattr(inv, "style_preset", "clasico") or "clasico"),
         createdAt=inv.created_at.isoformat() if getattr(inv, "created_at", None) else "",
         updatedAt=inv.updated_at.isoformat() if getattr(inv, "updated_at", None) else "",
     )
@@ -279,6 +282,7 @@ def create_invitation(body: InvitationCreate, db: Session = Depends(get_db)):
         photo_configs=json.dumps([pc.model_dump() for pc in body.photoConfigs]),
         free_elements=json.dumps([fe.model_dump() for fe in body.freeElements]),
         sections=json.dumps([s.model_dump() for s in body.sections]),
+        style_preset=body.stylePreset,
         created_at=now,
         updated_at=now,
     )
@@ -348,6 +352,8 @@ def update_invitation(slug: str, body: InvitationUpdate, db: Session = Depends(g
         inv.mensaje = body.mensaje
     if body.entryAnimation is not None:
         inv.entry_animation = body.entryAnimation
+    if body.stylePreset is not None:
+        inv.style_preset = body.stylePreset
 
     # Update JSON fields
     if body.fotos is not None:

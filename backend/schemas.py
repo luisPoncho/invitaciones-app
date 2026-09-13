@@ -99,6 +99,7 @@ class InvitationCreate(BaseModel):
     photoConfigs: List[PhotoConfig] = []
     freeElements: List[FreeElement] = []
     sections: List[SectionBlock] = []
+    stylePreset: str = "clasico"
 
 
 class InvitationUpdate(BaseModel):
@@ -126,6 +127,7 @@ class InvitationUpdate(BaseModel):
     photoConfigs: Optional[List[PhotoConfig]] = None
     freeElements: Optional[List[FreeElement]] = None
     sections: Optional[List[SectionBlock]] = None
+    stylePreset: Optional[str] = None
 
 
 class InvitationResponse(BaseModel):
@@ -153,6 +155,7 @@ class InvitationResponse(BaseModel):
     photoConfigs: List[PhotoConfig]
     freeElements: List[FreeElement]
     sections: List[SectionBlock]
+    stylePreset: str = "clasico"
     createdAt: str
     updatedAt: str
 
