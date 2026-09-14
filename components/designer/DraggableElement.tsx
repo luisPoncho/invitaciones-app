@@ -91,6 +91,8 @@ export default function DraggableElement({
     width: 0,
     height: 0,
     direction: "" as ResizeDirection,
+    posX: 0,
+    posY: 0,
   });
 
   const panStartRef = useRef({
@@ -194,23 +196,57 @@ export default function DraggableElement({
       posRef.current = { x: nextX, y: nextY };
       setPos({ x: nextX, y: nextY });
     } else if (action === "resize") {
-      const { mouseX, mouseY, width, height, direction } = resizeStartRef.current;
+      const layer = getFreeLayer(containerRef.current);
+      if (!layer) return;
+
+      const rect = layer.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return;
+
+      const { mouseX, mouseY, width, height, direction, posX, posY } = resizeStartRef.current;
       const deltaX = e.clientX - mouseX;
       const deltaY = e.clientY - mouseY;
 
       let newWidth = width;
       let newHeight = height;
+      let deltaCenterX_px = 0;
+      let deltaCenterY_px = 0;
 
-      if (direction.includes("right")) newWidth = width + deltaX;
-      if (direction.includes("left")) newWidth = width - deltaX;
-      if (direction.includes("bottom")) newHeight = height + deltaY;
-      if (direction.includes("top")) newHeight = height - deltaY;
+      // Resizing horizontally from one side: opposite side stays pinned
+      if (direction.includes("right")) {
+        newWidth = Math.max(30, width + deltaX);
+        const actualDeltaW = newWidth - width;
+        deltaCenterX_px = actualDeltaW / 2;
+      } else if (direction.includes("left")) {
+        newWidth = Math.max(30, width - deltaX);
+        const actualDeltaW = newWidth - width;
+        deltaCenterX_px = -actualDeltaW / 2;
+      }
 
-      newWidth = Math.max(40, Math.round(newWidth));
-      newHeight = Math.max(40, Math.round(newHeight));
+      // Resizing vertically from one side: opposite side stays pinned
+      if (direction.includes("bottom")) {
+        newHeight = Math.max(30, height + deltaY);
+        const actualDeltaH = newHeight - height;
+        deltaCenterY_px = actualDeltaH / 2;
+      } else if (direction.includes("top")) {
+        newHeight = Math.max(30, height - deltaY);
+        const actualDeltaH = newHeight - height;
+        deltaCenterY_px = -actualDeltaH / 2;
+      }
+
+      newWidth = Math.round(newWidth);
+      newHeight = Math.round(newHeight);
+
+      const deltaCenterXPercent = (deltaCenterX_px / rect.width) * 100;
+      const deltaCenterYPercent = (deltaCenterY_px / rect.height) * 100;
+
+      let nextX = Math.max(0, Math.min(100, Math.round((posX + deltaCenterXPercent) * 100) / 100));
+      let nextY = Math.max(0, Math.min(100, Math.round((posY + deltaCenterYPercent) * 100) / 100));
 
       sizeRef.current = { width: newWidth, height: newHeight };
+      posRef.current = { x: nextX, y: nextY };
+
       setSize({ width: newWidth, height: newHeight });
+      setPos({ x: nextX, y: nextY });
     } else if (action === "pan") {
       const deltaX = e.clientX - panStartRef.current.mouseX;
       const deltaY = e.clientY - panStartRef.current.mouseY;
@@ -235,7 +271,12 @@ export default function DraggableElement({
     if (action === "drag") {
       onUpdateRef.current?.({ x: posRef.current.x, y: posRef.current.y });
     } else if (action === "resize") {
-      onUpdateRef.current?.({ width: sizeRef.current.width, height: sizeRef.current.height });
+      onUpdateRef.current?.({
+        width: sizeRef.current.width,
+        height: sizeRef.current.height,
+        x: posRef.current.x,
+        y: posRef.current.y,
+      });
     } else if (action === "pan") {
       onUpdateRef.current?.({ imageX: imagePosRef.current.x, imageY: imagePosRef.current.y });
     }
@@ -272,7 +313,7 @@ export default function DraggableElement({
 
   /*
    * =========================
-   * INICIAR REDIMENSIÓN (8 PUNTOS)
+   * INICIAR REDIMENSIÓN (8 PUNTOS - 1 SOLO LADO ANCLADO)
    * =========================
    */
   const handleResizeStart = (e: React.PointerEvent, direction: ResizeDirection) => {
@@ -289,6 +330,8 @@ export default function DraggableElement({
       width: sizeRef.current.width,
       height: sizeRef.current.height,
       direction,
+      posX: posRef.current.x,
+      posY: posRef.current.y,
     };
     startAction("resize");
   };
@@ -478,7 +521,7 @@ export default function DraggableElement({
 
       {element.type === "image" && element.url ? (
         <div
-          className="relative overflow-hidden rounded-lg shadow-xl"
+          className="relative overflow-hidden"
           style={{
             width: `${size.width}px`,
             height: `${size.height}px`,
@@ -501,7 +544,7 @@ export default function DraggableElement({
             style={{
               width: "100%",
               height: "100%",
-              objectFit: "cover",
+              objectFit: "contain",
               transform: `translate(${imagePos.x}px, ${imagePos.y}px) scale(${zoom / 100})`,
               touchAction: "none",
               userSelect: "none",
