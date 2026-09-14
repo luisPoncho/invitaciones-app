@@ -25,8 +25,6 @@ type ResizeDirection =
   | "bottom-left"
   | "left";
 
-
-
 /**
  * Gets the [data-free-layer] element (FreeElementsLayer container),
  * which is what x% and y% are relative to.
@@ -47,9 +45,10 @@ export default function DraggableElement({
   onDelete,
 }: DraggableElementProps) {
   const [isSelected, setIsSelected] = useState(false);
+  const [isPanningMode, setIsPanningMode] = useState(false);
 
-  // States
-  const [pos, setPos] = useState({ x: element.x, y: element.y });
+  // States for visual updates
+  const [pos, setPos] = useState({ x: element.x ?? 50, y: element.y ?? 50 });
   const [size, setSize] = useState({
     width: element.width || 220,
     height: element.height || (element.type === "image" ? 220 : 100),
@@ -60,11 +59,32 @@ export default function DraggableElement({
   });
   const [zoom, setZoom] = useState(element.zoom ?? 120);
 
+  // Synchronized refs to completely prevent stale closures
+  const onUpdateRef = useRef(onUpdate);
+  onUpdateRef.current = onUpdate;
+
+  const posRef = useRef({ x: element.x ?? 50, y: element.y ?? 50 });
+  const sizeRef = useRef({
+    width: element.width || 220,
+    height: element.height || (element.type === "image" ? 220 : 100),
+  });
+  const imagePosRef = useRef({
+    x: element.imageX ?? 0,
+    y: element.imageY ?? 0,
+  });
+  const zoomRef = useRef(element.zoom ?? 120);
+
   // Active interaction refs
   const activeActionRef = useRef<"drag" | "resize" | "pan" | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const dragStartRef = useRef({ x: 0, y: 0 });
+  const dragStartRef = useRef({
+    mouseX: 0,
+    mouseY: 0,
+    posX: 0,
+    posY: 0,
+  });
+
   const resizeStartRef = useRef({
     mouseX: 0,
     mouseY: 0,
@@ -72,6 +92,7 @@ export default function DraggableElement({
     height: 0,
     direction: "" as ResizeDirection,
   });
+
   const panStartRef = useRef({
     mouseX: 0,
     mouseY: 0,
@@ -79,21 +100,40 @@ export default function DraggableElement({
     imageY: 0,
   });
 
-  // Sync with external updates when idle
+  // Sync with external updates when not actively dragging/interacting
   useEffect(() => {
     if (!activeActionRef.current) {
-      setPos({ x: element.x, y: element.y });
-      setSize({
+      const newPos = { x: element.x ?? 50, y: element.y ?? 50 };
+      const newSize = {
         width: element.width || 220,
         height: element.height || (element.type === "image" ? 220 : 100),
-      });
-      setImagePos({
+      };
+      const newImagePos = {
         x: element.imageX ?? 0,
         y: element.imageY ?? 0,
-      });
-      setZoom(element.zoom ?? 120);
+      };
+      const newZoom = element.zoom ?? 120;
+
+      posRef.current = newPos;
+      sizeRef.current = newSize;
+      imagePosRef.current = newImagePos;
+      zoomRef.current = newZoom;
+
+      setPos(newPos);
+      setSize(newSize);
+      setImagePos(newImagePos);
+      setZoom(newZoom);
     }
-  }, [element.x, element.y, element.width, element.height, element.imageX, element.imageY, element.zoom, element.type]);
+  }, [
+    element.x,
+    element.y,
+    element.width,
+    element.height,
+    element.imageX,
+    element.imageY,
+    element.zoom,
+    element.type,
+  ]);
 
   // Click outside to deselect
   useEffect(() => {
@@ -105,11 +145,15 @@ export default function DraggableElement({
         !containerRef.current.contains(e.target as Node)
       ) {
         setIsSelected(false);
+        setIsPanningMode(false);
       }
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsSelected(false);
+      if (e.key === "Escape") {
+        setIsSelected(false);
+        setIsPanningMode(false);
+      }
     };
 
     document.addEventListener("pointerdown", handleClickOutside);
@@ -135,19 +179,20 @@ export default function DraggableElement({
       const layer = getFreeLayer(containerRef.current);
       if (!layer) return;
 
-      // getBoundingClientRect() already accounts for scroll offset:
-      // if the layer is scrolled up 500px, rect.top becomes negative,
-      // so (e.clientY - rect.top) correctly gives the offset from the
-      // top of the full content.
       const rect = layer.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return;
 
-      let newX = ((e.clientX - rect.left) / rect.width) * 100;
-      let newY = ((e.clientY - rect.top) / rect.height) * 100;
+      const deltaXPercent = ((e.clientX - dragStartRef.current.mouseX) / rect.width) * 100;
+      const deltaYPercent = ((e.clientY - dragStartRef.current.mouseY) / rect.height) * 100;
 
-      newX = Math.max(0, Math.min(100, newX));
-      newY = Math.max(0, Math.min(100, newY));
+      let nextX = dragStartRef.current.posX + deltaXPercent;
+      let nextY = dragStartRef.current.posY + deltaYPercent;
 
-      setPos({ x: newX, y: newY });
+      nextX = Math.max(0, Math.min(100, Math.round(nextX * 100) / 100));
+      nextY = Math.max(0, Math.min(100, Math.round(nextY * 100) / 100));
+
+      posRef.current = { x: nextX, y: nextY };
+      setPos({ x: nextX, y: nextY });
     } else if (action === "resize") {
       const { mouseX, mouseY, width, height, direction } = resizeStartRef.current;
       const deltaX = e.clientX - mouseX;
@@ -161,18 +206,20 @@ export default function DraggableElement({
       if (direction.includes("bottom")) newHeight = height + deltaY;
       if (direction.includes("top")) newHeight = height - deltaY;
 
-      newWidth = Math.max(30, newWidth);
-      newHeight = Math.max(30, newHeight);
+      newWidth = Math.max(40, Math.round(newWidth));
+      newHeight = Math.max(40, Math.round(newHeight));
 
+      sizeRef.current = { width: newWidth, height: newHeight };
       setSize({ width: newWidth, height: newHeight });
     } else if (action === "pan") {
       const deltaX = e.clientX - panStartRef.current.mouseX;
       const deltaY = e.clientY - panStartRef.current.mouseY;
 
-      setImagePos({
-        x: panStartRef.current.imageX + deltaX,
-        y: panStartRef.current.imageY + deltaY,
-      });
+      const newImageX = Math.round(panStartRef.current.imageX + deltaX);
+      const newImageY = Math.round(panStartRef.current.imageY + deltaY);
+
+      imagePosRef.current = { x: newImageX, y: newImageY };
+      setImagePos({ x: newImageX, y: newImageY });
     }
   }, []);
 
@@ -183,20 +230,22 @@ export default function DraggableElement({
     activeActionRef.current = null;
     window.removeEventListener("pointermove", handleGlobalPointerMove);
     window.removeEventListener("pointerup", handleGlobalPointerUp);
+    window.removeEventListener("pointercancel", handleGlobalPointerUp);
 
     if (action === "drag") {
-      onUpdate?.({ x: pos.x, y: pos.y });
+      onUpdateRef.current?.({ x: posRef.current.x, y: posRef.current.y });
     } else if (action === "resize") {
-      onUpdate?.({ width: size.width, height: size.height });
+      onUpdateRef.current?.({ width: sizeRef.current.width, height: sizeRef.current.height });
     } else if (action === "pan") {
-      onUpdate?.({ imageX: imagePos.x, imageY: imagePos.y });
+      onUpdateRef.current?.({ imageX: imagePosRef.current.x, imageY: imagePosRef.current.y });
     }
-  }, [handleGlobalPointerMove, onUpdate, pos.x, pos.y, size.width, size.height, imagePos.x, imagePos.y]);
+  }, [handleGlobalPointerMove]);
 
   const startAction = (action: "drag" | "resize" | "pan") => {
     activeActionRef.current = action;
     window.addEventListener("pointermove", handleGlobalPointerMove, { passive: false });
     window.addEventListener("pointerup", handleGlobalPointerUp);
+    window.addEventListener("pointercancel", handleGlobalPointerUp);
   };
 
   /*
@@ -212,7 +261,12 @@ export default function DraggableElement({
     e.stopPropagation();
 
     setIsSelected(true);
-    dragStartRef.current = { x: e.clientX, y: e.clientY };
+    dragStartRef.current = {
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      posX: posRef.current.x,
+      posY: posRef.current.y,
+    };
     startAction("drag");
   };
 
@@ -232,8 +286,8 @@ export default function DraggableElement({
     resizeStartRef.current = {
       mouseX: e.clientX,
       mouseY: e.clientY,
-      width: size.width,
-      height: size.height,
+      width: sizeRef.current.width,
+      height: sizeRef.current.height,
       direction,
     };
     startAction("resize");
@@ -241,7 +295,7 @@ export default function DraggableElement({
 
   /*
    * =========================
-   * INICIAR ENCUADRE / DISPOSICIÓN IMAGEN (imageX, imageY)
+   * INICIAR ENCUADRE DE FOTO (imageX, imageY)
    * =========================
    */
   const handleImagePanStart = (e: React.PointerEvent) => {
@@ -256,18 +310,24 @@ export default function DraggableElement({
       return;
     }
 
-    panStartRef.current = {
-      mouseX: e.clientX,
-      mouseY: e.clientY,
-      imageX: imagePos.x,
-      imageY: imagePos.y,
-    };
-    startAction("pan");
+    if (isPanningMode) {
+      panStartRef.current = {
+        mouseX: e.clientX,
+        mouseY: e.clientY,
+        imageX: imagePosRef.current.x,
+        imageY: imagePosRef.current.y,
+      };
+      startAction("pan");
+    } else {
+      // Direct drag of element
+      handleDragElementStart(e);
+    }
   };
 
   const updateZoom = (newZoom: number) => {
+    zoomRef.current = newZoom;
     setZoom(newZoom);
-    onUpdate?.({ zoom: newZoom });
+    onUpdateRef.current?.({ zoom: newZoom });
   };
 
   const handleClass =
@@ -322,14 +382,30 @@ export default function DraggableElement({
             type="button"
             onPointerDown={handleDragElementStart}
             className="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center gap-1 font-semibold cursor-move"
-            title="Arrastra para mover la posición en la pantalla"
+            title="Arrastra para mover la posición en la invitación"
           >
             🖐️ Mover
           </button>
 
           {element.type === "image" && (
             <div className="flex items-center gap-1 border-l border-r border-white/15 px-2">
-              <span className="text-white/60 text-[9px]">Zoom:</span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsPanningMode((prev) => !prev);
+                }}
+                className={`px-2 py-0.5 rounded-full text-[9px] font-semibold transition-colors ${
+                  isPanningMode
+                    ? "bg-amber-400 text-black font-bold"
+                    : "bg-white/10 hover:bg-white/20 text-white"
+                }`}
+                title="Activar modo para mover la foto dentro del marco"
+              >
+                {isPanningMode ? "✓ Encuadrando" : "🖼️ Encuadrar"}
+              </button>
+
+              <span className="text-white/60 text-[9px] ml-1">Zoom:</span>
               <button
                 type="button"
                 onClick={(e) => {
@@ -357,9 +433,10 @@ export default function DraggableElement({
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
+                  imagePosRef.current = { x: 0, y: 0 };
                   setImagePos({ x: 0, y: 0 });
                   updateZoom(120);
-                  onUpdate?.({ imageX: 0, imageY: 0, zoom: 120 });
+                  onUpdateRef.current?.({ imageX: 0, imageY: 0, zoom: 120 });
                 }}
                 className="ml-1 text-[9px] text-white/50 hover:text-white underline"
                 title="Restablecer encuadre"
@@ -385,17 +462,17 @@ export default function DraggableElement({
         </div>
       )}
 
-      {/* Indicador sobre la foto cuando está seleccionada */}
-      {isDesigner && isSelected && element.type === "image" && (
-        <div className="absolute top-2 left-2 z-[90] pointer-events-none bg-black/70 text-amber-300 text-[9px] px-2 py-0.5 rounded-full backdrop-blur-sm border border-amber-400/30">
-          🖼️ Clic y arrastra sobre la foto para encuadrar
+      {/* Indicador sobre la foto cuando está en modo encuadre */}
+      {isDesigner && isSelected && element.type === "image" && isPanningMode && (
+        <div className="absolute top-2 left-2 z-[90] pointer-events-none bg-black/80 text-amber-300 text-[9px] px-2 py-0.5 rounded-full backdrop-blur-sm border border-amber-400/40">
+          🖼️ Arrastra sobre la imagen para encuadrar
         </div>
       )}
 
       {/* Badge al pasar cursor encima si NO está seleccionado */}
       {isDesigner && !isSelected && (
         <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 text-white/90 text-[9px] px-2 py-0.5 rounded whitespace-nowrap pointer-events-none">
-          Clic para seleccionar / editar
+          Clic para mover o editar
         </div>
       )}
 
@@ -414,7 +491,9 @@ export default function DraggableElement({
             onPointerDown={handleImagePanStart}
             className={`absolute max-w-none transition-transform duration-75 ${
               isDesigner && isSelected
-                ? "cursor-grab active:cursor-grabbing hover:brightness-105"
+                ? isPanningMode
+                  ? "cursor-grab active:cursor-grabbing hover:brightness-105"
+                  : "cursor-move hover:brightness-105"
                 : isDesigner
                 ? "cursor-pointer"
                 : ""
@@ -449,13 +528,13 @@ export default function DraggableElement({
                 onPointerDown={(e) => handleResizeStart(e, "bottom-left")}
               />
 
-              {/* LADOS */}
+              {/* BORDES LATERALES */}
               <div
-                className={`${handleClass} top-1/2 -left-1.5 -translate-y-1/2 cursor-ew-resize`}
+                className={`${handleClass} top-1/2 -translate-y-1/2 -left-1.5 cursor-ew-resize`}
                 onPointerDown={(e) => handleResizeStart(e, "left")}
               />
               <div
-                className={`${handleClass} top-1/2 -right-1.5 -translate-y-1/2 cursor-ew-resize`}
+                className={`${handleClass} top-1/2 -translate-y-1/2 -right-1.5 cursor-ew-resize`}
                 onPointerDown={(e) => handleResizeStart(e, "right")}
               />
               <div
@@ -470,32 +549,16 @@ export default function DraggableElement({
           )}
         </div>
       ) : (
-        <div className="relative">
-          <div onPointerDown={handleDragElementStart} className={isDesigner ? "cursor-move" : ""}>
-            {element.content}
-          </div>
-
-          {isDesigner && isSelected && (
-            <>
-              {/* ESQUINAS PARA TEXTO */}
-              <div
-                className={`${handleClass} -top-1.5 -left-1.5 cursor-nwse-resize`}
-                onPointerDown={(e) => handleResizeStart(e, "top-left")}
-              />
-              <div
-                className={`${handleClass} -top-1.5 -right-1.5 cursor-nesw-resize`}
-                onPointerDown={(e) => handleResizeStart(e, "top-right")}
-              />
-              <div
-                className={`${handleClass} -bottom-1.5 -right-1.5 cursor-nwse-resize`}
-                onPointerDown={(e) => handleResizeStart(e, "bottom-right")}
-              />
-              <div
-                className={`${handleClass} -bottom-1.5 -left-1.5 cursor-nesw-resize`}
-                onPointerDown={(e) => handleResizeStart(e, "bottom-left")}
-              />
-            </>
-          )}
+        /* Elemento de Texto */
+        <div
+          onPointerDown={handleDragElementStart}
+          className={`cursor-move relative px-2 py-1 ${
+            isDesigner && isSelected
+              ? "bg-black/20 rounded border border-amber-400/40"
+              : ""
+          }`}
+        >
+          {element.content || "Texto"}
         </div>
       )}
     </div>
