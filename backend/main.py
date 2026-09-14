@@ -5,6 +5,7 @@ Run with:
     cd backend && uvicorn main:app --reload --port 8000
 """
 
+import os
 import json
 import secrets
 import string
