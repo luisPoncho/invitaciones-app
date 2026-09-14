@@ -38,6 +38,11 @@ function getFreeLayer(el: HTMLElement | null): HTMLElement | null {
   return null;
 }
 
+const ALL_FONT_OPTIONS = [
+  ...FONT_DISPLAY_OPTIONS.map((f) => ({ id: f.id, label: f.label, cssVar: f.cssVar, group: "Display / Títulos" })),
+  ...FONT_BODY_OPTIONS.map((f) => ({ id: f.id, label: f.label, cssVar: f.cssVar, group: "Cuerpo / Lectura" })),
+];
+
 export default function DraggableElement({
   element,
   isDesigner,
@@ -50,14 +55,17 @@ export default function DraggableElement({
   // States for visual updates
   const [pos, setPos] = useState({ x: element.x ?? 50, y: element.y ?? 50 });
   const [size, setSize] = useState({
-    width: element.width || 220,
-    height: element.height || (element.type === "image" ? 220 : 100),
+    width: element.width || (element.type === "image" ? 220 : 260),
+    height: element.height || (element.type === "image" ? 220 : 80),
   });
   const [imagePos, setImagePos] = useState({
     x: element.imageX ?? 0,
     y: element.imageY ?? 0,
   });
   const [zoom, setZoom] = useState(element.zoom ?? 120);
+  const [fontSize, setFontSize] = useState(element.fontSize ?? 24);
+  const [textColor, setTextColor] = useState(element.color || "#FFFFFF");
+  const [fontFamilyId, setFontFamilyId] = useState(element.fontFamily || "fraunces");
 
   // Synchronized refs to completely prevent stale closures
   const onUpdateRef = useRef(onUpdate);
@@ -65,8 +73,8 @@ export default function DraggableElement({
 
   const posRef = useRef({ x: element.x ?? 50, y: element.y ?? 50 });
   const sizeRef = useRef({
-    width: element.width || 220,
-    height: element.height || (element.type === "image" ? 220 : 100),
+    width: element.width || (element.type === "image" ? 220 : 260),
+    height: element.height || (element.type === "image" ? 220 : 80),
   });
   const imagePosRef = useRef({
     x: element.imageX ?? 0,
@@ -107,14 +115,17 @@ export default function DraggableElement({
     if (!activeActionRef.current) {
       const newPos = { x: element.x ?? 50, y: element.y ?? 50 };
       const newSize = {
-        width: element.width || 220,
-        height: element.height || (element.type === "image" ? 220 : 100),
+        width: element.width || (element.type === "image" ? 220 : 260),
+        height: element.height || (element.type === "image" ? 220 : 80),
       };
       const newImagePos = {
         x: element.imageX ?? 0,
         y: element.imageY ?? 0,
       };
       const newZoom = element.zoom ?? 120;
+      const newFontSize = element.fontSize ?? 24;
+      const newColor = element.color || "#FFFFFF";
+      const newFont = element.fontFamily || "fraunces";
 
       posRef.current = newPos;
       sizeRef.current = newSize;
@@ -125,6 +136,9 @@ export default function DraggableElement({
       setSize(newSize);
       setImagePos(newImagePos);
       setZoom(newZoom);
+      setFontSize(newFontSize);
+      setTextColor(newColor);
+      setFontFamilyId(newFont);
     }
   }, [
     element.x,
@@ -134,6 +148,9 @@ export default function DraggableElement({
     element.imageX,
     element.imageY,
     element.zoom,
+    element.fontSize,
+    element.color,
+    element.fontFamily,
     element.type,
   ]);
 
@@ -224,11 +241,11 @@ export default function DraggableElement({
 
       // Resizing vertically from one side: opposite side stays pinned
       if (direction.includes("bottom")) {
-        newHeight = Math.max(30, height + deltaY);
+        newHeight = Math.max(20, height + deltaY);
         const actualDeltaH = newHeight - height;
         deltaCenterY_px = actualDeltaH / 2;
       } else if (direction.includes("top")) {
-        newHeight = Math.max(30, height - deltaY);
+        newHeight = Math.max(20, height - deltaY);
         const actualDeltaH = newHeight - height;
         deltaCenterY_px = -actualDeltaH / 2;
       }
@@ -373,16 +390,29 @@ export default function DraggableElement({
     onUpdateRef.current?.({ zoom: newZoom });
   };
 
+  const updateFontSize = (newSize: number) => {
+    const clamped = Math.max(10, Math.min(120, newSize));
+    setFontSize(clamped);
+    onUpdateRef.current?.({ fontSize: clamped });
+  };
+
+  const updateTextColor = (newColor: string) => {
+    setTextColor(newColor);
+    onUpdateRef.current?.({ color: newColor });
+  };
+
+  const updateFontFamily = (newFont: string) => {
+    setFontFamilyId(newFont);
+    onUpdateRef.current?.({ fontFamily: newFont });
+  };
+
   const handleClass =
     "absolute w-3.5 h-3.5 bg-amber-400 border-2 border-white rounded-full z-[100] shadow-md transition-transform hover:scale-125 cursor-pointer";
 
   const fontFamily = (() => {
-    const id = element.fontFamily;
-    const displayMatch = FONT_DISPLAY_OPTIONS.find((f) => f.id === id);
-    if (displayMatch) return displayMatch.cssVar;
-    const bodyMatch = FONT_BODY_OPTIONS.find((f) => f.id === id);
-    if (bodyMatch) return bodyMatch.cssVar;
-    if (id === "body") return "var(--font-work-sans)";
+    const id = fontFamilyId;
+    const match = ALL_FONT_OPTIONS.find((f) => f.id === id);
+    if (match) return match.cssVar;
     return "var(--font-fraunces)";
   })();
 
@@ -407,15 +437,14 @@ export default function DraggableElement({
         left: `${pos.x}%`,
         top: `${pos.y}%`,
         transform: "translate(-50%, -50%)",
-        color: element.color,
-        fontSize: `${element.fontSize}px`,
+        color: textColor,
+        fontSize: `${fontSize}px`,
         fontFamily,
-        whiteSpace: "pre-wrap",
         textAlign: "center",
         zIndex: isSelected ? 60 : 50,
         touchAction: isDesigner ? "none" : "auto",
         textShadow:
-          element.type === "text" ? "0px 2px 4px rgba(0,0,0,0.3)" : "none",
+          element.type === "text" ? "0px 2px 4px rgba(0,0,0,0.2)" : "none",
       }}
     >
       {/* Barra de herramientas flotante al seleccionar */}
@@ -430,6 +459,63 @@ export default function DraggableElement({
             🖐️ Mover
           </button>
 
+          {/* Opciones de Texto Libre */}
+          {element.type === "text" && (
+            <div className="flex items-center gap-1.5 border-l border-r border-white/15 px-2">
+              {/* Selector de Fuente */}
+              <select
+                value={fontFamilyId}
+                onChange={(e) => updateFontFamily(e.target.value)}
+                className="bg-[#222] text-white border border-white/20 rounded px-1.5 py-0.5 text-[9px] focus:outline-none"
+                title="Tipo de fuente"
+              >
+                {ALL_FONT_OPTIONS.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.label}
+                  </option>
+                ))}
+              </select>
+
+              {/* Tamaño de Fuente */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updateFontSize(fontSize - 2);
+                }}
+                className="w-5 h-5 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold flex items-center justify-center text-xs"
+                title="Reducir tamaño de letra"
+              >
+                -
+              </button>
+              <span className="text-[10px] text-amber-300 font-mono w-6 text-center">
+                {fontSize}
+              </span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updateFontSize(fontSize + 2);
+                }}
+                className="w-5 h-5 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold flex items-center justify-center text-xs"
+                title="Aumentar tamaño de letra"
+              >
+                +
+              </button>
+
+              {/* Color Picker */}
+              <label className="flex items-center gap-1 cursor-pointer" title="Color de texto">
+                <input
+                  type="color"
+                  value={textColor}
+                  onChange={(e) => updateTextColor(e.target.value)}
+                  className="w-4 h-4 rounded-full border-0 p-0 cursor-pointer bg-transparent"
+                />
+              </label>
+            </div>
+          )}
+
+          {/* Opciones de Imagen Libre */}
           {element.type === "image" && (
             <div className="flex items-center gap-1 border-l border-r border-white/15 px-2">
               <button
@@ -592,16 +678,64 @@ export default function DraggableElement({
           )}
         </div>
       ) : (
-        /* Elemento de Texto */
+        /* Elemento de Texto Libre */
         <div
           onPointerDown={handleDragElementStart}
-          className={`cursor-move relative px-2 py-1 ${
+          className={`cursor-move relative px-2 py-1 flex items-center justify-center ${
             isDesigner && isSelected
-              ? "bg-black/20 rounded border border-amber-400/40"
+              ? "border border-amber-400/60 bg-white/5 rounded"
               : ""
           }`}
+          style={{
+            width: size.width ? `${size.width}px` : "auto",
+            minHeight: size.height ? `${size.height}px` : "auto",
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
+          }}
         >
-          {element.content || "Texto"}
+          <div className="w-full h-full text-center">
+            {element.content || "Texto"}
+          </div>
+
+          {isDesigner && isSelected && (
+            <>
+              {/* ESQUINAS */}
+              <div
+                className={`${handleClass} -top-1.5 -left-1.5 cursor-nwse-resize`}
+                onPointerDown={(e) => handleResizeStart(e, "top-left")}
+              />
+              <div
+                className={`${handleClass} -top-1.5 -right-1.5 cursor-nesw-resize`}
+                onPointerDown={(e) => handleResizeStart(e, "top-right")}
+              />
+              <div
+                className={`${handleClass} -bottom-1.5 -right-1.5 cursor-nwse-resize`}
+                onPointerDown={(e) => handleResizeStart(e, "bottom-right")}
+              />
+              <div
+                className={`${handleClass} -bottom-1.5 -left-1.5 cursor-nesw-resize`}
+                onPointerDown={(e) => handleResizeStart(e, "bottom-left")}
+              />
+
+              {/* BORDES LATERALES */}
+              <div
+                className={`${handleClass} top-1/2 -translate-y-1/2 -left-1.5 cursor-ew-resize`}
+                onPointerDown={(e) => handleResizeStart(e, "left")}
+              />
+              <div
+                className={`${handleClass} top-1/2 -translate-y-1/2 -right-1.5 cursor-ew-resize`}
+                onPointerDown={(e) => handleResizeStart(e, "right")}
+              />
+              <div
+                className={`${handleClass} -top-1.5 left-1/2 -translate-x-1/2 cursor-ns-resize`}
+                onPointerDown={(e) => handleResizeStart(e, "top")}
+              />
+              <div
+                className={`${handleClass} -bottom-1.5 left-1/2 -translate-x-1/2 cursor-ns-resize`}
+                onPointerDown={(e) => handleResizeStart(e, "bottom")}
+              />
+            </>
+          )}
         </div>
       )}
     </div>

@@ -470,12 +470,12 @@ export default function DesignerSidebar({
                 </button>
               </div>
               {(config.freeElements?.length || 0) > 0 && (
-                <div className="mt-3 flex flex-col gap-2">
+                <div className="mt-3 flex flex-col gap-2.5">
                   {config.freeElements!.map(el => (
-                    <div key={el.id} className="flex flex-col gap-1.5 bg-white/5 rounded-lg px-3 py-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[10px] uppercase text-white/50 tracking-wider">
-                          {el.type === "text" ? "Texto Libre" : "Imagen Libre"}
+                    <div key={el.id} className="flex flex-col gap-2 bg-white/5 border border-white/10 rounded-lg p-3">
+                      <div className="flex justify-between items-center pb-1 border-b border-white/5">
+                        <span className="text-[10px] uppercase text-amber-300/80 font-bold tracking-wider">
+                          {el.type === "text" ? "📝 Texto Libre" : "🖼️ Imagen Libre"}
                         </span>
                         <button
                           onClick={() => update({ freeElements: config.freeElements!.filter(e => e.id !== el.id) })}
@@ -484,28 +484,139 @@ export default function DesignerSidebar({
                           Eliminar
                         </button>
                       </div>
+
                       {el.type === "text" ? (
-                        <input
-                          type="text"
-                          value={el.content || ""}
-                          onChange={(e) => {
-                            const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, content: e.target.value } : e2);
-                            update({ freeElements: newElements });
-                          }}
-                          placeholder="Escribe el texto..."
-                          className="bg-black/20 border border-white/10 rounded px-2 py-1.5 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-white/30"
-                        />
+                        <>
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] text-white/50 uppercase">Texto</label>
+                            <textarea
+                              value={el.content || ""}
+                              onChange={(e) => {
+                                const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, content: e.target.value } : e2);
+                                update({ freeElements: newElements });
+                              }}
+                              rows={2}
+                              placeholder="Escribe el texto..."
+                              className="bg-black/30 border border-white/10 rounded px-2 py-1.5 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 resize-none"
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2">
+                            {/* Tipo de Fuente */}
+                            <div className="flex flex-col gap-1">
+                              <label className="text-[10px] text-white/50 uppercase">Fuente</label>
+                              <select
+                                value={el.fontFamily || "fraunces"}
+                                onChange={(e) => {
+                                  const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, fontFamily: e.target.value } : e2);
+                                  update({ freeElements: newElements });
+                                }}
+                                className="bg-[#111] border border-white/10 rounded px-2 py-1 text-xs text-white focus:outline-none"
+                              >
+                                <optgroup label="Títulos / Display">
+                                  {FONT_DISPLAY_OPTIONS.map(f => (
+                                    <option key={f.id} value={f.id}>{f.label}</option>
+                                  ))}
+                                </optgroup>
+                                <optgroup label="Cuerpo / Lectura">
+                                  {FONT_BODY_OPTIONS.map(f => (
+                                    <option key={f.id} value={f.id}>{f.label}</option>
+                                  ))}
+                                </optgroup>
+                              </select>
+                            </div>
+
+                            {/* Color del Texto */}
+                            <div className="flex flex-col gap-1">
+                              <label className="text-[10px] text-white/50 uppercase">Color</label>
+                              <div className="flex items-center gap-1.5">
+                                <input
+                                  type="color"
+                                  value={el.color || config.theme.primary}
+                                  onChange={(e) => {
+                                    const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, color: e.target.value } : e2);
+                                    update({ freeElements: newElements });
+                                  }}
+                                  className="w-7 h-7 rounded border border-white/20 p-0 cursor-pointer bg-transparent"
+                                />
+                                <span className="text-[10px] text-white/60 font-mono">{el.color || config.theme.primary}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2">
+                            {/* Tamaño de Letra */}
+                            <div className="flex flex-col gap-1">
+                              <div className="flex justify-between text-[10px] text-white/50 uppercase">
+                                <span>Tamaño</span>
+                                <span className="text-amber-300 font-mono">{el.fontSize || 24}px</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="12"
+                                max="72"
+                                value={el.fontSize || 24}
+                                onChange={(e) => {
+                                  const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, fontSize: Number(e.target.value) } : e2);
+                                  update({ freeElements: newElements });
+                                }}
+                                className="accent-amber-400"
+                              />
+                            </div>
+
+                            {/* Ancho del Marco */}
+                            <div className="flex flex-col gap-1">
+                              <div className="flex justify-between text-[10px] text-white/50 uppercase">
+                                <span>Ancho Caja</span>
+                                <span className="text-amber-300 font-mono">{el.width || 260}px</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="80"
+                                max="380"
+                                value={el.width || 260}
+                                onChange={(e) => {
+                                  const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, width: Number(e.target.value) } : e2);
+                                  update({ freeElements: newElements });
+                                }}
+                                className="accent-amber-400"
+                              />
+                            </div>
+                          </div>
+                        </>
                       ) : (
-                        <input
-                          type="url"
-                          value={el.url || ""}
-                          onChange={(e) => {
-                            const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, url: e.target.value } : e2);
-                            update({ freeElements: newElements });
-                          }}
-                          placeholder="URL de la imagen"
-                          className="bg-black/20 border border-white/10 rounded px-2 py-1.5 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-white/30"
-                        />
+                        <>
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] text-white/50 uppercase">URL Imagen</label>
+                            <input
+                              type="url"
+                              value={el.url || ""}
+                              onChange={(e) => {
+                                const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, url: e.target.value } : e2);
+                                update({ freeElements: newElements });
+                              }}
+                              placeholder="https://..."
+                              className="bg-black/30 border border-white/10 rounded px-2 py-1.5 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-white/30"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <div className="flex justify-between text-[10px] text-white/50 uppercase">
+                              <span>Ancho de Imagen</span>
+                              <span className="text-amber-300 font-mono">{el.width || 220}px</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="60"
+                              max="380"
+                              value={el.width || 220}
+                              onChange={(e) => {
+                                const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, width: Number(e.target.value) } : e2);
+                                update({ freeElements: newElements });
+                              }}
+                              className="accent-amber-400"
+                            />
+                          </div>
+                        </>
                       )}
                     </div>
                   ))}
