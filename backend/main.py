@@ -468,6 +468,30 @@ def create_rsvp(slug: str, body: RsvpCreate, db: Session = Depends(get_db)):
     )
 
 
+ADMIN_CLEAR_PASSWORD = os.getenv("ADMIN_CLEAR_PASSWORD", "Ajl17xj03k")
+
+
+@app.delete("/api/invitations/{slug}/rsvp", status_code=204)
+def clear_rsvps(
+    slug: str,
+    token: str = Query(..., description="Admin token for authorization"),
+    password: str = Query(..., description="Admin password to clear responses"),
+    db: Session = Depends(get_db),
+):
+    """Clear/delete all RSVPs for an invitation. Protected by admin token and master password."""
+    inv = db.query(Invitation).filter(Invitation.slug == slug).first()
+    if not inv:
+        raise HTTPException(status_code=404, detail="Invitación no encontrada.")
+    if inv.admin_token != token:
+        raise HTTPException(status_code=403, detail="Token de administrador inválido.")
+    if password != ADMIN_CLEAR_PASSWORD:
+        raise HTTPException(status_code=401, detail="Contraseña de administrador incorrecta.")
+
+    db.query(Rsvp).filter(Rsvp.invitation_id == inv.id).delete()
+    db.commit()
+    return None
+
+
 # ── Health check ─────────────────────────────────────────────────────────────
 
 @app.get("/api/health")

@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import type { FullInvitationConfig, RSVPEntry } from "@/lib/mock-data";
-import { loadInvitation, getRSVPs } from "@/lib/storage";
+import { loadInvitation, getRSVPs, clearRSVPs } from "@/lib/storage";
 
 function StatCard({
   label,
@@ -57,6 +57,13 @@ export default function AdminPageClient({ slug }: { slug: string }) {
   const [filter, setFilter] = useState<"todos" | "si" | "no">("todos");
   const [search, setSearch] = useState("");
 
+  // Modal para limpiar respuestas
+  const [showClearModal, setShowClearModal] = useState(false);
+  const [clearPassword, setClearPassword] = useState("");
+  const [clearError, setClearError] = useState("");
+  const [clearing, setClearing] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
   const refresh = useCallback(async () => {
     const data = await loadInvitation(slug);
     if (!data || data.adminToken !== token) {
@@ -72,6 +79,34 @@ export default function AdminPageClient({ slug }: { slug: string }) {
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  const handleClearRSVPs = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!clearPassword.trim()) {
+      setClearError("Ingresa la contraseña de administrador.");
+      return;
+    }
+
+    setClearing(true);
+    setClearError("");
+
+    try {
+      await clearRSVPs(slug, token, clearPassword.trim());
+      setRsvps([]);
+      setShowClearModal(false);
+      setClearPassword("");
+      setSuccessMessage("✓ Todas las respuestas han sido eliminadas correctamente.");
+      setTimeout(() => setSuccessMessage(""), 5000);
+    } catch (err: any) {
+      if (err.message?.includes("401") || err.message?.includes("incorrecta")) {
+        setClearError("Contraseña de administrador incorrecta.");
+      } else {
+        setClearError("Error al limpiar las respuestas. Intenta de nuevo.");
+      }
+    } finally {
+      setClearing(false);
+    }
+  };
 
   if (status === "loading") {
     return (
@@ -110,7 +145,7 @@ export default function AdminPageClient({ slug }: { slug: string }) {
       {/* Header */}
       <header className="border-b border-white/10 bg-[#0f0f0f]">
         <div className="max-w-5xl mx-auto px-6 py-5">
-          <div className="flex items-start justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div>
               <p className="text-[11px] text-white/30 uppercase tracking-widest mb-1">
                 Panel de anfitriones
@@ -122,20 +157,52 @@ export default function AdminPageClient({ slug }: { slug: string }) {
                 {inv!.fechaLegible} · {inv!.lugarNombre}
               </p>
             </div>
-            <button
-              onClick={refresh}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-white/50 hover:text-white/70 transition-all"
-            >
-              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-              </svg>
-              Actualizar
-            </button>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={refresh}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-white/70 hover:text-white transition-all"
+              >
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+                Actualizar
+              </button>
+
+              <button
+                onClick={() => {
+                  setClearError("");
+                  setClearPassword("");
+                  setShowClearModal(true);
+                }}
+                disabled={rsvps.length === 0}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-xs text-red-300 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                title="Eliminar todas las respuestas recibidas con contraseña"
+              >
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                </svg>
+                Limpiar respuestas
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       <main className="max-w-5xl mx-auto px-6 py-8 space-y-8">
+        {/* Mensaje de éxito */}
+        {successMessage && (
+          <div className="bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs px-4 py-3 rounded-xl flex items-center justify-between animate-fadeIn">
+            <span>{successMessage}</span>
+            <button
+              onClick={() => setSuccessMessage("")}
+              className="text-emerald-400 hover:text-emerald-200 text-xs font-bold"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <StatCard label="Total respuestas" value={rsvps.length} sublabel={`${confirmados.length} asisten · ${declinados.length} no`} color="#ffffff" />
@@ -275,6 +342,73 @@ export default function AdminPageClient({ slug }: { slug: string }) {
           </div>
         )}
       </main>
+
+      {/* Modal de confirmación con contraseña */}
+      {showClearModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+          <div className="bg-[#161616] border border-white/15 rounded-2xl max-w-md w-full p-6 shadow-2xl animate-scaleIn">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-400 text-lg flex-shrink-0">
+                ⚠️
+              </div>
+              <div>
+                <h3 className="text-white text-base font-semibold">
+                  Limpiar todas las respuestas
+                </h3>
+                <p className="text-white/40 text-xs">
+                  Esta acción eliminará todas las confirmaciones registradas.
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs text-white/60 mb-5 leading-relaxed bg-white/5 p-3 rounded-xl border border-white/5">
+              Se borrarán <strong>{rsvps.length} respuestas</strong> ({totalPasesConfirmados} pases confirmados) de la base de datos de manera irreversible.
+            </p>
+
+            <form onSubmit={handleClearRSVPs} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] uppercase tracking-wider text-white/60 font-medium">
+                  Contraseña de Administrador
+                </label>
+                <input
+                  type="password"
+                  autoFocus
+                  value={clearPassword}
+                  onChange={(e) => setClearPassword(e.target.value)}
+                  placeholder="Ingresa la contraseña..."
+                  className="bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-red-400/60 focus:ring-1 focus:ring-red-400/40 transition-colors"
+                />
+                {clearError && (
+                  <p className="text-red-400 text-xs font-medium mt-1">
+                    {clearError}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-white/10 mt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowClearModal(false);
+                    setClearPassword("");
+                    setClearError("");
+                  }}
+                  className="px-4 py-2 rounded-xl text-xs text-white/60 hover:text-white hover:bg-white/5 border border-white/10 transition-all font-medium"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={clearing || !clearPassword.trim()}
+                  className="px-4 py-2 rounded-xl text-xs text-white bg-red-600 hover:bg-red-500 font-medium shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+                >
+                  {clearing ? "Eliminando..." : "Confirmar y Limpiar"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

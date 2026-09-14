@@ -124,3 +124,17 @@ export async function getRSVPs(
     return [];
   }
 }
+
+/** Elimina todas las respuestas de un evento (requiere token y contraseña de admin) */
+export async function clearRSVPs(
+  slug: string,
+  token: string,
+  password: string
+): Promise<void> {
+  await api<void>(
+    `/api/invitations/${slug}/rsvp?token=${encodeURIComponent(token)}&password=${encodeURIComponent(password)}`,
+    {
+      method: "DELETE",
+    }
+  );
+}
