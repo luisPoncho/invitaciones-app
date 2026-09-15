@@ -628,6 +628,32 @@ export default function DesignerSidebar({
                           </div>
                         </>
                       )}
+
+                      {/* Control de Capas (Z-Index) común para texto e imagen */}
+                      <div className="flex flex-col gap-1 mt-1 pt-2 border-t border-white/5">
+                        <label className="text-[10px] text-white/50 uppercase">Posición de la capa</label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, zIndex: (e2.zIndex ?? 50) - 1 } : e2);
+                              update({ freeElements: newElements });
+                            }}
+                            className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded py-1 text-xs text-white/80 transition-colors"
+                          >
+                            ⏬ Enviar atrás
+                          </button>
+                          <span className="text-[10px] text-amber-300 font-mono w-6 text-center">{el.zIndex ?? 50}</span>
+                          <button
+                            onClick={() => {
+                              const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, zIndex: (e2.zIndex ?? 50) + 1 } : e2);
+                              update({ freeElements: newElements });
+                            }}
+                            className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded py-1 text-xs text-white/80 transition-colors"
+                          >
+                            ⏫ Traer al frente
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>

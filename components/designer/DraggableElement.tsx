@@ -441,7 +441,7 @@ export default function DraggableElement({
         fontSize: `${fontSize}px`,
         fontFamily,
         textAlign: "center",
-        zIndex: isSelected ? 60 : 50,
+        zIndex: isSelected ? 999 : (element.zIndex ?? 50),
         touchAction: isDesigner ? "none" : "auto",
         textShadow:
           element.type === "text" ? "0px 2px 4px rgba(0,0,0,0.2)" : "none",
