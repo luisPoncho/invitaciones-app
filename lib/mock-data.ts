@@ -61,6 +61,7 @@ export type FreeElement = {
   imageX?: number; // px offset horizontal para encuadre
   imageY?: number; // px offset vertical para encuadre
   zoom?: number; // zoom percentage (e.g. 100 - 300)
+  zIndex?: number; // Control de capa (profundidad)
 };
 
 export type SectionBackgrounds = {
