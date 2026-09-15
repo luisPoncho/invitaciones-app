@@ -13,6 +13,7 @@ import FotoFondo from "@/components/panels/FotoFondo";
 import Separador from "@/components/panels/Separador";
 import EntryWrapper from "@/components/entry/EntryWrapper";
 import FreeElementsLayer from "@/components/designer/FreeElementsLayer";
+import MusicPlayer from "@/components/MusicPlayer";
 import { mockEvent, defaultTheme } from "@/lib/mock-data";
 import type { EventData, InvitationTheme, FullInvitationConfig, PhotoConfig, EntryAnimation, FreeElement, SectionBlock, StylePreset } from "@/lib/mock-data";
 import { loadInvitation } from "@/lib/storage";
@@ -29,7 +30,9 @@ export default function InvitacionPage({
   const [entryAnimation, setEntryAnimation] = useState<EntryAnimation>("carta");
   const [freeElements, setFreeElements] = useState<FreeElement[]>([]);
   const [sections, setSections] = useState<SectionBlock[]>([]);
+  const [musicUrl, setMusicUrl] = useState<string | undefined>();
   const [loading, setLoading] = useState(true);
+  const [musicShouldPlay, setMusicShouldPlay] = useState(false);
 
   useEffect(() => {
     loadInvitation(params.slug).then((saved) => {
@@ -41,6 +44,7 @@ export default function InvitacionPage({
         setEntryAnimation(saved.entryAnimation || "carta");
         setFreeElements(saved.freeElements || []);
         setSections(saved.sections || []);
+        setMusicUrl(saved.musicUrl);
       }
       setLoading(false);
     });
@@ -57,7 +61,11 @@ export default function InvitacionPage({
   return (
     <main className="min-h-screen relative overflow-hidden bg-[#111] flex justify-center">
       <div className="relative w-full max-w-[480px] min-h-screen bg-white overflow-hidden shadow-2xl">
-        <EntryWrapper animation={entryAnimation} theme={theme}>
+        <EntryWrapper
+          animation={entryAnimation}
+          theme={theme}
+          onAnimationOpen={() => setMusicShouldPlay(true)}
+        >
           <FreeElementsLayer elements={freeElements} isDesigner={false} />
           {sections.map(section => {
             switch (section.type) {
@@ -87,6 +95,9 @@ export default function InvitacionPage({
           })}
         </EntryWrapper>
       </div>
+
+      {/* Floating music player */}
+      <MusicPlayer musicUrl={musicUrl} theme={theme} shouldPlay={musicShouldPlay} />
     </main>
   );
 }

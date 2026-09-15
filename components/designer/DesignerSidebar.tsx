@@ -624,6 +624,41 @@ export default function DesignerSidebar({
               )}
             </div>
 
+            {/* Sección: Música de Fondo */}
+            <div className="px-5 py-4 border-b border-white/10">
+              <p className="text-[11px] font-semibold text-white/40 uppercase tracking-widest mb-3">
+                🎵 Música de Fondo
+              </p>
+              <p className="text-xs text-white/40 mb-3 leading-relaxed">
+                Pega el link de una canción de Spotify. Se reproducirá automáticamente cuando el invitado abra la invitación.
+              </p>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-white/50 uppercase tracking-wider">
+                  URL de Spotify
+                </label>
+                <input
+                  type="url"
+                  value={config.musicUrl || ""}
+                  onChange={(e) => update({ musicUrl: e.target.value || undefined })}
+                  placeholder="https://open.spotify.com/track/..."
+                  className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-white/30 transition-colors"
+                />
+                {config.musicUrl && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                    <span className="text-[10px] text-green-400/80">Canción configurada</span>
+                    <button
+                      type="button"
+                      onClick={() => update({ musicUrl: undefined })}
+                      className="ml-auto text-red-400/60 hover:text-red-400 text-[10px] uppercase tracking-wider"
+                    >
+                      Quitar
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Sección: Link / slug */}
             <div className="px-5 py-4 border-b border-white/10">
               <p className="text-[11px] font-semibold text-white/40 uppercase tracking-widest mb-3">

@@ -114,6 +114,7 @@ class InvitationCreate(BaseModel):
     sections: List[SectionBlock] = []
     stylePreset: str = "clasico"
     itinerary: Optional[List[ItineraryItem]] = None
+    musicUrl: Optional[str] = None
 
 
 class InvitationUpdate(BaseModel):
@@ -143,6 +144,7 @@ class InvitationUpdate(BaseModel):
     sections: Optional[List[SectionBlock]] = None
     stylePreset: Optional[str] = None
     itinerary: Optional[List[ItineraryItem]] = None
+    musicUrl: Optional[str] = None
 
 
 class InvitationResponse(BaseModel):
@@ -172,6 +174,7 @@ class InvitationResponse(BaseModel):
     sections: List[SectionBlock]
     stylePreset: str = "clasico"
     itinerary: Optional[List[ItineraryItem]] = None
+    musicUrl: Optional[str] = None
     createdAt: str
     updatedAt: str
 

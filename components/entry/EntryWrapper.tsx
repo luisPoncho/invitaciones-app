@@ -8,10 +8,12 @@ import EntryVinyl from "./EntryVinyl";
 export default function EntryWrapper({ 
   animation, 
   theme,
+  onAnimationOpen,
   children
 }: { 
   animation: EntryAnimation;
   theme: InvitationTheme;
+  onAnimationOpen?: () => void;
   children: React.ReactNode;
 }) {
   const [opened, setOpened] = useState(animation === "none");
@@ -22,6 +24,8 @@ export default function EntryWrapper({
     if (animation === "none") {
       setOpened(true);
       setShowAnimation(false);
+      // If there's no animation, signal immediately
+      onAnimationOpen?.();
     } else {
       setOpened(false);
       setShowAnimation(true);
@@ -30,6 +34,7 @@ export default function EntryWrapper({
 
   const handleOpen = () => {
     setOpened(true);
+    onAnimationOpen?.();
     setTimeout(() => {
       setShowAnimation(false);
     }, 1000);

@@ -68,6 +68,7 @@ def auto_migrate_db():
             ("recepcion_url", "TEXT DEFAULT NULL"),
             ("style_preset", "TEXT DEFAULT 'clasico'"),
             ("itinerary", "TEXT DEFAULT '[]'"),
+            ("music_url", "TEXT DEFAULT NULL"),
         ]
 
         with engine.begin() as connection:
@@ -146,6 +147,7 @@ def seed_db():
                     {"id": "sec-6", "type": "rsvp"},
                 ]),
                 itinerary=json.dumps([]),
+                music_url=None,
                 created_at=now,
                 updated_at=now,
             )
@@ -244,6 +246,7 @@ def _invitation_to_response(inv: Invitation) -> InvitationResponse:
         sections=_safe_json_loads(getattr(inv, "sections", "[]"), []),
         stylePreset=cast(str, getattr(inv, "style_preset", "clasico") or "clasico"),
         itinerary=_safe_json_loads(getattr(inv, "itinerary", "[]"), []),
+        musicUrl=getattr(inv, "music_url", None),
         createdAt=inv.created_at.isoformat() if getattr(inv, "created_at", None) else "",
         updatedAt=inv.updated_at.isoformat() if getattr(inv, "updated_at", None) else "",
     )
@@ -298,6 +301,7 @@ def create_invitation(body: InvitationCreate, db: Session = Depends(get_db)):
         sections=json.dumps([s.model_dump() for s in body.sections]),
         style_preset=body.stylePreset,
         itinerary=json.dumps([i.model_dump() for i in body.itinerary]) if body.itinerary else json.dumps([]),
+        music_url=body.musicUrl,
         created_at=now,
         updated_at=now,
     )
@@ -383,6 +387,8 @@ def update_invitation(slug: str, body: InvitationUpdate, db: Session = Depends(g
         inv.sections = json.dumps([s.model_dump() for s in body.sections])
     if body.itinerary is not None:
         inv.itinerary = json.dumps([i.model_dump() for i in body.itinerary])
+    if body.musicUrl is not None:
+        inv.music_url = body.musicUrl
 
     inv.updated_at = datetime.now(timezone.utc)
 

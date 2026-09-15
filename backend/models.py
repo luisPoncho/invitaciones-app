@@ -52,6 +52,7 @@ class Invitation(Base):
     sections: Mapped[str] = mapped_column(nullable=False, default="[]")
     style_preset: Mapped[str] = mapped_column(nullable=False, default="clasico")
     itinerary: Mapped[str] = mapped_column(nullable=False, default="[]")
+    music_url: Mapped[str | None] = mapped_column(nullable=True, default=None)
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(nullable=False, default=_utcnow, onupdate=_utcnow)
 

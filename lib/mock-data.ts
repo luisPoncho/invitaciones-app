@@ -160,6 +160,7 @@ export type FullInvitationConfig = EventData & {
   sectionBackgrounds?: SectionBackgrounds; // DEPRECATED: Se mantiene por compatibilidad hacia atrás, migrar a sections
   sections?: SectionBlock[];
   itinerary?: ItineraryItem[];
+  musicUrl?: string; // Spotify track URL for background music
 };
 
 // Respuesta de un invitado al RSVP

@@ -140,6 +140,14 @@ export default function InvitationPreview({ config, onChange }: InvitationPrevie
         )}
       </div>
 
+      {/* Music indicator in preview */}
+      {config.musicUrl && (
+        <div className="flex items-center justify-center gap-1.5 mt-3 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20">
+          <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+          <span className="text-[10px] text-green-400/80 font-medium">🎵 Música de fondo configurada</span>
+        </div>
+      )}
+
       <p className="text-[10px] text-white/20 mt-4">
         {onChange ? "Arrastra los textos libres en la previsualización" : "Los cambios se reflejan al instante"}
       </p>
