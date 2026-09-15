@@ -90,8 +90,13 @@ export default function MusicPlayer({ musicUrl, theme, shouldPlay = false }: Mus
   useEffect(() => {
     if (shouldPlay && isReady && !hasStartedRef.current && !userMuted && controllerRef.current) {
       hasStartedRef.current = true;
-      controllerRef.current.seek(0);
       controllerRef.current.play();
+      // Pequeño delay para asegurar que el reproductor registró el play antes de regresarlo a 0
+      setTimeout(() => {
+        if (controllerRef.current) {
+          controllerRef.current.seek(0);
+        }
+      }, 300);
     }
   }, [shouldPlay, isReady, userMuted]);
 
