@@ -473,13 +473,23 @@ export default function DesignerSidebar({
                 <div className="mt-3 flex flex-col gap-2.5">
                   {config.freeElements!.map(el => (
                     <div key={el.id} className="flex flex-col gap-2 bg-white/5 border border-white/10 rounded-lg p-3">
-                      <div className="flex justify-between items-center pb-1 border-b border-white/5">
-                        <span className="text-[10px] uppercase text-amber-300/80 font-bold tracking-wider">
-                          {el.type === "text" ? "📝 Texto Libre" : "🖼️ Imagen Libre"}
-                        </span>
+                      <div className="flex justify-between items-center pb-2 border-b border-white/5">
+                        <div className="flex items-center gap-2 flex-1 mr-4">
+                          <span className="text-xs">{el.type === "text" ? "📝" : "🖼️"}</span>
+                          <input
+                            type="text"
+                            value={el.name || ""}
+                            onChange={(e) => {
+                              const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, name: e.target.value } : e2);
+                              update({ freeElements: newElements });
+                            }}
+                            placeholder={el.type === "text" ? "Nombre del texto..." : "Nombre de la imagen..."}
+                            className="bg-transparent text-[11px] font-bold text-amber-300/90 uppercase tracking-wider placeholder:text-amber-300/40 focus:outline-none w-full border-b border-transparent focus:border-amber-300/30 pb-0.5"
+                          />
+                        </div>
                         <button
                           onClick={() => update({ freeElements: config.freeElements!.filter(e => e.id !== el.id) })}
-                          className="text-red-400 hover:text-red-300 text-[10px] uppercase tracking-wider"
+                          className="text-red-400 hover:text-red-300 text-[10px] uppercase tracking-wider shrink-0"
                         >
                           Eliminar
                         </button>

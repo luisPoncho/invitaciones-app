@@ -71,6 +71,7 @@ class PhotoConfig(BaseModel):
 class FreeElement(BaseModel):
     id: str
     type: str
+    name: Optional[str] = None
     content: Optional[str] = None
     url: Optional[str] = None
     x: float = 0

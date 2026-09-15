@@ -48,6 +48,7 @@ export type PhotoConfig = {
 export type FreeElement = {
   id: string;
   type: "text" | "image";
+  name?: string; // Título organizativo para el diseñador
   content?: string;
   url?: string;
   x: number; // percentage 0-100
