@@ -630,17 +630,17 @@ export default function DesignerSidebar({
                 🎵 Música de Fondo
               </p>
               <p className="text-xs text-white/40 mb-3 leading-relaxed">
-                Pega el link de una canción de Spotify. Se reproducirá automáticamente cuando el invitado abra la invitación.
+                Pega el link de una canción de Spotify o YouTube. Se reproducirá automáticamente cuando el invitado abra la invitación.
               </p>
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-medium text-white/50 uppercase tracking-wider">
-                  URL de Spotify
+                  URL de Spotify o YouTube
                 </label>
                 <input
                   type="url"
                   value={config.musicUrl || ""}
                   onChange={(e) => update({ musicUrl: e.target.value || undefined })}
-                  placeholder="https://open.spotify.com/track/..."
+                  placeholder="https://youtu.be/... o https://open.spotify.com/..."
                   className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-white/30 transition-colors"
                 />
                 {config.musicUrl && (
