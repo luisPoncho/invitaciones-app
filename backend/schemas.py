@@ -84,6 +84,8 @@ class FreeElement(BaseModel):
     imageX: Optional[float] = None
     imageY: Optional[float] = None
     zoom: Optional[float] = None
+    zIndex: Optional[int] = 50
+
 
 
 # ── Invitation ───────────────────────────────────────────────────────────────

@@ -437,6 +437,7 @@ export default function DesignerSidebar({
               <div className="flex gap-2">
                 <button
                   onClick={() => {
+                    const maxZ = Math.max(49, ...(config.freeElements || []).map(e => e.zIndex ?? 50));
                     const newEl: FreeElement = {
                       id: Math.random().toString(36).slice(2, 9),
                       type: "text",
@@ -444,7 +445,8 @@ export default function DesignerSidebar({
                       x: 50,
                       y: 50,
                       fontSize: 24,
-                      color: config.theme.primary
+                      color: config.theme.primary,
+                      zIndex: maxZ + 1,
                     };
                     update({ freeElements: [...(config.freeElements || []), newEl] });
                   }}
@@ -454,13 +456,15 @@ export default function DesignerSidebar({
                 </button>
                 <button
                   onClick={() => {
+                    const maxZ = Math.max(49, ...(config.freeElements || []).map(e => e.zIndex ?? 50));
                     const newEl: FreeElement = {
                       id: Math.random().toString(36).slice(2, 9),
                       type: "image",
                       url: "https://via.placeholder.com/150",
                       width: 100,
                       x: 50,
-                      y: 50
+                      y: 50,
+                      zIndex: maxZ + 1,
                     };
                     update({ freeElements: [...(config.freeElements || []), newEl] });
                   }}
@@ -631,26 +635,40 @@ export default function DesignerSidebar({
 
                       {/* Control de Capas (Z-Index) común para texto e imagen */}
                       <div className="flex flex-col gap-1 mt-1 pt-2 border-t border-white/5">
-                        <label className="text-[10px] text-white/50 uppercase">Posición de la capa</label>
+                        <label className="text-[10px] text-white/50 uppercase">Posición de la capa (Nivel depth)</label>
                         <div className="flex items-center gap-2">
                           <button
+                            type="button"
                             onClick={() => {
                               const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, zIndex: (e2.zIndex ?? 50) - 1 } : e2);
                               update({ freeElements: newElements });
                             }}
                             className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded py-1 text-xs text-white/80 transition-colors"
+                            title="Mover una capa hacia atrás"
                           >
-                            ⏬ Enviar atrás
+                            ⏬ Atrás
                           </button>
-                          <span className="text-[10px] text-amber-300 font-mono w-6 text-center">{el.zIndex ?? 50}</span>
+                          <input
+                            type="number"
+                            value={el.zIndex ?? 50}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value, 10);
+                              const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, zIndex: isNaN(val) ? 50 : val } : e2);
+                              update({ freeElements: newElements });
+                            }}
+                            className="w-14 bg-white/10 text-amber-300 font-mono text-center text-xs rounded border border-white/20 px-1 py-1 focus:outline-none focus:border-amber-400"
+                            title="Número de capa (z-index)"
+                          />
                           <button
+                            type="button"
                             onClick={() => {
                               const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, zIndex: (e2.zIndex ?? 50) + 1 } : e2);
                               update({ freeElements: newElements });
                             }}
                             className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded py-1 text-xs text-white/80 transition-colors"
+                            title="Traer una capa al frente"
                           >
-                            ⏫ Traer al frente
+                            ⏫ Frente
                           </button>
                         </div>
                       </div>

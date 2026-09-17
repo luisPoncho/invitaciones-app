@@ -18,6 +18,10 @@ export default function FreeElementsLayer({
 }: FreeElementsLayerProps) {
   if (!elements || elements.length === 0) return null;
 
+  const sortedElements = [...elements].sort(
+    (a, b) => (a.zIndex ?? 50) - (b.zIndex ?? 50)
+  );
+
   return (
     <div
       data-free-layer
@@ -26,7 +30,7 @@ export default function FreeElementsLayer({
       } z-40 overflow-visible`}
       style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, minHeight: "100%" }}
     >
-      {elements.map((el) => (
+      {sortedElements.map((el) => (
         <DraggableElement
           key={el.id}
           element={el}
