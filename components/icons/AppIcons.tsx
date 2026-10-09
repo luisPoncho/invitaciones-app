@@ -134,7 +134,8 @@ export function isImageUrl(str?: string): boolean {
     trimmed.startsWith("https://") ||
     trimmed.startsWith("data:image/") ||
     trimmed.startsWith("/") ||
-    /\.(png|jpg|jpeg|svg|webp|gif|ico)(\?.*)?$/i.test(trimmed)
+    trimmed.startsWith("blob:") ||
+    /\.(png|jpg|jpeg|svg|webp|gif|ico|avif)(\?.*)?$/i.test(trimmed)
   );
 }
 
@@ -171,7 +172,7 @@ export default function AppIcon({
           height: numericSize,
           objectFit: "contain",
         }}
-        className={`inline-block ${className}`}
+        className={`inline-block object-contain max-w-full max-h-full rounded-full ${className}`}
       />
     );
   }

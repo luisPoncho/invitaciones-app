@@ -103,10 +103,12 @@ class InvitationCreate(BaseModel):
     ceremoniaLugar: Optional[str] = ""
     ceremoniaDireccion: Optional[str] = ""
     ceremoniaUrl: Optional[str] = None
+    ceremoniaIcon: Optional[str] = None
     recepcionHora: Optional[str] = ""
     recepcionLugar: Optional[str] = ""
     recepcionDireccion: Optional[str] = ""
     recepcionUrl: Optional[str] = None
+    recepcionIcon: Optional[str] = None
     mensaje: str = ""
     fotos: List[str] = []
     theme: InvitationTheme = Field(default_factory=InvitationTheme)
@@ -133,10 +135,12 @@ class InvitationUpdate(BaseModel):
     ceremoniaLugar: Optional[str] = None
     ceremoniaDireccion: Optional[str] = None
     ceremoniaUrl: Optional[str] = None
+    ceremoniaIcon: Optional[str] = None
     recepcionHora: Optional[str] = None
     recepcionLugar: Optional[str] = None
     recepcionDireccion: Optional[str] = None
     recepcionUrl: Optional[str] = None
+    recepcionIcon: Optional[str] = None
     mensaje: Optional[str] = None
     fotos: Optional[List[str]] = None
     theme: Optional[InvitationTheme] = None
@@ -163,10 +167,12 @@ class InvitationResponse(BaseModel):
     ceremoniaLugar: Optional[str] = ""
     ceremoniaDireccion: Optional[str] = ""
     ceremoniaUrl: Optional[str] = None
+    ceremoniaIcon: Optional[str] = None
     recepcionHora: Optional[str] = ""
     recepcionLugar: Optional[str] = ""
     recepcionDireccion: Optional[str] = ""
     recepcionUrl: Optional[str] = None
+    recepcionIcon: Optional[str] = None
     mensaje: str
     fotos: List[str]
     theme: InvitationTheme

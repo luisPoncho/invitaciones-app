@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { SectionBlock, PhotoScrollBehavior, ItineraryItem } from "@/lib/mock-data";
 import { DEFAULT_ITINERARY_ITEMS } from "@/lib/mock-data";
+import { renderIconOrEmoji } from "@/components/icons";
 
 interface SectionDesignListProps {
   sections: SectionBlock[];
@@ -160,20 +161,9 @@ export default function SectionDesignList({ sections, onChange }: SectionDesignL
                 {((sec.itineraryItems && sec.itineraryItems.length > 0) ? sec.itineraryItems : DEFAULT_ITINERARY_ITEMS).map((item, itemIdx, arr) => (
                   <div
                     key={item.id || itemIdx}
-                    className="flex flex-col gap-2 bg-black/40 border border-white/10 rounded-lg p-2.5 relative"
+                    className="flex flex-col gap-2.5 bg-black/40 border border-white/10 rounded-lg p-3 relative"
                   >
                     <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={item.icon || "✨"}
-                        onChange={(e) => {
-                          const newItems = [...arr];
-                          newItems[itemIdx] = { ...newItems[itemIdx], icon: e.target.value };
-                          updateSection(sec.id, { itineraryItems: newItems });
-                        }}
-                        className="w-10 text-center bg-white/10 border border-white/10 rounded px-1 py-1 text-sm text-white focus:outline-none"
-                        title="Emoji o ícono"
-                      />
                       <input
                         type="text"
                         value={item.time}
@@ -183,7 +173,7 @@ export default function SectionDesignList({ sections, onChange }: SectionDesignL
                           updateSection(sec.id, { itineraryItems: newItems });
                         }}
                         placeholder="4:00 PM"
-                        className="w-24 bg-white/5 border border-white/10 rounded px-2 py-1 text-xs text-white font-medium focus:outline-none"
+                        className="w-24 bg-white/5 border border-white/10 rounded px-2 py-1.5 text-xs text-white font-medium focus:outline-none"
                       />
                       <input
                         type="text"
@@ -194,7 +184,7 @@ export default function SectionDesignList({ sections, onChange }: SectionDesignL
                           updateSection(sec.id, { itineraryItems: newItems });
                         }}
                         placeholder="Qué se va a hacer (Actividad)"
-                        className="flex-1 bg-white/5 border border-white/10 rounded px-2 py-1 text-xs text-white focus:outline-none"
+                        className="flex-1 bg-white/5 border border-white/10 rounded px-2 py-1.5 text-xs text-white focus:outline-none"
                       />
                       <button
                         type="button"
@@ -202,7 +192,7 @@ export default function SectionDesignList({ sections, onChange }: SectionDesignL
                           const newItems = arr.filter((_, idx) => idx !== itemIdx);
                           updateSection(sec.id, { itineraryItems: newItems });
                         }}
-                        className="text-red-400/60 hover:text-red-400 hover:bg-white/10 rounded p-1 text-xs transition-colors"
+                        className="text-red-400/60 hover:text-red-400 hover:bg-white/10 rounded p-1.5 text-xs transition-colors"
                         title="Eliminar evento"
                       >
                         ✕
@@ -218,25 +208,52 @@ export default function SectionDesignList({ sections, onChange }: SectionDesignL
                         updateSection(sec.id, { itineraryItems: newItems });
                       }}
                       placeholder="Lugar o descripción opcional (ej: Salón Principal)"
-                      className="bg-white/5 border border-white/10 rounded px-2 py-1 text-[11px] text-white/70 focus:outline-none"
+                      className="bg-white/5 border border-white/10 rounded px-2 py-1.5 text-[11px] text-white/70 focus:outline-none"
                     />
 
-                    {/* Quick emoji selection */}
-                    <div className="flex flex-wrap gap-1 pt-1 border-t border-white/5">
-                      {QUICK_ICONS.map((emoji) => (
-                        <button
-                          key={emoji}
-                          type="button"
-                          onClick={() => {
+                    {/* Barra de Icono o URL de Imagen (Delimitada al espacio del icono) */}
+                    <div className="flex flex-col gap-1.5 pt-2 border-t border-white/10">
+                      <label className="text-[10px] text-white/50 uppercase font-semibold">
+                        Icono del evento (URL de imagen o emoji)
+                      </label>
+                      <div className="flex items-center gap-2">
+                        {/* Vista previa delimitada al espacio del icono */}
+                        <div
+                          className="w-8 h-8 rounded-full border border-white/20 bg-black/40 flex items-center justify-center shrink-0 overflow-hidden p-0.5"
+                          title="Vista previa del icono/imagen"
+                        >
+                          {renderIconOrEmoji(item.icon || "✨", { size: 18 })}
+                        </div>
+                        <input
+                          type="text"
+                          value={item.icon || ""}
+                          onChange={(e) => {
                             const newItems = [...arr];
-                            newItems[itemIdx] = { ...newItems[itemIdx], icon: emoji };
+                            newItems[itemIdx] = { ...newItems[itemIdx], icon: e.target.value };
                             updateSection(sec.id, { itineraryItems: newItems });
                           }}
-                          className={`text-xs px-1.5 py-0.5 rounded hover:bg-white/10 transition-colors ${item.icon === emoji ? 'bg-white/20' : ''}`}
-                        >
-                          {emoji}
-                        </button>
-                      ))}
+                          placeholder="Pega URL de la imagen o escribe un emoji (ej. https://... o ⛪)"
+                          className="flex-1 bg-white/5 border border-white/10 rounded px-2.5 py-1.5 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-white/30"
+                        />
+                      </div>
+
+                      {/* Accesos rápidos de emoji opcionales */}
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {QUICK_ICONS.map((emoji) => (
+                          <button
+                            key={emoji}
+                            type="button"
+                            onClick={() => {
+                              const newItems = [...arr];
+                              newItems[itemIdx] = { ...newItems[itemIdx], icon: emoji };
+                              updateSection(sec.id, { itineraryItems: newItems });
+                            }}
+                            className={`text-xs px-1.5 py-0.5 rounded hover:bg-white/10 transition-colors ${item.icon === emoji ? 'bg-white/20 border border-white/20' : 'text-white/70'}`}
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 ))}

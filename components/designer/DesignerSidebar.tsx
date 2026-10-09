@@ -8,6 +8,7 @@ import SectionCatalog from "./SectionCatalog";
 import SectionList from "./SectionList";
 import SectionDesignList from "./SectionDesignList";
 import StylesPanel from "./StylesPanel";
+import { renderIconOrEmoji } from "@/components/icons";
 
 interface DesignerSidebarProps {
   config: FullInvitationConfig;
@@ -195,6 +196,23 @@ export default function DesignerSidebar({
                   <p className="text-[10px] font-bold text-amber-300/80 uppercase tracking-wider">
                     ⛪ Boda Religiosa (Misa)
                   </p>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-medium text-white/50 uppercase tracking-wider">
+                      Icono / Imagen de Misa (URL o Emoji)
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full border border-white/20 bg-black/40 flex items-center justify-center shrink-0 overflow-hidden p-0.5">
+                        {renderIconOrEmoji(config.ceremoniaIcon || "⛪", { size: 18 })}
+                      </div>
+                      <input
+                        type="text"
+                        value={config.ceremoniaIcon || ""}
+                        onChange={(e) => update({ ceremoniaIcon: e.target.value })}
+                        placeholder="https://... o emoji (ej. ⛪)"
+                        className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-white/30 transition-colors"
+                      />
+                    </div>
+                  </div>
                   <Field
                     label="Hora de la Misa"
                     value={config.ceremoniaHora}
@@ -227,6 +245,23 @@ export default function DesignerSidebar({
                   <p className="text-[10px] font-bold text-amber-300/80 uppercase tracking-wider">
                     🥂 Recepción & Fiesta
                   </p>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-medium text-white/50 uppercase tracking-wider">
+                      Icono / Imagen de Recepción (URL o Emoji)
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full border border-white/20 bg-black/40 flex items-center justify-center shrink-0 overflow-hidden p-0.5">
+                        {renderIconOrEmoji(config.recepcionIcon || "🥂", { size: 18 })}
+                      </div>
+                      <input
+                        type="text"
+                        value={config.recepcionIcon || ""}
+                        onChange={(e) => update({ recepcionIcon: e.target.value })}
+                        placeholder="https://... o emoji (ej. 🥂)"
+                        className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-white/30 transition-colors"
+                      />
+                    </div>
+                  </div>
                   <Field
                     label="Hora de la Recepción"
                     value={config.recepcionHora}

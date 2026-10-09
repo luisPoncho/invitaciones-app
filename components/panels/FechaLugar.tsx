@@ -1,6 +1,6 @@
 "use client";
 
-import { AppIcon } from "@/components/icons";
+import { AppIcon, renderIconOrEmoji } from "@/components/icons";
 import type { EventData, InvitationTheme, PhotoScrollBehavior, StylePreset } from "@/lib/mock-data";
 import { defaultTheme, getFontDisplayVar, getFontBodyVar } from "@/lib/mock-data";
 import { formatImageUrl } from "@/lib/image-utils";
@@ -120,9 +120,9 @@ export default function FechaLugar({
               <div>
                 <div
                   style={{ backgroundColor: `${t.accent}15`, borderColor: `${t.accent}30` }}
-                  className="w-14 h-14 mx-auto rounded-full border flex items-center justify-center text-2xl mb-3"
+                  className="w-14 h-14 mx-auto rounded-full border flex items-center justify-center text-2xl mb-3 overflow-hidden p-1"
                 >
-                  ⛪
+                  {renderIconOrEmoji(event.ceremoniaIcon || "⛪", { size: 28, color: t.accent })}
                 </div>
                 <span
                   style={{ color: t.accent, borderColor: `${t.accent}40`, fontFamily: fontBody }}
@@ -176,9 +176,9 @@ export default function FechaLugar({
               <div>
                 <div
                   style={{ backgroundColor: `${t.accent}15`, borderColor: `${t.accent}30` }}
-                  className="w-14 h-14 mx-auto rounded-full border flex items-center justify-center text-2xl mb-3"
+                  className="w-14 h-14 mx-auto rounded-full border flex items-center justify-center text-2xl mb-3 overflow-hidden p-1"
                 >
-                  🥂
+                  {renderIconOrEmoji(event.recepcionIcon || "🥂", { size: 28, color: t.accent })}
                 </div>
                 <span
                   style={{ color: t.accent, borderColor: `${t.accent}40`, fontFamily: fontBody }}
@@ -274,7 +274,12 @@ export default function FechaLugar({
           >
             <div>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-2xl">⛪</span>
+                <div
+                  style={{ backgroundColor: `${t.accentLight}15`, borderColor: `${t.accentLight}30` }}
+                  className="w-12 h-12 rounded-full border flex items-center justify-center text-xl overflow-hidden p-1 shrink-0"
+                >
+                  {renderIconOrEmoji(event.ceremoniaIcon || "⛪", { size: 24, color: t.accentLight })}
+                </div>
                 <span
                   style={{ color: t.accentLight, fontFamily: fontBody }}
                   className="text-xs font-semibold uppercase tracking-widest px-2.5 py-1 rounded-full bg-white/10"
@@ -327,7 +332,12 @@ export default function FechaLugar({
           >
             <div>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-2xl">🥂</span>
+                <div
+                  style={{ backgroundColor: `${t.accentLight}15`, borderColor: `${t.accentLight}30` }}
+                  className="w-12 h-12 rounded-full border flex items-center justify-center text-xl overflow-hidden p-1 shrink-0"
+                >
+                  {renderIconOrEmoji(event.recepcionIcon || "🥂", { size: 24, color: t.accentLight })}
+                </div>
                 <span
                   style={{ color: t.accentLight, fontFamily: fontBody }}
                   className="text-xs font-semibold uppercase tracking-widest px-2.5 py-1 rounded-full bg-white/10"

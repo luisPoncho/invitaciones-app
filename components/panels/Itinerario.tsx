@@ -106,9 +106,9 @@ export default function Itinerario({
                       boxShadow: `0 4px 14px ${t.accent}25`,
                       color: t.accent,
                     }}
-                    className="relative z-10 w-12 h-12 rounded-full border flex items-center justify-center text-xl flex-shrink-0 transition-transform group-hover:scale-105"
+                    className="relative z-10 w-12 h-12 rounded-full border flex items-center justify-center text-xl flex-shrink-0 transition-transform group-hover:scale-105 overflow-hidden p-1"
                   >
-                    {renderIconOrEmoji(item.icon, { size: 20, color: t.accent })}
+                    {renderIconOrEmoji(item.icon, { size: 24, color: t.accent })}
                   </div>
 
                   {/* Contenido del Evento */}
@@ -220,9 +220,9 @@ export default function Itinerario({
                     boxShadow: `0 0 16px ${t.accent}30`,
                     color: t.accentLight,
                   }}
-                  className="relative z-10 w-12 h-12 rounded-full border flex items-center justify-center text-xl flex-shrink-0 transition-transform group-hover:scale-105"
+                  className="relative z-10 w-12 h-12 rounded-full border flex items-center justify-center text-xl flex-shrink-0 transition-transform group-hover:scale-105 overflow-hidden p-1"
                 >
-                  {renderIconOrEmoji(item.icon, { size: 20, color: t.accentLight })}
+                  {renderIconOrEmoji(item.icon, { size: 24, color: t.accentLight })}
                 </div>
 
                 {/* Tarjeta del evento */}

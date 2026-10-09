@@ -12,10 +12,12 @@ export type EventData = {
   ceremoniaLugar?: string;
   ceremoniaDireccion?: string;
   ceremoniaUrl?: string;
+  ceremoniaIcon?: string;
   recepcionHora?: string;
   recepcionLugar?: string;
   recepcionDireccion?: string;
   recepcionUrl?: string;
+  recepcionIcon?: string;
   mensaje: string;
   fotos: string[];
 };
