@@ -13,11 +13,13 @@ export type EventData = {
   ceremoniaDireccion?: string;
   ceremoniaUrl?: string;
   ceremoniaIcon?: string;
+  ceremoniaIconSize?: number;
   recepcionHora?: string;
   recepcionLugar?: string;
   recepcionDireccion?: string;
   recepcionUrl?: string;
   recepcionIcon?: string;
+  recepcionIconSize?: number;
   mensaje: string;
   fotos: string[];
 };
@@ -111,6 +113,7 @@ export type ItineraryItem = {
   title: string;
   description?: string;
   icon?: string;
+  iconSize?: number;
 };
 
 export const DEFAULT_ITINERARY_ITEMS: ItineraryItem[] = [
@@ -148,6 +151,7 @@ export type SectionBlock = {
   photoUrl?: string;
   itineraryTitle?: string;
   itinerarySubtitle?: string;
+  itineraryIconSize?: number;
   itineraryItems?: ItineraryItem[];
 };
 

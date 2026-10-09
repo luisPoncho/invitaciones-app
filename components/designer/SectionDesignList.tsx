@@ -154,109 +154,155 @@ export default function SectionDesignList({ sections, onChange }: SectionDesignL
                 />
               </div>
 
+              {/* Control de tamaño general del círculo */}
+              <div className="flex flex-col gap-1.5 bg-white/5 p-2.5 rounded-lg border border-white/10">
+                <div className="flex items-center justify-between text-[10px] text-white/60 uppercase font-semibold">
+                  <span>Tamaño de los círculos del itinerario</span>
+                  <span className="text-amber-300 font-bold">{sec.itineraryIconSize || 48}px</span>
+                </div>
+                <input
+                  type="range"
+                  min="32"
+                  max="84"
+                  step="2"
+                  value={sec.itineraryIconSize || 48}
+                  onChange={(e) => updateSection(sec.id, { itineraryIconSize: Number(e.target.value) })}
+                  className="w-full accent-amber-400 h-1.5 bg-white/10 rounded-lg cursor-pointer"
+                />
+              </div>
+
               {/* Eventos del Itinerario */}
               <div className="flex flex-col gap-2 mt-2">
                 <label className="text-[10px] text-white/50 uppercase font-semibold">Eventos / Horarios</label>
                 
-                {((sec.itineraryItems && sec.itineraryItems.length > 0) ? sec.itineraryItems : DEFAULT_ITINERARY_ITEMS).map((item, itemIdx, arr) => (
-                  <div
-                    key={item.id || itemIdx}
-                    className="flex flex-col gap-2.5 bg-black/40 border border-white/10 rounded-lg p-3 relative"
-                  >
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={item.time}
-                        onChange={(e) => {
-                          const newItems = [...arr];
-                          newItems[itemIdx] = { ...newItems[itemIdx], time: e.target.value };
-                          updateSection(sec.id, { itineraryItems: newItems });
-                        }}
-                        placeholder="4:00 PM"
-                        className="w-24 bg-white/5 border border-white/10 rounded px-2 py-1.5 text-xs text-white font-medium focus:outline-none"
-                      />
-                      <input
-                        type="text"
-                        value={item.title}
-                        onChange={(e) => {
-                          const newItems = [...arr];
-                          newItems[itemIdx] = { ...newItems[itemIdx], title: e.target.value };
-                          updateSection(sec.id, { itineraryItems: newItems });
-                        }}
-                        placeholder="Qué se va a hacer (Actividad)"
-                        className="flex-1 bg-white/5 border border-white/10 rounded px-2 py-1.5 text-xs text-white focus:outline-none"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const newItems = arr.filter((_, idx) => idx !== itemIdx);
-                          updateSection(sec.id, { itineraryItems: newItems });
-                        }}
-                        className="text-red-400/60 hover:text-red-400 hover:bg-white/10 rounded p-1.5 text-xs transition-colors"
-                        title="Eliminar evento"
-                      >
-                        ✕
-                      </button>
-                    </div>
+                {((sec.itineraryItems && sec.itineraryItems.length > 0) ? sec.itineraryItems : DEFAULT_ITINERARY_ITEMS).map((item, itemIdx, arr) => {
+                  const currentSize = item.iconSize || sec.itineraryIconSize || 48;
 
-                    <input
-                      type="text"
-                      value={item.description || ""}
-                      onChange={(e) => {
-                        const newItems = [...arr];
-                        newItems[itemIdx] = { ...newItems[itemIdx], description: e.target.value };
-                        updateSection(sec.id, { itineraryItems: newItems });
-                      }}
-                      placeholder="Lugar o descripción opcional (ej: Salón Principal)"
-                      className="bg-white/5 border border-white/10 rounded px-2 py-1.5 text-[11px] text-white/70 focus:outline-none"
-                    />
-
-                    {/* Barra de Icono o URL de Imagen (Delimitada al espacio del icono) */}
-                    <div className="flex flex-col gap-1.5 pt-2 border-t border-white/10">
-                      <label className="text-[10px] text-white/50 uppercase font-semibold">
-                        Icono del evento (URL de imagen o emoji)
-                      </label>
+                  return (
+                    <div
+                      key={item.id || itemIdx}
+                      className="flex flex-col gap-2.5 bg-black/40 border border-white/10 rounded-lg p-3 relative"
+                    >
                       <div className="flex items-center gap-2">
-                        {/* Vista previa delimitada al espacio del icono */}
-                        <div
-                          className="w-8 h-8 rounded-full border border-white/20 bg-black/40 flex items-center justify-center shrink-0 overflow-hidden p-0.5"
-                          title="Vista previa del icono/imagen"
-                        >
-                          {renderIconOrEmoji(item.icon || "✨", { size: 18 })}
-                        </div>
                         <input
                           type="text"
-                          value={item.icon || ""}
+                          value={item.time}
                           onChange={(e) => {
                             const newItems = [...arr];
-                            newItems[itemIdx] = { ...newItems[itemIdx], icon: e.target.value };
+                            newItems[itemIdx] = { ...newItems[itemIdx], time: e.target.value };
                             updateSection(sec.id, { itineraryItems: newItems });
                           }}
-                          placeholder="Pega URL de la imagen o escribe un emoji (ej. https://... o ⛪)"
-                          className="flex-1 bg-white/5 border border-white/10 rounded px-2.5 py-1.5 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-white/30"
+                          placeholder="4:00 PM"
+                          className="w-24 bg-white/5 border border-white/10 rounded px-2 py-1.5 text-xs text-white font-medium focus:outline-none"
                         />
+                        <input
+                          type="text"
+                          value={item.title}
+                          onChange={(e) => {
+                            const newItems = [...arr];
+                            newItems[itemIdx] = { ...newItems[itemIdx], title: e.target.value };
+                            updateSection(sec.id, { itineraryItems: newItems });
+                          }}
+                          placeholder="Qué se va a hacer (Actividad)"
+                          className="flex-1 bg-white/5 border border-white/10 rounded px-2 py-1.5 text-xs text-white focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newItems = arr.filter((_, idx) => idx !== itemIdx);
+                            updateSection(sec.id, { itineraryItems: newItems });
+                          }}
+                          className="text-red-400/60 hover:text-red-400 hover:bg-white/10 rounded p-1.5 text-xs transition-colors"
+                          title="Eliminar evento"
+                        >
+                          ✕
+                        </button>
                       </div>
 
-                      {/* Accesos rápidos de emoji opcionales */}
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {QUICK_ICONS.map((emoji) => (
-                          <button
-                            key={emoji}
-                            type="button"
-                            onClick={() => {
+                      <input
+                        type="text"
+                        value={item.description || ""}
+                        onChange={(e) => {
+                          const newItems = [...arr];
+                          newItems[itemIdx] = { ...newItems[itemIdx], description: e.target.value };
+                          updateSection(sec.id, { itineraryItems: newItems });
+                        }}
+                        placeholder="Lugar o descripción opcional (ej: Salón Principal)"
+                        className="bg-white/5 border border-white/10 rounded px-2 py-1.5 text-[11px] text-white/70 focus:outline-none"
+                      />
+
+                      {/* Barra de Icono o URL de Imagen */}
+                      <div className="flex flex-col gap-2 pt-2 border-t border-white/10">
+                        <label className="text-[10px] text-white/50 uppercase font-semibold">
+                          Icono del evento (URL de imagen o emoji)
+                        </label>
+                        <div className="flex items-center gap-2">
+                          {/* Vista previa con tamaño dinámico */}
+                          <div
+                            style={{
+                              width: `${Math.min(currentSize, 40)}px`,
+                              height: `${Math.min(currentSize, 40)}px`,
+                            }}
+                            className="rounded-full border border-white/20 bg-black/40 flex items-center justify-center shrink-0 overflow-hidden p-0.5"
+                            title="Vista previa del icono/imagen"
+                          >
+                            {renderIconOrEmoji(item.icon || "✨", { size: Math.round(Math.min(currentSize, 40) * 0.55) })}
+                          </div>
+                          <input
+                            type="text"
+                            value={item.icon || ""}
+                            onChange={(e) => {
                               const newItems = [...arr];
-                              newItems[itemIdx] = { ...newItems[itemIdx], icon: emoji };
+                              newItems[itemIdx] = { ...newItems[itemIdx], icon: e.target.value };
                               updateSection(sec.id, { itineraryItems: newItems });
                             }}
-                            className={`text-xs px-1.5 py-0.5 rounded hover:bg-white/10 transition-colors ${item.icon === emoji ? 'bg-white/20 border border-white/20' : 'text-white/70'}`}
-                          >
-                            {emoji}
-                          </button>
-                        ))}
+                            placeholder="Pega URL de la imagen o escribe un emoji (ej. https://... o ⛪)"
+                            className="flex-1 bg-white/5 border border-white/10 rounded px-2.5 py-1.5 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-white/30"
+                          />
+                        </div>
+
+                        {/* Slider de tamaño individual */}
+                        <div className="flex items-center justify-between text-[10px] text-white/50 uppercase">
+                          <span>Tamaño del círculo individual:</span>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="range"
+                              min="32"
+                              max="84"
+                              step="2"
+                              value={currentSize}
+                              onChange={(e) => {
+                                const newItems = [...arr];
+                                newItems[itemIdx] = { ...newItems[itemIdx], iconSize: Number(e.target.value) };
+                                updateSection(sec.id, { itineraryItems: newItems });
+                              }}
+                              className="w-20 accent-white h-1 bg-white/10 rounded cursor-pointer"
+                            />
+                            <span className="text-white w-8 text-right font-semibold">{currentSize}px</span>
+                          </div>
+                        </div>
+
+                        {/* Accesos rápidos de emoji opcionales */}
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {QUICK_ICONS.map((emoji) => (
+                            <button
+                              key={emoji}
+                              type="button"
+                              onClick={() => {
+                                const newItems = [...arr];
+                                newItems[itemIdx] = { ...newItems[itemIdx], icon: emoji };
+                                updateSection(sec.id, { itineraryItems: newItems });
+                              }}
+                              className={`text-xs px-1.5 py-0.5 rounded hover:bg-white/10 transition-colors ${item.icon === emoji ? 'bg-white/20 border border-white/20' : 'text-white/70'}`}
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
 
                 <button
                   type="button"

@@ -33,6 +33,7 @@ class ItineraryItem(BaseModel):
     title: str
     description: Optional[str] = None
     icon: Optional[str] = None
+    iconSize: Optional[float] = None
 
 
 # ── Section Block ────────────────────────────────────────────────────────────
@@ -52,6 +53,7 @@ class SectionBlock(BaseModel):
     photoUrl: Optional[str] = None
     itineraryTitle: Optional[str] = None
     itinerarySubtitle: Optional[str] = None
+    itineraryIconSize: Optional[float] = None
     itineraryItems: Optional[List[ItineraryItem]] = None
 
 
@@ -104,11 +106,13 @@ class InvitationCreate(BaseModel):
     ceremoniaDireccion: Optional[str] = ""
     ceremoniaUrl: Optional[str] = None
     ceremoniaIcon: Optional[str] = None
+    ceremoniaIconSize: Optional[float] = None
     recepcionHora: Optional[str] = ""
     recepcionLugar: Optional[str] = ""
     recepcionDireccion: Optional[str] = ""
     recepcionUrl: Optional[str] = None
     recepcionIcon: Optional[str] = None
+    recepcionIconSize: Optional[float] = None
     mensaje: str = ""
     fotos: List[str] = []
     theme: InvitationTheme = Field(default_factory=InvitationTheme)
@@ -136,11 +140,13 @@ class InvitationUpdate(BaseModel):
     ceremoniaDireccion: Optional[str] = None
     ceremoniaUrl: Optional[str] = None
     ceremoniaIcon: Optional[str] = None
+    ceremoniaIconSize: Optional[float] = None
     recepcionHora: Optional[str] = None
     recepcionLugar: Optional[str] = None
     recepcionDireccion: Optional[str] = None
     recepcionUrl: Optional[str] = None
     recepcionIcon: Optional[str] = None
+    recepcionIconSize: Optional[float] = None
     mensaje: Optional[str] = None
     fotos: Optional[List[str]] = None
     theme: Optional[InvitationTheme] = None
@@ -168,11 +174,13 @@ class InvitationResponse(BaseModel):
     ceremoniaDireccion: Optional[str] = ""
     ceremoniaUrl: Optional[str] = None
     ceremoniaIcon: Optional[str] = None
+    ceremoniaIconSize: Optional[float] = None
     recepcionHora: Optional[str] = ""
     recepcionLugar: Optional[str] = ""
     recepcionDireccion: Optional[str] = ""
     recepcionUrl: Optional[str] = None
     recepcionIcon: Optional[str] = None
+    recepcionIconSize: Optional[float] = None
     mensaje: str
     fotos: List[str]
     theme: InvitationTheme

@@ -213,6 +213,21 @@ export default function DesignerSidebar({
                       />
                     </div>
                   </div>
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between text-xs font-medium text-white/50 uppercase">
+                      <span>Tamaño del círculo (px)</span>
+                      <span className="text-amber-300 font-semibold">{config.ceremoniaIconSize || 56}px</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="36"
+                      max="96"
+                      step="2"
+                      value={config.ceremoniaIconSize || 56}
+                      onChange={(e) => update({ ceremoniaIconSize: Number(e.target.value) })}
+                      className="w-full accent-amber-400 h-1.5 bg-white/10 rounded-lg cursor-pointer"
+                    />
+                  </div>
                   <Field
                     label="Hora de la Misa"
                     value={config.ceremoniaHora}
@@ -261,6 +276,21 @@ export default function DesignerSidebar({
                         className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-white/30 transition-colors"
                       />
                     </div>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between text-xs font-medium text-white/50 uppercase">
+                      <span>Tamaño del círculo (px)</span>
+                      <span className="text-amber-300 font-semibold">{config.recepcionIconSize || 56}px</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="36"
+                      max="96"
+                      step="2"
+                      value={config.recepcionIconSize || 56}
+                      onChange={(e) => update({ recepcionIconSize: Number(e.target.value) })}
+                      className="w-full accent-amber-400 h-1.5 bg-white/10 rounded-lg cursor-pointer"
+                    />
                   </div>
                   <Field
                     label="Hora de la Recepción"

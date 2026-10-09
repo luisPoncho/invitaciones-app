@@ -53,11 +53,13 @@ export default function FechaLugar({
   const ceremoniaDireccion = event.ceremoniaDireccion || event.lugarDireccion || "Centro Histórico";
   const ceremoniaHora = event.ceremoniaHora || "4:00 PM";
   const ceremoniaMapsUrl = getMapsUrl(event.ceremoniaUrl, ceremoniaLugar, ceremoniaDireccion);
+  const ceremoniaCircleSize = event.ceremoniaIconSize || 56;
 
   const recepcionLugar = event.recepcionLugar || event.lugarNombre || "Hacienda Los Encinos";
   const recepcionDireccion = event.recepcionDireccion || event.lugarDireccion || "Camino a San Isidro 450";
   const recepcionHora = event.recepcionHora || "7:00 PM";
   const recepcionMapsUrl = getMapsUrl(event.recepcionUrl, recepcionLugar, recepcionDireccion);
+  const recepcionCircleSize = event.recepcionIconSize || 56;
 
   if (isRomantico) {
     return (
@@ -119,10 +121,15 @@ export default function FechaLugar({
             >
               <div>
                 <div
-                  style={{ backgroundColor: `${t.accent}15`, borderColor: `${t.accent}30` }}
-                  className="w-14 h-14 mx-auto rounded-full border flex items-center justify-center text-2xl mb-3 overflow-hidden p-1"
+                  style={{
+                    width: `${ceremoniaCircleSize}px`,
+                    height: `${ceremoniaCircleSize}px`,
+                    backgroundColor: `${t.accent}15`,
+                    borderColor: `${t.accent}30`
+                  }}
+                  className="mx-auto rounded-full border flex items-center justify-center text-2xl mb-3 overflow-hidden p-1"
                 >
-                  {renderIconOrEmoji(event.ceremoniaIcon || "⛪", { size: 28, color: t.accent })}
+                  {renderIconOrEmoji(event.ceremoniaIcon || "⛪", { size: Math.round(ceremoniaCircleSize * 0.52), color: t.accent })}
                 </div>
                 <span
                   style={{ color: t.accent, borderColor: `${t.accent}40`, fontFamily: fontBody }}
@@ -175,10 +182,15 @@ export default function FechaLugar({
             >
               <div>
                 <div
-                  style={{ backgroundColor: `${t.accent}15`, borderColor: `${t.accent}30` }}
-                  className="w-14 h-14 mx-auto rounded-full border flex items-center justify-center text-2xl mb-3 overflow-hidden p-1"
+                  style={{
+                    width: `${recepcionCircleSize}px`,
+                    height: `${recepcionCircleSize}px`,
+                    backgroundColor: `${t.accent}15`,
+                    borderColor: `${t.accent}30`
+                  }}
+                  className="mx-auto rounded-full border flex items-center justify-center text-2xl mb-3 overflow-hidden p-1"
                 >
-                  {renderIconOrEmoji(event.recepcionIcon || "🥂", { size: 28, color: t.accent })}
+                  {renderIconOrEmoji(event.recepcionIcon || "🥂", { size: Math.round(recepcionCircleSize * 0.52), color: t.accent })}
                 </div>
                 <span
                   style={{ color: t.accent, borderColor: `${t.accent}40`, fontFamily: fontBody }}
@@ -275,10 +287,15 @@ export default function FechaLugar({
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div
-                  style={{ backgroundColor: `${t.accentLight}15`, borderColor: `${t.accentLight}30` }}
-                  className="w-12 h-12 rounded-full border flex items-center justify-center text-xl overflow-hidden p-1 shrink-0"
+                  style={{
+                    width: `${ceremoniaCircleSize}px`,
+                    height: `${ceremoniaCircleSize}px`,
+                    backgroundColor: `${t.accentLight}15`,
+                    borderColor: `${t.accentLight}30`
+                  }}
+                  className="rounded-full border flex items-center justify-center text-xl overflow-hidden p-1 shrink-0"
                 >
-                  {renderIconOrEmoji(event.ceremoniaIcon || "⛪", { size: 24, color: t.accentLight })}
+                  {renderIconOrEmoji(event.ceremoniaIcon || "⛪", { size: Math.round(ceremoniaCircleSize * 0.52), color: t.accentLight })}
                 </div>
                 <span
                   style={{ color: t.accentLight, fontFamily: fontBody }}
@@ -333,10 +350,15 @@ export default function FechaLugar({
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div
-                  style={{ backgroundColor: `${t.accentLight}15`, borderColor: `${t.accentLight}30` }}
-                  className="w-12 h-12 rounded-full border flex items-center justify-center text-xl overflow-hidden p-1 shrink-0"
+                  style={{
+                    width: `${recepcionCircleSize}px`,
+                    height: `${recepcionCircleSize}px`,
+                    backgroundColor: `${t.accentLight}15`,
+                    borderColor: `${t.accentLight}30`
+                  }}
+                  className="rounded-full border flex items-center justify-center text-xl overflow-hidden p-1 shrink-0"
                 >
-                  {renderIconOrEmoji(event.recepcionIcon || "🥂", { size: 24, color: t.accentLight })}
+                  {renderIconOrEmoji(event.recepcionIcon || "🥂", { size: Math.round(recepcionCircleSize * 0.52), color: t.accentLight })}
                 </div>
                 <span
                   style={{ color: t.accentLight, fontFamily: fontBody }}
