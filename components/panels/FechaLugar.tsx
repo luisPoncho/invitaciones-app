@@ -1,7 +1,10 @@
+"use client";
+
 import type { EventData, InvitationTheme, PhotoScrollBehavior, StylePreset } from "@/lib/mock-data";
 import { defaultTheme, getFontDisplayVar, getFontBodyVar } from "@/lib/mock-data";
 import { formatImageUrl } from "@/lib/image-utils";
 import { LeafDivider } from "./Ornaments";
+import { ScrollReveal, MotionLink } from "@/components/motion";
 
 interface FechaLugarProps {
   event: EventData;
@@ -72,20 +75,22 @@ export default function FechaLugar({
       >
         {formattedBgUrl && <div className="absolute inset-0 bg-white/75 backdrop-blur-[2px] z-0" />}
         <div className="relative z-10 max-w-lg mx-auto">
-          <p
-            style={{ color: t.accent, fontFamily: fontBody }}
-            className="text-xs uppercase tracking-[0.25em] mb-2 font-medium"
-          >
-            Ubicación
-          </p>
+          <ScrollReveal direction="up" duration={0.7}>
+            <p
+              style={{ color: t.accent, fontFamily: fontBody }}
+              className="text-xs uppercase tracking-[0.25em] mb-2 font-medium"
+            >
+              Ubicación
+            </p>
 
-          <h2 style={{ fontFamily: fontDisplay, color: t.primary }} className="italic text-4xl mb-2 font-normal">
-            Dónde & Cuándo
-          </h2>
+            <h2 style={{ fontFamily: fontDisplay, color: t.primary }} className="italic text-4xl mb-2 font-normal">
+              Dónde & Cuándo
+            </h2>
 
-          <div className="my-3">
-            <LeafDivider color={t.accent} />
-          </div>
+            <div className="my-3">
+              <LeafDivider color={t.accent} />
+            </div>
+          </ScrollReveal>
 
           {event.fechaLegible && (
             <div
@@ -102,6 +107,7 @@ export default function FechaLugar({
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-center">
+            <ScrollReveal direction="up" delay={0.1} duration={0.6}>
             {/* Card 1: Boda Religiosa */}
             <div
               style={{
@@ -140,7 +146,7 @@ export default function FechaLugar({
                 </p>
               </div>
 
-              <a
+              <MotionLink
                 href={ceremoniaMapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -156,9 +162,11 @@ export default function FechaLugar({
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                 </svg>
                 Ver Ubicación
-              </a>
+              </MotionLink>
             </div>
+            </ScrollReveal>
 
+            <ScrollReveal direction="up" delay={0.25} duration={0.6}>
             {/* Card 2: Recepción */}
             <div
               style={{
@@ -197,7 +205,7 @@ export default function FechaLugar({
                 </p>
               </div>
 
-              <a
+              <MotionLink
                 href={recepcionMapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -213,8 +221,9 @@ export default function FechaLugar({
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                 </svg>
                 Ver Ubicación
-              </a>
+              </MotionLink>
             </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
@@ -237,16 +246,18 @@ export default function FechaLugar({
     >
       {formattedBgUrl && <div className="absolute inset-0 bg-black/55 z-0" />}
       <div className="relative z-10 max-w-lg mx-auto">
-        <p
-          style={{ color: t.accentLight, fontFamily: fontBody }}
-          className="text-xs uppercase tracking-[0.25em] mb-2 font-medium"
-        >
-          Ubicación
-        </p>
+        <ScrollReveal direction="up" duration={0.7}>
+          <p
+            style={{ color: t.accentLight, fontFamily: fontBody }}
+            className="text-xs uppercase tracking-[0.25em] mb-2 font-medium"
+          >
+            Ubicación
+          </p>
 
-        <h2 style={{ fontFamily: fontDisplay }} className="italic text-4xl mb-4">
-          Dónde & Cuándo
-        </h2>
+          <h2 style={{ fontFamily: fontDisplay }} className="italic text-4xl mb-4">
+            Dónde & Cuándo
+          </h2>
+        </ScrollReveal>
 
         {event.fechaLegible && (
           <div className="inline-block mb-10 border border-white/20 rounded-full px-5 py-1.5 bg-black/20 backdrop-blur-sm">
@@ -257,6 +268,7 @@ export default function FechaLugar({
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-left">
+          <ScrollReveal direction="up" delay={0.1} duration={0.6}>
           {/* Card 1: Boda Religiosa */}
           <div
             style={{
@@ -292,7 +304,7 @@ export default function FechaLugar({
               </p>
             </div>
 
-            <a
+            <MotionLink
               href={ceremoniaMapsUrl}
               target="_blank"
               rel="noopener noreferrer"
@@ -308,9 +320,11 @@ export default function FechaLugar({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
               </svg>
               Ubicación Misa
-            </a>
+            </MotionLink>
           </div>
+          </ScrollReveal>
 
+          <ScrollReveal direction="up" delay={0.25} duration={0.6}>
           {/* Card 2: Recepción */}
           <div
             style={{
@@ -346,7 +360,7 @@ export default function FechaLugar({
               </p>
             </div>
 
-            <a
+            <MotionLink
               href={recepcionMapsUrl}
               target="_blank"
               rel="noopener noreferrer"
@@ -362,8 +376,9 @@ export default function FechaLugar({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
               </svg>
               Ubicación Recepción
-            </a>
+            </MotionLink>
           </div>
+          </ScrollReveal>
         </div>
       </div>
     </section>

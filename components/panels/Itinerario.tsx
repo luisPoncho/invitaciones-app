@@ -1,7 +1,10 @@
+"use client";
+
 import type { InvitationTheme, PhotoScrollBehavior, StylePreset, ItineraryItem } from "@/lib/mock-data";
 import { defaultTheme, DEFAULT_ITINERARY_ITEMS, getFontDisplayVar, getFontBodyVar } from "@/lib/mock-data";
 import { formatImageUrl } from "@/lib/image-utils";
 import { LeafDivider } from "./Ornaments";
+import { ScrollReveal } from "@/components/motion";
 
 interface ItinerarioProps {
   theme?: InvitationTheme;
@@ -91,8 +94,9 @@ export default function Itinerario({
             />
 
             <div className="flex flex-col gap-6">
-              {eventList.map((item, idx) => (
-                <div key={item.id || idx} className="relative flex items-start gap-4 group">
+                {eventList.map((item, idx) => (
+                  <ScrollReveal key={item.id || idx} direction="up" delay={idx * 0.1} duration={0.5}>
+                  <div className="relative flex items-start gap-4 group">
                   {/* Icono / Burbuja */}
                   <div
                     style={{
@@ -143,7 +147,8 @@ export default function Itinerario({
                       </p>
                     )}
                   </div>
-                </div>
+                  </div>
+                  </ScrollReveal>
               ))}
             </div>
           </div>
@@ -202,8 +207,9 @@ export default function Itinerario({
           />
 
           <div className="flex flex-col gap-6">
-            {eventList.map((item, idx) => (
-              <div key={item.id || idx} className="relative flex items-start gap-4 group">
+              {eventList.map((item, idx) => (
+                <ScrollReveal key={item.id || idx} direction="up" delay={idx * 0.1} duration={0.5}>
+                <div className="relative flex items-start gap-4 group">
                 {/* Icono / Círculo */}
                 <div
                   style={{
@@ -254,7 +260,8 @@ export default function Itinerario({
                     </p>
                   )}
                 </div>
-              </div>
+                </div>
+                </ScrollReveal>
             ))}
           </div>
         </div>

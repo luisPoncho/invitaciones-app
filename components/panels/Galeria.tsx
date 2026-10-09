@@ -1,9 +1,12 @@
+"use client";
+
 import type { PhotoConfig, InvitationTheme, StylePreset } from "@/lib/mock-data";
 import { defaultTheme, getFontDisplayVar, getFontBodyVar } from "@/lib/mock-data";
 import { formatImageUrl } from "@/lib/image-utils";
 import PhotoBackground from "./PhotoBackground";
 import PhotoFrame from "./PhotoFrame";
 import { LeafDivider } from "./Ornaments";
+import { ScrollReveal, PhotoCarousel } from "@/components/motion";
 
 interface GaleriaProps {
   photoConfigs?: PhotoConfig[];
@@ -37,6 +40,9 @@ export default function Galeria({ photoConfigs, fotos, theme, stylePreset = "cla
 
   const hasPhotos = galeriaPhotos.length > 0 || specialPhotos.length > 0;
 
+  // Extract URLs for the carousel
+  const carouselUrls = galeriaPhotos.map(p => formatImageUrl(p.url)).filter(Boolean) as string[];
+
   return (
     <>
       {specialPhotos.map((p, i) => (
@@ -53,57 +59,86 @@ export default function Galeria({ photoConfigs, fotos, theme, stylePreset = "cla
         style={{ backgroundColor: t.paper || "#FAF6EE" }}
         className="py-20 px-6"
       >
-        {isRomantico ? (
-          <div className="text-center mb-10">
-            <p
-              style={{ color: t.accent, fontFamily: fontBody }}
-              className="text-xs uppercase tracking-[0.25em] mb-1 font-medium"
-            >
-              Nuestra Historia en Fotos
-            </p>
-            <h2
-              style={{ color: t.primary, fontFamily: fontDisplay }}
-              className="italic text-4xl font-normal"
-            >
-              Nuestros Momentos
-            </h2>
-            <div className="my-3">
-              <LeafDivider color={t.accent} />
+        <ScrollReveal direction="up" duration={0.7}>
+          {isRomantico ? (
+            <div className="text-center mb-10">
+              <p
+                style={{ color: t.accent, fontFamily: fontBody }}
+                className="text-xs uppercase tracking-[0.25em] mb-1 font-medium"
+              >
+                Nuestra Historia en Fotos
+              </p>
+              <h2
+                style={{ color: t.primary, fontFamily: fontDisplay }}
+                className="italic text-4xl font-normal"
+              >
+                Nuestros Momentos
+              </h2>
+              <div className="my-3">
+                <LeafDivider color={t.accent} />
+              </div>
             </div>
-          </div>
-        ) : (
-          <h2
-            style={{ color: t.primary }}
-            className="font-display italic text-3xl text-center mb-10"
-          >
-            Nuestros momentos
-          </h2>
-        )}
+          ) : (
+            <h2
+              style={{ color: t.primary }}
+              className="font-display italic text-3xl text-center mb-10"
+            >
+              Nuestros momentos
+            </h2>
+          )}
+        </ScrollReveal>
 
         {hasPhotos ? (
-          <div className={`grid grid-cols-2 md:grid-cols-3 gap-3 max-w-2xl mx-auto ${isRomantico ? 'p-2' : ''}`}>
-            {galeriaPhotos.map((p, i) => (
-              <div
-                key={i}
-                style={isRomantico ? {
-                  borderColor: `${t.accent}40`,
-                  boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
-                } : undefined}
-                className={`relative aspect-[3/4] overflow-hidden group ${
-                  isRomantico ? "rounded-2xl border-[1.5px] p-1 bg-white" : ""
-                }`}
-              >
-                <img
-                  src={formatImageUrl(p.url)}
-                  alt=""
-                  className={`w-full h-full object-cover transition-transform duration-700 ${
-                    isRomantico ? "rounded-xl" : ""
-                  } ${p.scrollBehavior === 'movimiento' ? 'hover:scale-110' : ''}`}
-                  style={{ objectPosition: p.objectPosition || "center" }}
+          carouselUrls.length > 1 ? (
+            /* ── CAROUSEL MODE ─── For 2+ gallery photos, use interactive carousel */
+            <ScrollReveal direction="up" delay={0.15} duration={0.7}>
+              <div className="max-w-md mx-auto">
+                <PhotoCarousel
+                  photos={carouselUrls}
+                  accentColor={t.accent}
+                  accentLightColor={t.accentLight}
+                  autoPlayMs={5000}
                 />
               </div>
-            ))}
-          </div>
+            </ScrollReveal>
+          ) : carouselUrls.length === 1 ? (
+            /* ── SINGLE PHOTO ─── Show single photo with reveal animation */
+            <ScrollReveal direction="up" delay={0.15} duration={0.7}>
+              <div className="max-w-md mx-auto">
+                <PhotoCarousel
+                  photos={carouselUrls}
+                  accentColor={t.accent}
+                  accentLightColor={t.accentLight}
+                />
+              </div>
+            </ScrollReveal>
+          ) : (
+            /* ── GRID FALLBACK ─── If photos don't have URLs yet, show grid placeholders */
+            <div className={`grid grid-cols-2 md:grid-cols-3 gap-3 max-w-2xl mx-auto ${isRomantico ? 'p-2' : ''}`}>
+              {galeriaPhotos.map((p, i) => (
+                <ScrollReveal key={i} direction="up" delay={i * 0.08} duration={0.5}>
+                  <div
+                    style={isRomantico ? {
+                      borderColor: `${t.accent}40`,
+                      boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
+                    } : undefined}
+                    className={`relative aspect-[3/4] overflow-hidden group ${
+                      isRomantico ? "rounded-2xl border-[1.5px] p-1 bg-white" : ""
+                    }`}
+                  >
+                    <img
+                      src={formatImageUrl(p.url)}
+                      alt=""
+                      className={`w-full h-full object-cover transition-transform duration-700 ${
+                        isRomantico ? "rounded-xl" : ""
+                      } ${p.scrollBehavior === 'movimiento' ? 'hover:scale-110' : ''}`}
+                      style={{ objectPosition: p.objectPosition || "center" }}
+                    />
+                  </div>
+                </ScrollReveal>
+              ))}
+            </div>
+          )
         ) : (
           <div className="max-w-2xl mx-auto flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed border-black/10 bg-black/5 text-center">
             <svg className="w-12 h-12 mb-3 opacity-30" style={{ color: t.primary }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

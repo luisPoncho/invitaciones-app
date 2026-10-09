@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import type { EntryAnimation, InvitationTheme } from "@/lib/mock-data";
 import EntryEnvelope from "./EntryEnvelope";
 import EntryDisc from "./EntryDisc";
@@ -49,9 +50,15 @@ export default function EntryWrapper({
            {animation === "vinilo" && <EntryVinyl theme={theme} onOpen={handleOpen} />}
         </div>
       )}
-      <div className={`relative w-full transition-opacity duration-1000 ${opened ? 'opacity-100' : 'opacity-0 max-h-screen overflow-hidden'}`}>
+      <motion.div
+        className="relative w-full"
+        initial={animation !== "none" ? { opacity: 0 } : { opacity: 1 }}
+        animate={opened ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 1, ease: "easeInOut" }}
+        style={!opened ? { maxHeight: "100vh", overflow: "hidden" } : undefined}
+      >
         {children}
-      </div>
+      </motion.div>
     </div>
   );
 }

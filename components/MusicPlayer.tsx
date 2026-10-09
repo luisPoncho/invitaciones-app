@@ -30,13 +30,21 @@ export default function MusicPlayer({ musicUrl, theme, shouldPlay = false }: Mus
   const [userMuted, setUserMuted] = useState(false);
   
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const spotifyControllerRef = useRef<any>(null);
   const youtubePlayerRef = useRef<any>(null);
   const hasStartedRef = useRef(false);
 
   const spotifyId = musicUrl ? extractSpotifyTrackId(musicUrl) : null;
   const youtubeId = musicUrl ? extractYouTubeId(musicUrl) : null;
-  const provider = spotifyId ? "spotify" : youtubeId ? "youtube" : null;
+  const isAudioUrl = musicUrl && !spotifyId && !youtubeId;
+  const provider = spotifyId ? "spotify" : youtubeId ? "youtube" : isAudioUrl ? "audio" : null;
+
+  // ─── AUDIO FILE INIT ───────────────────────────────────────────
+  useEffect(() => {
+    if (provider !== "audio") return;
+    setIsReady(true);
+  }, [provider]);
 
   // ─── SPOTIFY INIT ──────────────────────────────────────────────
   useEffect(() => {
@@ -151,6 +159,8 @@ export default function MusicPlayer({ musicUrl, theme, shouldPlay = false }: Mus
       } else if (provider === "youtube" && youtubePlayerRef.current) {
         youtubePlayerRef.current.seekTo(0);
         youtubePlayerRef.current.playVideo();
+      } else if (provider === "audio" && audioRef.current) {
+        audioRef.current.play().catch(() => {});
       }
     }
   }, [shouldPlay, isReady, userMuted, provider]);
@@ -173,6 +183,14 @@ export default function MusicPlayer({ musicUrl, theme, shouldPlay = false }: Mus
         youtubePlayerRef.current.playVideo();
         setUserMuted(false);
       }
+    } else if (provider === "audio" && audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+        setUserMuted(true);
+      } else {
+        audioRef.current.play().catch(() => {});
+        setUserMuted(false);
+      }
     }
   }, [isPlaying, provider]);
 
@@ -183,6 +201,18 @@ export default function MusicPlayer({ musicUrl, theme, shouldPlay = false }: Mus
 
   return (
     <>
+      {provider === "audio" && musicUrl && (
+        <audio
+          ref={audioRef}
+          src={musicUrl}
+          loop
+          preload="auto"
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          onEnded={() => setIsPlaying(false)}
+        />
+      )}
+
       <div
         id={provider === "spotify" ? "spotify-embed-container" : "youtube-embed-container"}
         style={{

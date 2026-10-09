@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { InvitationTheme, StylePreset } from "@/lib/mock-data";
 import { defaultTheme, getFontDisplayVar, getFontBodyVar } from "@/lib/mock-data";
 import { LeafDivider } from "./Ornaments";
+import { ScrollReveal } from "@/components/motion";
 
 function getTimeLeft(target: string) {
   const diff = Math.max(0, new Date(target).getTime() - Date.now());
@@ -51,24 +52,27 @@ export default function CuentaRegresiva({ fechaISO, theme, stylePreset = "clasic
         className="relative py-16 px-6 text-center overflow-hidden"
       >
         <div className="max-w-md mx-auto">
-          <p
-            style={{ color: t.accent, fontFamily: fontBody }}
-            className="text-xs tracking-[0.3em] uppercase mb-2 font-medium"
-          >
-            Esperando el gran día
-          </p>
-          <h3
-            style={{ fontFamily: fontDisplay, color: t.primary }}
-            className="text-3xl italic mb-3 font-normal"
-          >
-            Falta poco tiempo
-          </h3>
+          <ScrollReveal direction="up" duration={0.7}>
+            <p
+              style={{ color: t.accent, fontFamily: fontBody }}
+              className="text-xs tracking-[0.3em] uppercase mb-2 font-medium"
+            >
+              Esperando el gran día
+            </p>
+            <h3
+              style={{ fontFamily: fontDisplay, color: t.primary }}
+              className="text-3xl italic mb-3 font-normal"
+            >
+              Falta poco tiempo
+            </h3>
 
-          <div className="my-3">
-            <LeafDivider color={t.accent} />
-          </div>
+            <div className="my-3">
+              <LeafDivider color={t.accent} />
+            </div>
+          </ScrollReveal>
 
-          <div className="grid grid-cols-4 gap-3 max-w-xs mx-auto mt-6">
+          <ScrollReveal direction="up" delay={0.15} duration={0.5}>
+            <div className="grid grid-cols-4 gap-3 max-w-xs mx-auto mt-6">
             {unidades.map(([etiqueta, valor]) => (
               <div
                 key={etiqueta}
@@ -92,7 +96,8 @@ export default function CuentaRegresiva({ fechaISO, theme, stylePreset = "clasic
                 </span>
               </div>
             ))}
-          </div>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
     );
@@ -109,6 +114,7 @@ export default function CuentaRegresiva({ fechaISO, theme, stylePreset = "clasic
       >
         Falta poco
       </p>
+      <ScrollReveal direction="up" delay={0.1} duration={0.5}>
       <div className="flex justify-center gap-6 sm:gap-10">
         {unidades.map(([etiqueta, valor]) => (
           <div key={etiqueta} className="flex flex-col items-center">
@@ -127,6 +133,7 @@ export default function CuentaRegresiva({ fechaISO, theme, stylePreset = "clasic
           </div>
         ))}
       </div>
+      </ScrollReveal>
     </section>
   );
 }

@@ -1,7 +1,10 @@
+"use client";
+
 import type { EventData, InvitationTheme, PhotoScrollBehavior, StylePreset } from "@/lib/mock-data";
 import { defaultTheme, getFontDisplayVar, getFontBodyVar } from "@/lib/mock-data";
 import { formatImageUrl } from "@/lib/image-utils";
 import { FloralFrame, FloralDivider, LeafAccent } from "./Ornaments";
+import { ScrollReveal } from "@/components/motion";
 
 interface PortadaProps {
   event: EventData;

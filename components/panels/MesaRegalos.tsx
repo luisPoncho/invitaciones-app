@@ -1,7 +1,10 @@
+"use client";
+
 import type { InvitationTheme, PhotoScrollBehavior, StylePreset } from "@/lib/mock-data";
 import { defaultTheme, getFontDisplayVar, getFontBodyVar } from "@/lib/mock-data";
 import { formatImageUrl } from "@/lib/image-utils";
 import { LeafDivider } from "./Ornaments";
+import { ScrollReveal, MotionLink } from "@/components/motion";
 
 interface MesaRegalosProps {
   theme?: InvitationTheme;
@@ -58,6 +61,7 @@ export default function MesaRegalos({
       >
         {formattedBgUrl && <div className="absolute inset-0 bg-white/75 z-0" />}
         <div className="relative z-10 max-w-md mx-auto">
+          <ScrollReveal direction="up" duration={0.7}>
           <div
             style={{ backgroundColor: `${t.accent}15`, borderColor: `${t.accent}30` }}
             className="w-14 h-14 mx-auto rounded-full border flex items-center justify-center text-2xl mb-3"
@@ -88,7 +92,7 @@ export default function MesaRegalos({
               {body || "El mejor regalo es tu presencia. Sin embargo, si deseas tener un detalle con nosotros, puedes ver nuestra mesa de regalos aquí."}
             </p>
             {url && (
-              <a
+              <MotionLink
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -96,9 +100,10 @@ export default function MesaRegalos({
                 className="inline-block text-xs uppercase tracking-widest rounded-2xl px-8 py-3.5 hover:opacity-90 transition-all font-medium shadow-md"
               >
                 Ver Mesa de Regalos
-              </a>
+              </MotionLink>
             )}
           </div>
+          </ScrollReveal>
         </div>
       </section>
     );
@@ -128,7 +133,7 @@ export default function MesaRegalos({
             {body || "El mejor regalo es tu presencia. Sin embargo, si deseas tener un detalle con nosotros, puedes ver nuestra mesa de regalos aquí."}
           </p>
           {url && (
-            <a
+            <MotionLink
               href={url}
               target="_blank"
               rel="noopener noreferrer"
@@ -136,7 +141,7 @@ export default function MesaRegalos({
               className="inline-block mt-4 text-xs uppercase tracking-widest rounded-md px-6 py-3 hover:opacity-90 transition-opacity"
             >
               Ver Mesa de Regalos
-            </a>
+            </MotionLink>
           )}
         </div>
       </div>
