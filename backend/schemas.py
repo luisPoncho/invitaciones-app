@@ -53,6 +53,7 @@ class SectionBlock(BaseModel):
     photoUrl: Optional[str] = None
     itineraryTitle: Optional[str] = None
     itinerarySubtitle: Optional[str] = None
+    itineraryLayout: Optional[str] = None
     itineraryIconSize: Optional[float] = None
     itineraryItems: Optional[List[ItineraryItem]] = None
 

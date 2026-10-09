@@ -76,7 +76,7 @@ export default function InvitacionPage({
               case "fecha-lugar":
                 return <FechaLugar key={section.id} event={event} theme={theme} stylePreset={stylePreset} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
               case "itinerario":
-                return <Itinerario key={section.id} theme={theme} stylePreset={stylePreset} title={section.itineraryTitle} subtitle={section.itinerarySubtitle} items={section.itineraryItems && section.itineraryItems.length > 0 ? section.itineraryItems : (event as any).itinerary} iconSize={section.itineraryIconSize} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+                return <Itinerario key={section.id} theme={theme} stylePreset={stylePreset} title={section.itineraryTitle} subtitle={section.itinerarySubtitle} items={section.itineraryItems && section.itineraryItems.length > 0 ? section.itineraryItems : (event as any).itinerary} iconSize={section.itineraryIconSize} itineraryLayout={section.itineraryLayout} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
               case "galeria":
                 return <Galeria key={section.id} photoConfigs={photoConfigs} fotos={event.fotos || []} theme={theme} stylePreset={stylePreset} />;
               case "rsvp":

@@ -151,6 +151,7 @@ export type SectionBlock = {
   photoUrl?: string;
   itineraryTitle?: string;
   itinerarySubtitle?: string;
+  itineraryLayout?: "lateral" | "centrado";
   itineraryIconSize?: number;
   itineraryItems?: ItineraryItem[];
 };

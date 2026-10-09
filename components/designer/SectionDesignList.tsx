@@ -133,6 +133,37 @@ export default function SectionDesignList({ sections, onChange }: SectionDesignL
           {/* Itinerario Specific Config */}
           {sec.type === "itinerario" && (
             <div className="flex flex-col gap-3 mt-2 border-t border-white/10 pt-3">
+              {/* Selector de Formato del Itinerario */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] text-white/50 uppercase font-semibold">Diseño / Formato del Itinerario</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => updateSection(sec.id, { itineraryLayout: "lateral" })}
+                    className={`p-2.5 rounded-lg border text-left flex flex-col gap-1 transition-all ${
+                      (sec.itineraryLayout || "lateral") === "lateral"
+                        ? "bg-amber-400/20 border-amber-400 text-amber-300 shadow-sm"
+                        : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white"
+                    }`}
+                  >
+                    <span className="text-xs font-bold">📍 Lateral</span>
+                    <span className="text-[10px] opacity-75">Icono en burbuja sobre línea lateral</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateSection(sec.id, { itineraryLayout: "centrado" })}
+                    className={`p-2.5 rounded-lg border text-left flex flex-col gap-1 transition-all ${
+                      sec.itineraryLayout === "centrado"
+                        ? "bg-amber-400/20 border-amber-400 text-amber-300 shadow-sm"
+                        : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white"
+                    }`}
+                  >
+                    <span className="text-xs font-bold">✨ Centrado</span>
+                    <span className="text-[10px] opacity-75">Línea central, icono arriba sin círculo</span>
+                  </button>
+                </div>
+              </div>
+
               <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] text-white/50 uppercase">Título del Panel</label>
                 <input
