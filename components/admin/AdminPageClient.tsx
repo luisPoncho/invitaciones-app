@@ -413,31 +413,45 @@ export default function AdminPageClient({ slug }: { slug: string }) {
         {/* ═══════════════ TAB: Gestionar Invitaciones ═══════════════ */}
         {activeTab === "invitaciones" && (
           <div className="space-y-6">
-            {/* Mensaje personalizable */}
+            {/* Mensaje personalizable (Plantilla predeterminada) */}
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#d9c48b" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 011.037-.443 48.282 48.282 0 005.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
-                </svg>
-                <h3 className="text-white text-sm font-semibold">Mensaje de invitación</h3>
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <div className="flex items-center gap-2">
+                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#d9c48b" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 011.037-.443 48.282 48.282 0 005.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+                  </svg>
+                  <h3 className="text-white text-sm font-semibold">Mensaje predeterminado (Plantilla para todos)</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setGuestMessage("¡Hola {nombre}! Estás cordialmente invitado(a) a nuestra celebración. Confirma tu asistencia aquí:")}
+                  className="text-[11px] text-amber-300/80 hover:text-amber-300 hover:underline transition-colors"
+                >
+                  ↺ Restablecer predeterminado
+                </button>
               </div>
-              <p className="text-white/40 text-xs mb-3">
-                Este mensaje se incluirá cuando copies el link para enviar a cada invitado. Usa <code className="bg-white/10 px-1 py-0.5 rounded text-[10px] text-amber-300">{"{nombre}"}</code> para insertar el nombre del invitado automáticamente.
+              <p className="text-white/50 text-xs mb-3 leading-relaxed">
+                Este mensaje servirá de <strong>plantilla predeterminada para todos los invitados</strong>. No necesitas cambiar el nombre uno por uno aquí: el sistema tomará automáticamente el nombre que escribas al crear cada link e insertará <code className="bg-amber-400/10 text-amber-300 px-1.5 py-0.5 rounded text-[11px] font-mono border border-amber-400/20">{"{nombre}"}</code> sin alterar los demás links.
               </p>
               <textarea
                 value={guestMessage}
                 onChange={(e) => setGuestMessage(e.target.value)}
                 rows={3}
                 className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-white/25 transition-colors resize-none"
-                placeholder="Escribe el mensaje que acompañará el link..."
+                placeholder="Escribe el mensaje predeterminado..."
               />
-              <div className="flex justify-end mt-2">
+              {!guestMessage.includes("{nombre}") && (
+                <p className="text-amber-300/80 text-[11px] mt-1.5 flex items-center gap-1.5">
+                  <span>💡 Nota:</span> Al no incluir <code className="bg-amber-400/10 text-amber-300 px-1 py-0.2 rounded font-mono">{"{nombre}"}</code>, se añadirá "¡Hola [Nombre]!" al inicio del mensaje automáticamente.
+                </p>
+              )}
+              <div className="flex justify-end mt-3">
                 <button
                   onClick={async () => {
                     setSavingMessage(true);
                     try {
                       await updateGuestMessage(slug, token, guestMessage);
-                      setSuccessMessage("✓ Mensaje guardado correctamente.");
+                      setSuccessMessage("✓ Mensaje predeterminado guardado correctamente.");
                       setTimeout(() => setSuccessMessage(""), 3000);
                     } catch {
                       setSuccessMessage("Error al guardar el mensaje.");
@@ -448,7 +462,7 @@ export default function AdminPageClient({ slug }: { slug: string }) {
                   disabled={savingMessage}
                   className="px-4 py-2 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-xs text-amber-300 font-medium transition-all disabled:opacity-50"
                 >
-                  {savingMessage ? "Guardando..." : "Guardar mensaje"}
+                  {savingMessage ? "Guardando..." : "Guardar plantilla"}
                 </button>
               </div>
             </div>
@@ -518,6 +532,21 @@ export default function AdminPageClient({ slug }: { slug: string }) {
                   {creatingLink ? "Generando..." : "Generar Link"}
                 </button>
               </div>
+
+              {/* Vista previa en tiempo real mientras escribe el nombre */}
+              {guestName.trim() && (
+                <div className="mt-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3.5 text-xs">
+                  <div className="flex items-center justify-between text-emerald-400 text-[11px] font-semibold mb-1">
+                    <span>VISTA PREVIA DEL MENSAJE AUTOMÁTICO</span>
+                    <span>Para: {guestName.trim()}</span>
+                  </div>
+                  <p className="text-white/80 italic leading-relaxed">
+                    "{guestMessage.includes("{nombre}")
+                      ? guestMessage.replace(/\{nombre\}/g, guestName.trim())
+                      : `¡Hola ${guestName.trim()}! ${guestMessage}`}"
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Lista de links generados */}
@@ -544,7 +573,9 @@ export default function AdminPageClient({ slug }: { slug: string }) {
                   const linkUrl = typeof window !== "undefined"
                     ? `${window.location.origin}/invitacion/${slug}?guest=${link.code}`
                     : `/invitacion/${slug}?guest=${link.code}`;
-                  const personalizedMessage = guestMessage.replace(/\{nombre\}/g, link.guestName);
+                  const personalizedMessage = guestMessage.includes("{nombre}")
+                    ? guestMessage.replace(/\{nombre\}/g, link.guestName)
+                    : `¡Hola ${link.guestName}! ${guestMessage}`;
                   const fullCopyText = `${personalizedMessage}\n\n${linkUrl}`;
 
                   return (
