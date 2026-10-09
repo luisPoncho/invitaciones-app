@@ -21,23 +21,29 @@ from sqlalchemy.orm import Session
 
 try:
     from database import engine, get_db, Base, SessionLocal
-    from models import Invitation, Rsvp
+    from models import Invitation, Rsvp, GuestLink
     from schemas import (
         InvitationCreate,
         InvitationUpdate,
         InvitationResponse,
         RsvpCreate,
         RsvpResponse,
+        GuestLinkCreate,
+        GuestLinkResponse,
+        GuestMessageUpdate,
     )
 except ImportError:
     from .database import engine, get_db, Base, SessionLocal
-    from .models import Invitation, Rsvp
+    from .models import Invitation, Rsvp, GuestLink
     from .schemas import (
         InvitationCreate,
         InvitationUpdate,
         InvitationResponse,
         RsvpCreate,
         RsvpResponse,
+        GuestLinkCreate,
+        GuestLinkResponse,
+        GuestMessageUpdate,
     )
 
 
@@ -92,6 +98,35 @@ def auto_migrate_db():
             with engine.begin() as connection:
                 connection.execute(
                     text("ALTER TABLE rsvps ADD COLUMN pases INTEGER DEFAULT 1")
+                )
+
+        # Add guest_message_template to invitations if missing
+        if "guest_message_template" not in existing_cols:
+            with engine.begin() as connection:
+                connection.execute(
+                    text(
+                        "ALTER TABLE invitations ADD COLUMN guest_message_template TEXT DEFAULT NULL"
+                    )
+                )
+
+        # Create guest_links table if it doesn't exist
+        table_names = inspector.get_table_names()
+        if "guest_links" not in table_names:
+            with engine.begin() as connection:
+                connection.execute(
+                    text(
+                        "CREATE TABLE IF NOT EXISTS guest_links ("
+                        "  id TEXT PRIMARY KEY,"
+                        "  code TEXT UNIQUE NOT NULL,"
+                        "  guest_name TEXT NOT NULL,"
+                        "  max_passes INTEGER NOT NULL DEFAULT 1,"
+                        "  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+                        "  invitation_id TEXT NOT NULL REFERENCES invitations(id) ON DELETE CASCADE"
+                        ")"
+                    )
+                )
+                connection.execute(
+                    text("CREATE INDEX IF NOT EXISTS ix_guest_links_code ON guest_links (code)")
                 )
 
         print("Database migration check completed.")
@@ -517,6 +552,157 @@ def clear_rsvps(
     db.query(Rsvp).filter(Rsvp.invitation_id == inv.id).delete()
     db.commit()
     return None
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  GUEST LINKS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+def _generate_guest_code() -> str:
+    """Generate a short, URL-safe guest code."""
+    chars = string.ascii_lowercase + string.digits
+    return "".join(secrets.choice(chars) for _ in range(10))
+
+
+@app.get("/api/invitations/{slug}/guest-links", response_model=List[GuestLinkResponse])
+def list_guest_links(
+    slug: str,
+    token: str = Query(..., description="Admin token for authorization"),
+    db: Session = Depends(get_db),
+):
+    """List all guest links for an invitation. Requires admin token."""
+    inv = db.query(Invitation).filter(Invitation.slug == slug).first()
+    if not inv:
+        raise HTTPException(status_code=404, detail="Invitación no encontrada.")
+    if inv.admin_token != token:
+        raise HTTPException(status_code=403, detail="Token de administrador inválido.")
+
+    links = db.query(GuestLink).filter(GuestLink.invitation_id == inv.id).order_by(GuestLink.created_at.desc()).all()
+    return [
+        GuestLinkResponse(
+            id=gl.id,
+            code=gl.code,
+            guestName=gl.guest_name,
+            maxPasses=gl.max_passes,
+            createdAt=gl.created_at.isoformat() if gl.created_at else "",
+        )
+        for gl in links
+    ]
+
+
+@app.post("/api/invitations/{slug}/guest-links", response_model=GuestLinkResponse, status_code=201)
+def create_guest_link(
+    slug: str,
+    body: GuestLinkCreate,
+    token: str = Query(..., description="Admin token for authorization"),
+    db: Session = Depends(get_db),
+):
+    """Create a personalized guest link. Requires admin token."""
+    inv = db.query(Invitation).filter(Invitation.slug == slug).first()
+    if not inv:
+        raise HTTPException(status_code=404, detail="Invitación no encontrada.")
+    if inv.admin_token != token:
+        raise HTTPException(status_code=403, detail="Token de administrador inválido.")
+
+    now = datetime.now(timezone.utc)
+    gl = GuestLink(
+        id=_generate_id(),
+        code=_generate_guest_code(),
+        guest_name=body.guestName.strip(),
+        max_passes=max(1, body.maxPasses),
+        invitation_id=inv.id,
+        created_at=now,
+    )
+    db.add(gl)
+    db.commit()
+    db.refresh(gl)
+
+    return GuestLinkResponse(
+        id=gl.id,
+        code=gl.code,
+        guestName=gl.guest_name,
+        maxPasses=gl.max_passes,
+        createdAt=gl.created_at.isoformat(),
+    )
+
+
+@app.delete("/api/invitations/{slug}/guest-links/{link_id}", status_code=204)
+def delete_guest_link(
+    slug: str,
+    link_id: str,
+    token: str = Query(..., description="Admin token for authorization"),
+    db: Session = Depends(get_db),
+):
+    """Delete a single guest link. Requires admin token."""
+    inv = db.query(Invitation).filter(Invitation.slug == slug).first()
+    if not inv:
+        raise HTTPException(status_code=404, detail="Invitación no encontrada.")
+    if inv.admin_token != token:
+        raise HTTPException(status_code=403, detail="Token de administrador inválido.")
+
+    gl = db.query(GuestLink).filter(GuestLink.id == link_id, GuestLink.invitation_id == inv.id).first()
+    if not gl:
+        raise HTTPException(status_code=404, detail="Link no encontrado.")
+
+    db.delete(gl)
+    db.commit()
+    return None
+
+
+@app.put("/api/invitations/{slug}/guest-message")
+def update_guest_message(
+    slug: str,
+    body: GuestMessageUpdate,
+    db: Session = Depends(get_db),
+):
+    """Update the guest message template. Requires admin token."""
+    inv = db.query(Invitation).filter(Invitation.slug == slug).first()
+    if not inv:
+        raise HTTPException(status_code=404, detail="Invitación no encontrada.")
+    if inv.admin_token != body.adminToken:
+        raise HTTPException(status_code=403, detail="Token de administrador inválido.")
+
+    inv.guest_message_template = body.message
+    inv.updated_at = datetime.now(timezone.utc)
+    db.commit()
+    return {"ok": True}
+
+
+@app.get("/api/invitations/{slug}/guest-message")
+def get_guest_message(
+    slug: str,
+    token: str = Query(..., description="Admin token for authorization"),
+    db: Session = Depends(get_db),
+):
+    """Get the guest message template. Requires admin token."""
+    inv = db.query(Invitation).filter(Invitation.slug == slug).first()
+    if not inv:
+        raise HTTPException(status_code=404, detail="Invitación no encontrada.")
+    if inv.admin_token != token:
+        raise HTTPException(status_code=403, detail="Token de administrador inválido.")
+
+    return {
+        "message": getattr(inv, "guest_message_template", None)
+        or "¡Hola {nombre}! Estás cordialmente invitado(a) a nuestra celebración. Confirma tu asistencia aquí:",
+    }
+
+
+@app.get("/api/guest/{code}")
+def resolve_guest_code(code: str, db: Session = Depends(get_db)):
+    """Public endpoint: resolve a guest code to get guest name, max passes, and invitation slug."""
+    gl = db.query(GuestLink).filter(GuestLink.code == code).first()
+    if not gl:
+        raise HTTPException(status_code=404, detail="Link de invitado no encontrado.")
+
+    inv = db.query(Invitation).filter(Invitation.id == gl.invitation_id).first()
+    if not inv:
+        raise HTTPException(status_code=404, detail="Invitación no encontrada.")
+
+    return {
+        "guestName": gl.guest_name,
+        "maxPasses": gl.max_passes,
+        "slug": inv.slug,
+    }
 
 
 # ── Health check ─────────────────────────────────────────────────────────────

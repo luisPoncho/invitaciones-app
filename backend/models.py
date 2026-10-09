@@ -63,6 +63,30 @@ class Invitation(Base):
     rsvps: Mapped[list[Rsvp]] = relationship(
         back_populates="invitation", cascade="all, delete-orphan"
     )
+    guest_links: Mapped[list[GuestLink]] = relationship(
+        back_populates="invitation", cascade="all, delete-orphan"
+    )
+
+    # Customizable message template for guest links
+    guest_message_template: Mapped[str | None] = mapped_column(
+        nullable=True,
+        default="¡Hola {nombre}! Estás cordialmente invitado(a) a nuestra celebración. Confirma tu asistencia aquí:",
+    )
+
+
+class GuestLink(Base):
+    __tablename__ = "guest_links"
+
+    id: Mapped[str] = mapped_column(primary_key=True)
+    code: Mapped[str] = mapped_column(unique=True, nullable=False, index=True)
+    guest_name: Mapped[str] = mapped_column(nullable=False)
+    max_passes: Mapped[int] = mapped_column(nullable=False, default=1)
+    created_at: Mapped[datetime] = mapped_column(nullable=False, default=_utcnow)
+
+    invitation_id: Mapped[str] = mapped_column(
+        ForeignKey("invitations.id", ondelete="CASCADE"), nullable=False
+    )
+    invitation: Mapped[Invitation] = relationship(back_populates="guest_links")
 
 
 class Rsvp(Base):

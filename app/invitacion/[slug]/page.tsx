@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Portada from "@/components/panels/Portada";
 import CuentaRegresiva from "@/components/panels/CuentaRegresiva";
 import FechaLugar from "@/components/panels/FechaLugar";
@@ -16,13 +17,16 @@ import FreeElementsLayer from "@/components/designer/FreeElementsLayer";
 import MusicPlayer from "@/components/MusicPlayer";
 import { mockEvent, defaultTheme } from "@/lib/mock-data";
 import type { EventData, InvitationTheme, FullInvitationConfig, PhotoConfig, EntryAnimation, FreeElement, SectionBlock, StylePreset } from "@/lib/mock-data";
-import { loadInvitation } from "@/lib/storage";
+import { loadInvitation, resolveGuestCode } from "@/lib/storage";
 
 export default function InvitacionPage({
   params,
 }: {
   params: { slug: string };
 }) {
+  const searchParams = useSearchParams();
+  const guestCode = searchParams.get("guest") ?? "";
+
   const [event, setEvent] = useState<EventData>(mockEvent);
   const [theme, setTheme] = useState<InvitationTheme>(defaultTheme);
   const [stylePreset, setStylePreset] = useState<StylePreset>("clasico");
@@ -34,8 +38,14 @@ export default function InvitacionPage({
   const [loading, setLoading] = useState(true);
   const [musicShouldPlay, setMusicShouldPlay] = useState(false);
 
+  // Guest link data (pre-filled name + max passes)
+  const [guestName, setGuestName] = useState<string | undefined>();
+  const [guestMaxPasses, setGuestMaxPasses] = useState<number | undefined>();
+
   useEffect(() => {
-    loadInvitation(params.slug).then((saved) => {
+    async function init() {
+      // Load invitation data
+      const saved = await loadInvitation(params.slug);
       if (saved) {
         setEvent(saved);
         setTheme(saved.theme);
@@ -46,9 +56,20 @@ export default function InvitacionPage({
         setSections(saved.sections || []);
         setMusicUrl(saved.musicUrl);
       }
+
+      // Resolve guest code if present
+      if (guestCode) {
+        const guestData = await resolveGuestCode(guestCode);
+        if (guestData) {
+          setGuestName(guestData.guestName);
+          setGuestMaxPasses(guestData.maxPasses);
+        }
+      }
+
       setLoading(false);
-    });
-  }, [params.slug]);
+    }
+    init();
+  }, [params.slug, guestCode]);
 
   if (loading) {
     return (
@@ -80,7 +101,7 @@ export default function InvitacionPage({
               case "galeria":
                 return <Galeria key={section.id} photoConfigs={photoConfigs} fotos={event.fotos || []} theme={theme} stylePreset={stylePreset} />;
               case "rsvp":
-                return <RSVP key={section.id} slug={params.slug} theme={theme} stylePreset={stylePreset} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+                return <RSVP key={section.id} slug={params.slug} theme={theme} stylePreset={stylePreset} guestName={guestName} guestMaxPasses={guestMaxPasses} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
               case "foto-fondo":
                 return <FotoFondo key={section.id} theme={theme} photoUrl={section.photoUrl || section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
               case "mesa-regalos":

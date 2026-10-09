@@ -13,6 +13,8 @@ interface RSVPProps {
   slug: string;
   theme?: InvitationTheme;
   stylePreset?: StylePreset;
+  guestName?: string;
+  guestMaxPasses?: number;
   bgUrl?: string;
   bgScrollBehavior?: PhotoScrollBehavior;
   bgPositionX?: number;
@@ -24,6 +26,8 @@ export default function RSVP({
   slug,
   theme,
   stylePreset = "clasico",
+  guestName: prefilledName,
+  guestMaxPasses,
   bgUrl,
   bgScrollBehavior,
   bgPositionX,
@@ -43,7 +47,9 @@ export default function RSVP({
   const bgSize = bgZoom && bgZoom > 100 ? `${bgZoom}% auto` : bgScrollBehavior === "movimiento" ? "120%" : "cover";
   const bgPosition = `${bgPositionX ?? 50}% ${bgPositionY ?? 50}%`;
 
-  const [nombre, setNombre] = useState("");
+  const isGuestLink = !!prefilledName;
+  const maxPasesAllowed = guestMaxPasses ?? 20;
+  const [nombre, setNombre] = useState(prefilledName || "");
   const [asistencia, setAsistencia] = useState<"si" | "no" | "">("");
   const [pases, setPases] = useState<number>(1);
   const [enviado, setEnviado] = useState(false);
@@ -53,7 +59,7 @@ export default function RSVP({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!nombre.trim() || !asistencia) {
-      setError("Completa tu nombre y confirma tu asistencia.");
+      setError(isGuestLink ? "Confirma tu asistencia." : "Completa tu nombre y confirma tu asistencia.");
       return;
     }
     setError("");
@@ -131,23 +137,30 @@ export default function RSVP({
             }}
             className="mt-6 p-6 sm:p-8 rounded-3xl border shadow-sm flex flex-col gap-4"
           >
-            <div className="flex flex-col gap-1.5 text-left">
-              <label style={{ fontFamily: fontBody, color: `${t.primary}99` }} className="text-xs uppercase tracking-wider font-medium">
-                Nombre y Apellido
-              </label>
-              <input
-                type="text"
-                placeholder="Escribe tu nombre completo"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                style={{
-                  borderColor: `${t.accent}40`,
-                  color: t.primary,
-                  fontFamily: fontBody,
-                }}
-                className="bg-white border rounded-xl px-4 py-3 text-sm placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all"
-              />
-            </div>
+            {isGuestLink ? (
+              <div className="text-center py-2">
+                <p style={{ fontFamily: fontBody, color: `${t.primary}99` }} className="text-xs uppercase tracking-wider font-medium mb-1">Invitación para</p>
+                <p style={{ fontFamily: fontDisplay, color: t.primary }} className="italic text-xl font-normal">{nombre}</p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-1.5 text-left">
+                <label style={{ fontFamily: fontBody, color: `${t.primary}99` }} className="text-xs uppercase tracking-wider font-medium">
+                  Nombre y Apellido
+                </label>
+                <input
+                  type="text"
+                  placeholder="Escribe tu nombre completo"
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                  style={{
+                    borderColor: `${t.accent}40`,
+                    color: t.primary,
+                    fontFamily: fontBody,
+                  }}
+                  className="bg-white border rounded-xl px-4 py-3 text-sm placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all"
+                />
+              </div>
+            )}
 
             <div className="flex flex-col gap-1.5 text-left">
               <label style={{ fontFamily: fontBody, color: `${t.primary}99` }} className="text-xs uppercase tracking-wider font-medium">
@@ -196,7 +209,7 @@ export default function RSVP({
                   </button>
 
                   <div className="flex-1 flex gap-1.5 justify-center overflow-x-auto py-0.5">
-                    {[1, 2, 3, 4, 5].map(num => (
+                    {Array.from({ length: Math.min(maxPasesAllowed, 5) }, (_, i) => i + 1).map(num => (
                       <button
                         key={num}
                         type="button"
@@ -215,9 +228,10 @@ export default function RSVP({
 
                   <button
                     type="button"
-                    onClick={() => setPases(prev => Math.min(20, prev + 1))}
+                    onClick={() => setPases(prev => Math.min(maxPasesAllowed, prev + 1))}
+                    disabled={pases >= maxPasesAllowed}
                     style={{ borderColor: `${t.accent}40`, color: t.accent }}
-                    className="w-9 h-9 rounded-xl border bg-white flex items-center justify-center text-base font-bold shadow-xs hover:bg-amber-50 transition-colors"
+                    className="w-9 h-9 rounded-xl border bg-white flex items-center justify-center text-base font-bold shadow-xs hover:bg-amber-50 transition-colors disabled:opacity-40"
                   >
                     +
                   </button>
@@ -280,19 +294,26 @@ export default function RSVP({
           Confirma tu asistencia
         </h2>
         <form onSubmit={handleSubmit} className="max-w-xs mx-auto flex flex-col gap-4">
-          <input
-            type="text"
-            placeholder="Tu nombre completo"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            style={{
-              borderColor: `${t.accentLight}66`,
-              color: t.paper,
-              backgroundColor: "transparent",
-              fontFamily: fontBody,
-            }}
-            className="border rounded-md px-4 py-3 text-sm placeholder:opacity-40 focus:outline-none transition-opacity"
-          />
+          {isGuestLink ? (
+            <div className="text-center py-2">
+              <p style={{ color: `${t.paper}80`, fontFamily: fontBody }} className="text-xs uppercase tracking-wider mb-1">Invitación para</p>
+              <p style={{ fontFamily: fontDisplay, color: t.paper }} className="italic text-xl">{nombre}</p>
+            </div>
+          ) : (
+            <input
+              type="text"
+              placeholder="Tu nombre completo"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              style={{
+                borderColor: `${t.accentLight}66`,
+                color: t.paper,
+                backgroundColor: "transparent",
+                fontFamily: fontBody,
+              }}
+              className="border rounded-md px-4 py-3 text-sm placeholder:opacity-40 focus:outline-none transition-opacity"
+            />
+          )}
 
           <div className="flex gap-3">
             {(["si", "no"] as const).map((val) => (
@@ -333,7 +354,7 @@ export default function RSVP({
                 </button>
 
                 <div className="flex-1 flex gap-1 justify-center overflow-x-auto py-0.5">
-                  {[1, 2, 3, 4, 5].map(num => (
+                  {Array.from({ length: Math.min(maxPasesAllowed, 5) }, (_, i) => i + 1).map(num => (
                     <button
                       key={num}
                       type="button"
@@ -352,8 +373,9 @@ export default function RSVP({
 
                 <button
                   type="button"
-                  onClick={() => setPases(prev => Math.min(20, prev + 1))}
-                  className="w-8 h-8 rounded border border-white/20 bg-white/5 flex items-center justify-center text-sm font-bold text-white hover:bg-white/10"
+                  onClick={() => setPases(prev => Math.min(maxPasesAllowed, prev + 1))}
+                  disabled={pases >= maxPasesAllowed}
+                  className="w-8 h-8 rounded border border-white/20 bg-white/5 flex items-center justify-center text-sm font-bold text-white hover:bg-white/10 disabled:opacity-30"
                 >
                   +
                 </button>

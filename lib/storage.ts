@@ -138,3 +138,96 @@ export async function clearRSVPs(
     }
   );
 }
+
+// ── Guest Links ──────────────────────────────────────────────────────────────
+
+export type GuestLinkData = {
+  id: string;
+  code: string;
+  guestName: string;
+  maxPasses: number;
+  createdAt: string;
+};
+
+/** Crea un link personalizado para un invitado */
+export async function createGuestLink(
+  slug: string,
+  token: string,
+  guestName: string,
+  maxPasses: number
+): Promise<GuestLinkData> {
+  return api<GuestLinkData>(
+    `/api/invitations/${slug}/guest-links?token=${encodeURIComponent(token)}`,
+    {
+      method: "POST",
+      body: JSON.stringify({ guestName, maxPasses }),
+    }
+  );
+}
+
+/** Lista todos los guest links de una invitación */
+export async function listGuestLinks(
+  slug: string,
+  token: string
+): Promise<GuestLinkData[]> {
+  try {
+    return await api<GuestLinkData[]>(
+      `/api/invitations/${slug}/guest-links?token=${encodeURIComponent(token)}`
+    );
+  } catch {
+    return [];
+  }
+}
+
+/** Elimina un guest link */
+export async function deleteGuestLink(
+  slug: string,
+  token: string,
+  linkId: string
+): Promise<void> {
+  await api<void>(
+    `/api/invitations/${slug}/guest-links/${linkId}?token=${encodeURIComponent(token)}`,
+    { method: "DELETE" }
+  );
+}
+
+/** Actualiza la plantilla de mensaje para invitados */
+export async function updateGuestMessage(
+  slug: string,
+  token: string,
+  message: string
+): Promise<void> {
+  await api<unknown>(`/api/invitations/${slug}/guest-message`, {
+    method: "PUT",
+    body: JSON.stringify({ adminToken: token, message }),
+  });
+}
+
+/** Obtiene la plantilla de mensaje para invitados */
+export async function getGuestMessage(
+  slug: string,
+  token: string
+): Promise<string> {
+  try {
+    const res = await api<{ message: string }>(
+      `/api/invitations/${slug}/guest-message?token=${encodeURIComponent(token)}`
+    );
+    return res.message;
+  } catch {
+    return "¡Hola {nombre}! Estás cordialmente invitado(a) a nuestra celebración. Confirma tu asistencia aquí:";
+  }
+}
+
+/** Resuelve un código de invitado (endpoint público) */
+export async function resolveGuestCode(
+  code: string
+): Promise<{ guestName: string; maxPasses: number; slug: string } | null> {
+  try {
+    return await api<{ guestName: string; maxPasses: number; slug: string }>(
+      `/api/guest/${code}`
+    );
+  } catch {
+    return null;
+  }
+}
+

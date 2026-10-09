@@ -211,3 +211,26 @@ class RsvpResponse(BaseModel):
     asistencia: str
     pases: int = 1
     timestamp: str
+
+
+# ── Guest Links ──────────────────────────────────────────────────────────────
+
+class GuestLinkCreate(BaseModel):
+    """Body for POST /api/invitations/{slug}/guest-links"""
+    guestName: str
+    maxPasses: int = 1
+
+
+class GuestLinkResponse(BaseModel):
+    id: str
+    code: str
+    guestName: str
+    maxPasses: int
+    createdAt: str
+
+
+class GuestMessageUpdate(BaseModel):
+    """Body for PUT /api/invitations/{slug}/guest-message"""
+    adminToken: str
+    message: str
+
