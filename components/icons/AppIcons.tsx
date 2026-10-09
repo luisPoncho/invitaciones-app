@@ -107,13 +107,44 @@ export interface AppIconProps extends Omit<LucideProps, "ref"> {
 }
 
 /**
+ * Helper para verificar si un string representa un espacio en blanco ("none", "blank", "ninguno", "").
+ */
+export function isBlankIcon(str?: string): boolean {
+  if (!str) return true;
+  const lower = str.trim().toLowerCase();
+  return (
+    lower === "none" ||
+    lower === "blank" ||
+    lower === "ninguno" ||
+    lower === "ningun" ||
+    lower === "vacio" ||
+    lower === "sin-icono" ||
+    lower === ""
+  );
+}
+
+/**
+ * Helper para verificar si un string es una URL de imagen (http/https/data-uri/path).
+ */
+export function isImageUrl(str?: string): boolean {
+  if (!str) return false;
+  const trimmed = str.trim();
+  return (
+    trimmed.startsWith("http://") ||
+    trimmed.startsWith("https://") ||
+    trimmed.startsWith("data:image/") ||
+    trimmed.startsWith("/") ||
+    /\.(png|jpg|jpeg|svg|webp|gif|ico)(\?.*)?$/i.test(trimmed)
+  );
+}
+
+/**
  * AppIcon — Componente centralizado de iconos para la app de invitaciones.
  *
- * Uso sencillo:
- * `<AppIcon name="map-pin" size={20} color="#B08D3F" />`
- * `<AppIcon name="ceremony" size={24} />`
- *
- * Para personalizar un icono en todo el proyecto, solo cambia la referencia en `ICON_MAP` arriba.
+ * Soporta:
+ * 1. Nombres de iconos Lucide: `<AppIcon name="map-pin" />`
+ * 2. URLs de imágenes personalizadas: `<AppIcon name="https://misitio.com/icono.png" />`
+ * 3. En blanco: `<AppIcon name="none" />` o `<AppIcon name="" />`
  */
 export default function AppIcon({
   name,
@@ -123,10 +154,32 @@ export default function AppIcon({
   className = "",
   ...rest
 }: AppIconProps) {
+  // 1. Si es espacio en blanco, no renderiza nada
+  if (isBlankIcon(name)) {
+    return null;
+  }
+
+  // 2. Si es una URL de imagen personalizada
+  if (isImageUrl(name)) {
+    const numericSize = typeof size === "number" ? `${size}px` : size;
+    return (
+      <img
+        src={name}
+        alt="Icono"
+        style={{
+          width: numericSize,
+          height: numericSize,
+          objectFit: "contain",
+        }}
+        className={`inline-block ${className}`}
+      />
+    );
+  }
+
+  // 3. Icono de la lista registrada
   const IconComponent = ICON_MAP[name as IconName];
 
   if (!IconComponent) {
-    // Fallback genérico si el nombre no existe
     return (
       <Sparkles
         size={size}
@@ -153,6 +206,13 @@ export default function AppIcon({
  * Lista de iconos sugeridos organizada por categorías para el Diseñador
  */
 export const ICON_CATEGORIES = [
+  {
+    category: "Opciones de Formato",
+    icons: [
+      { name: "none", label: "Sin Icono (Dejar en blanco)" },
+      { name: "sparkles", label: "Destello por defecto" },
+    ],
+  },
   {
     category: "Ubicación y Tiempo",
     icons: [
@@ -190,17 +250,24 @@ export const ICON_CATEGORIES = [
 ];
 
 /**
- * Renderiza un AppIcon si iconStr es un nombre de icono registrado ("ceremony", "party", "map-pin", etc.),
- * o renderiza el texto/emoji si es un emoji ("💒", "🥂", "💍").
+ * Renderiza un AppIcon (Lucide o Imagen por URL), emoji, o nada si es "none" / blanco.
  */
 export function renderIconOrEmoji(
   iconStr?: string,
   props: Partial<AppIconProps> = {}
 ) {
-  if (!iconStr) return <AppIcon name="sparkles" {...props} />;
-  if (iconStr in ICON_MAP) {
+  if (isBlankIcon(iconStr)) {
+    return null;
+  }
+
+  if (isImageUrl(iconStr)) {
+    return <AppIcon name={iconStr!} {...props} />;
+  }
+
+  if (iconStr! in ICON_MAP) {
     return <AppIcon name={iconStr as IconName} {...props} />;
   }
+
   return <span>{iconStr}</span>;
 }
 
