@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { AppIcon } from "@/components/icons";
 import type { InvitationTheme, PhotoScrollBehavior, StylePreset } from "@/lib/mock-data";
 import { defaultTheme, getFontDisplayVar, getFontBodyVar } from "@/lib/mock-data";
 import { saveRSVP } from "@/lib/storage";
 import { formatImageUrl } from "@/lib/image-utils";
 import { LeafDivider } from "./Ornaments";
+import { ScrollReveal, MotionButton } from "@/components/motion";
 
 interface RSVPProps {
   slug: string;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { AppIcon } from "@/components/icons";
 import type { InvitationTheme } from "@/lib/mock-data";
 
 interface MusicPlayerProps {
@@ -257,20 +258,7 @@ export default function MusicPlayer({ musicUrl, theme, shouldPlay = false }: Mus
               <span className="w-[3px] bg-white rounded-full animate-soundbar4" style={{ animationDuration: "0.6s" }} />
             </span>
           ) : (
-            <svg
-              width="20"
-              height="20"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="white"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M11 5L6 9H2v6h4l5 4V5z" />
-              <line x1="23" y1="9" x2="17" y2="15" />
-              <line x1="17" y1="9" x2="23" y2="15" />
-            </svg>
+            <AppIcon name="volume-off" size={20} color="white" />
           )}
         </span>
       </button>

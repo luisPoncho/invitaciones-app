@@ -1,5 +1,6 @@
 "use client";
 
+import { renderIconOrEmoji } from "@/components/icons";
 import type { InvitationTheme, PhotoScrollBehavior, StylePreset, ItineraryItem } from "@/lib/mock-data";
 import { defaultTheme, DEFAULT_ITINERARY_ITEMS, getFontDisplayVar, getFontBodyVar } from "@/lib/mock-data";
 import { formatImageUrl } from "@/lib/image-utils";
@@ -103,10 +104,11 @@ export default function Itinerario({
                       backgroundColor: "#FFFFFF",
                       borderColor: `${t.accent}60`,
                       boxShadow: `0 4px 14px ${t.accent}25`,
+                      color: t.accent,
                     }}
                     className="relative z-10 w-12 h-12 rounded-full border flex items-center justify-center text-xl flex-shrink-0 transition-transform group-hover:scale-105"
                   >
-                    <span>{item.icon || "✨"}</span>
+                    {renderIconOrEmoji(item.icon, { size: 20, color: t.accent })}
                   </div>
 
                   {/* Contenido del Evento */}
@@ -216,10 +218,11 @@ export default function Itinerario({
                     backgroundColor: `${t.secondary}E6`,
                     borderColor: `${t.accentLight}60`,
                     boxShadow: `0 0 16px ${t.accent}30`,
+                    color: t.accentLight,
                   }}
                   className="relative z-10 w-12 h-12 rounded-full border flex items-center justify-center text-xl flex-shrink-0 transition-transform group-hover:scale-105"
                 >
-                  <span>{item.icon || "✦"}</span>
+                  {renderIconOrEmoji(item.icon, { size: 20, color: t.accentLight })}
                 </div>
 
                 {/* Tarjeta del evento */}

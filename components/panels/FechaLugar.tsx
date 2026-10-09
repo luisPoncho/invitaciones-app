@@ -1,5 +1,6 @@
 "use client";
 
+import { AppIcon } from "@/components/icons";
 import type { EventData, InvitationTheme, PhotoScrollBehavior, StylePreset } from "@/lib/mock-data";
 import { defaultTheme, getFontDisplayVar, getFontBodyVar } from "@/lib/mock-data";
 import { formatImageUrl } from "@/lib/image-utils";
@@ -157,10 +158,7 @@ export default function FechaLugar({
                 }}
                 className="flex items-center justify-center gap-2 text-xs uppercase tracking-widest rounded-2xl py-3 px-4 hover:opacity-90 transition-all text-center shadow-md font-medium"
               >
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                </svg>
+                <AppIcon name="map-pin" size={14} />
                 Ver Ubicación
               </MotionLink>
             </div>
@@ -216,10 +214,7 @@ export default function FechaLugar({
                 }}
                 className="flex items-center justify-center gap-2 text-xs uppercase tracking-widest rounded-2xl py-3 px-4 hover:opacity-90 transition-all text-center shadow-md font-medium"
               >
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                </svg>
+                <AppIcon name="map-pin" size={14} />
                 Ver Ubicación
               </MotionLink>
             </div>
@@ -315,10 +310,7 @@ export default function FechaLugar({
               }}
               className="flex items-center justify-center gap-2 text-xs uppercase tracking-widest rounded-xl py-3 px-4 hover:opacity-90 transition-all text-center shadow-lg font-medium"
             >
-              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-              </svg>
+              <AppIcon name="map-pin" size={14} />
               Ubicación Misa
             </MotionLink>
           </div>
@@ -371,10 +363,7 @@ export default function FechaLugar({
               }}
               className="flex items-center justify-center gap-2 text-xs uppercase tracking-widest rounded-xl py-3 px-4 hover:opacity-90 transition-all text-center shadow-lg font-medium"
             >
-              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-              </svg>
+              <AppIcon name="map-pin" size={14} />
               Ubicación Recepción
             </MotionLink>
           </div>

@@ -7,6 +7,7 @@ import {
   useReducedMotion,
   type PanInfo,
 } from "framer-motion";
+import { AppIcon } from "@/components/icons";
 
 interface PhotoCarouselProps {
   /** Array of image URLs */
@@ -211,18 +212,7 @@ export default function PhotoCarousel({
           }}
           aria-label="Foto anterior"
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="white"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
+          <AppIcon name="chevron-left" size={18} color="white" strokeWidth={2.5} />
         </button>
 
         <button
@@ -237,18 +227,7 @@ export default function PhotoCarousel({
           }}
           aria-label="Foto siguiente"
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="white"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
+          <AppIcon name="chevron-right" size={18} color="white" strokeWidth={2.5} />
         </button>
       </div>
 
@@ -353,19 +332,7 @@ function Lightbox({
             className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center hover:bg-white/20 transition-colors"
             aria-label="Cerrar"
           >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
+            <AppIcon name="close" size={20} color="white" />
           </button>
 
           {/* Navigation buttons */}
@@ -379,18 +346,7 @@ function Lightbox({
                 className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center hover:bg-white/20 transition-colors"
                 aria-label="Foto anterior"
               >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polyline points="15 18 9 12 15 6" />
-                </svg>
+                <AppIcon name="chevron-left" size={20} color="white" strokeWidth={2.5} />
               </button>
               <button
                 onClick={(e) => {
@@ -400,18 +356,7 @@ function Lightbox({
                 className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center hover:bg-white/20 transition-colors"
                 aria-label="Foto siguiente"
               >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polyline points="9 18 15 12 9 6" />
-                </svg>
+                <AppIcon name="chevron-right" size={20} color="white" strokeWidth={2.5} />
               </button>
             </>
           )}
