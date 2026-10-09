@@ -16,6 +16,12 @@ DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///{DB_PATH}")
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
+# Use psycopg2, which is installed through psycopg2-binary
+if DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace(
+        "postgresql://", "postgresql+psycopg2://", 1
+    )
+
 # Only SQLite requires check_same_thread=False
 connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
 
