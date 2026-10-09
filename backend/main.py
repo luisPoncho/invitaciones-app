@@ -62,10 +62,14 @@ def auto_migrate_db():
             ("ceremonia_lugar", "TEXT DEFAULT ''"),
             ("ceremonia_direccion", "TEXT DEFAULT ''"),
             ("ceremonia_url", "TEXT DEFAULT NULL"),
+            ("ceremonia_icon", "TEXT DEFAULT NULL"),
+            ("ceremonia_icon_size", "REAL DEFAULT NULL"),
             ("recepcion_hora", "TEXT DEFAULT ''"),
             ("recepcion_lugar", "TEXT DEFAULT ''"),
             ("recepcion_direccion", "TEXT DEFAULT ''"),
             ("recepcion_url", "TEXT DEFAULT NULL"),
+            ("recepcion_icon", "TEXT DEFAULT NULL"),
+            ("recepcion_icon_size", "REAL DEFAULT NULL"),
             ("style_preset", "TEXT DEFAULT 'clasico'"),
             ("itinerary", "TEXT DEFAULT '[]'"),
             ("music_url", "TEXT DEFAULT NULL"),
@@ -232,10 +236,14 @@ def _invitation_to_response(inv: Invitation) -> InvitationResponse:
         ceremoniaLugar=cast(Optional[str], getattr(inv, "ceremonia_lugar", "") or ""),
         ceremoniaDireccion=cast(Optional[str], getattr(inv, "ceremonia_direccion", "") or ""),
         ceremoniaUrl=cast(Optional[str], getattr(inv, "ceremonia_url", None)),
+        ceremoniaIcon=cast(Optional[str], getattr(inv, "ceremonia_icon", None)),
+        ceremoniaIconSize=cast(Optional[float], getattr(inv, "ceremonia_icon_size", None)),
         recepcionHora=cast(Optional[str], getattr(inv, "recepcion_hora", "") or ""),
         recepcionLugar=cast(Optional[str], getattr(inv, "recepcion_lugar", "") or ""),
         recepcionDireccion=cast(Optional[str], getattr(inv, "recepcion_direccion", "") or ""),
         recepcionUrl=cast(Optional[str], getattr(inv, "recepcion_url", None)),
+        recepcionIcon=cast(Optional[str], getattr(inv, "recepcion_icon", None)),
+        recepcionIconSize=cast(Optional[float], getattr(inv, "recepcion_icon_size", None)),
         mensaje=cast(str, getattr(inv, "mensaje", "") or ""),
         fotos=_safe_json_loads(getattr(inv, "fotos", "[]"), []),
         theme=_safe_json_loads(getattr(inv, "theme", "{}"), {}),
@@ -287,10 +295,14 @@ def create_invitation(body: InvitationCreate, db: Session = Depends(get_db)):
         ceremonia_lugar=body.ceremoniaLugar,
         ceremonia_direccion=body.ceremoniaDireccion,
         ceremonia_url=body.ceremoniaUrl,
+        ceremonia_icon=body.ceremoniaIcon,
+        ceremonia_icon_size=body.ceremoniaIconSize,
         recepcion_hora=body.recepcionHora,
         recepcion_lugar=body.recepcionLugar,
         recepcion_direccion=body.recepcionDireccion,
         recepcion_url=body.recepcionUrl,
+        recepcion_icon=body.recepcionIcon,
+        recepcion_icon_size=body.recepcionIconSize,
         mensaje=body.mensaje,
         fotos=json.dumps(body.fotos),
         theme=json.dumps(body.theme.model_dump()),
@@ -359,6 +371,10 @@ def update_invitation(slug: str, body: InvitationUpdate, db: Session = Depends(g
         inv.ceremonia_direccion = body.ceremoniaDireccion
     if body.ceremoniaUrl is not None:
         inv.ceremonia_url = body.ceremoniaUrl
+    if body.ceremoniaIcon is not None:
+        inv.ceremonia_icon = body.ceremoniaIcon
+    if body.ceremoniaIconSize is not None:
+        inv.ceremonia_icon_size = body.ceremoniaIconSize
     if body.recepcionHora is not None:
         inv.recepcion_hora = body.recepcionHora
     if body.recepcionLugar is not None:
@@ -367,6 +383,10 @@ def update_invitation(slug: str, body: InvitationUpdate, db: Session = Depends(g
         inv.recepcion_direccion = body.recepcionDireccion
     if body.recepcionUrl is not None:
         inv.recepcion_url = body.recepcionUrl
+    if body.recepcionIcon is not None:
+        inv.recepcion_icon = body.recepcionIcon
+    if body.recepcionIconSize is not None:
+        inv.recepcion_icon_size = body.recepcionIconSize
     if body.mensaje is not None:
         inv.mensaje = body.mensaje
     if body.entryAnimation is not None:
