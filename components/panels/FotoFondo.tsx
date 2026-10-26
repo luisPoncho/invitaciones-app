@@ -1,6 +1,7 @@
 import type { InvitationTheme, PhotoScrollBehavior } from "@/lib/mock-data";
 import { defaultTheme } from "@/lib/mock-data";
 import { formatImageUrl } from "@/lib/image-utils";
+import SectionBackground from "./SectionBackground";
 
 interface FotoFondoProps {
   theme?: InvitationTheme;
@@ -24,21 +25,9 @@ export default function FotoFondo({ theme, photoUrl, bgScrollBehavior, bgPositio
     );
   }
 
-  const isFija = bgScrollBehavior === "fija" || bgScrollBehavior === "movimiento";
-  const bgSize = bgZoom && bgZoom > 100 ? `${bgZoom}% auto` : bgScrollBehavior === "movimiento" ? "120%" : "cover";
-  const bgPosition = `${bgPositionX ?? 50}% ${bgPositionY ?? 50}%`;
-
   return (
     <section className="relative w-full min-h-[calc(var(--inv-vh,100vh)*0.6)] flex items-center justify-center overflow-hidden">
-       <div 
-         className="absolute inset-0 w-full h-full bg-center"
-         style={{
-            backgroundImage: `url(${formattedUrl})`,
-            backgroundAttachment: isFija ? "fixed" : "scroll",
-            backgroundSize: bgSize,
-            backgroundPosition: bgPosition
-         }}
-       ></div>
+      <SectionBackground url={formattedUrl} behavior={bgScrollBehavior} positionX={bgPositionX} positionY={bgPositionY} zoom={bgZoom} />
     </section>
   );
 }

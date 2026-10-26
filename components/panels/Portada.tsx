@@ -3,7 +3,7 @@
 import type { EventData, InvitationTheme, PhotoScrollBehavior, StylePreset } from "@/lib/mock-data";
 import { defaultTheme, getFontDisplayVar, getFontBodyVar } from "@/lib/mock-data";
 import { formatImageUrl } from "@/lib/image-utils";
-import { getSectionBgStyles } from "@/lib/bg-utils";
+import SectionBackground from "./SectionBackground";
 import { FloralFrame, FloralDivider, LeafAccent } from "./Ornaments";
 import { ScrollReveal } from "@/components/motion";
 
@@ -23,7 +23,6 @@ export default function Portada({ event, theme, stylePreset = "clasico", bgUrl, 
   const fontDisplay = getFontDisplayVar(t.fontDisplay);
   const fontBody = getFontBodyVar(t.fontBody);
   const formattedBgUrl = formatImageUrl(bgUrl);
-  const bgStyles = getSectionBgStyles(formattedBgUrl, bgScrollBehavior, bgPositionX, bgPositionY, bgZoom);
 
   if (stylePreset === "romantico") {
     return (
@@ -31,10 +30,10 @@ export default function Portada({ event, theme, stylePreset = "clasico", bgUrl, 
         style={{
           backgroundColor: t.paper,
           color: t.primary,
-          ...(bgStyles || {}),
         }}
         className="min-h-[var(--inv-vh,100svh)] relative overflow-hidden"
       >
+        <SectionBackground url={formattedBgUrl} behavior={bgScrollBehavior} positionX={bgPositionX} positionY={bgPositionY} zoom={bgZoom} />
         {formattedBgUrl && <div className="absolute inset-0 bg-white/60 z-0" />}
 
         {/* Floral frame ornament */}
@@ -102,10 +101,10 @@ export default function Portada({ event, theme, stylePreset = "clasico", bgUrl, 
       style={{
         backgroundColor: t.primary,
         color: t.paper,
-        ...(bgStyles || {}),
       }}
       className="min-h-[var(--inv-vh,100svh)] relative overflow-hidden"
     >
+      <SectionBackground url={formattedBgUrl} behavior={bgScrollBehavior} positionX={bgPositionX} positionY={bgPositionY} zoom={bgZoom} />
       {bgUrl && <div className="absolute inset-0 bg-black/50 z-0" />}
       <div className="relative z-10 flex flex-col items-center justify-center px-6 text-center min-h-[var(--inv-vh,100svh)]">
       <p

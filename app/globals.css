@@ -19,16 +19,6 @@ body {
   overflow-x: hidden;
 }
 
-/* ── iOS background-attachment: fixed fallback ─────────────── 
-   iOS Safari no soporta background-attachment: fixed dentro
-   de contenedores con overflow. Se reemplaza por un efecto
-   similar usando -webkit-overflow-scrolling. */
-@supports (-webkit-touch-callout: none) {
-  .bg-fixed-ios-fix {
-    background-attachment: scroll !important;
-  }
-}
-
 /* ── Animaciones de entrada ────────────────────────────────── */
 
 @keyframes envelope-open {

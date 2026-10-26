@@ -4,6 +4,7 @@ import { AppIcon, renderIconOrEmoji } from "@/components/icons";
 import type { EventData, InvitationTheme, PhotoScrollBehavior, StylePreset } from "@/lib/mock-data";
 import { defaultTheme, getFontDisplayVar, getFontBodyVar } from "@/lib/mock-data";
 import { formatImageUrl } from "@/lib/image-utils";
+import SectionBackground from "./SectionBackground";
 import { LeafDivider } from "./Ornaments";
 import { ScrollReveal, MotionLink } from "@/components/motion";
 
@@ -42,13 +43,6 @@ export default function FechaLugar({
   const formattedBgUrl = formatImageUrl(bgUrl);
   const isRomantico = stylePreset === "romantico";
 
-  const bgAttachment =
-    bgScrollBehavior === "fija" ? "fixed" :
-    bgScrollBehavior === "movimiento" ? "fixed" :
-    "scroll";
-  const bgSize = bgZoom && bgZoom > 100 ? `${bgZoom}% auto` : bgScrollBehavior === "movimiento" ? "120%" : "cover";
-  const bgPosition = `${bgPositionX ?? 50}% ${bgPositionY ?? 50}%`;
-
   const ceremoniaLugar = event.ceremoniaLugar || event.lugarNombre || "Parroquia de San José";
   const ceremoniaDireccion = event.ceremoniaDireccion || event.lugarDireccion || "Centro Histórico";
   const ceremoniaHora = event.ceremoniaHora || "4:00 PM";
@@ -67,15 +61,10 @@ export default function FechaLugar({
         style={{
           backgroundColor: t.paper || "#FAF6EE",
           color: t.primary,
-          ...(formattedBgUrl ? {
-            backgroundImage: `url(${formattedBgUrl})`,
-            backgroundSize: bgSize,
-            backgroundPosition: bgPosition,
-            backgroundAttachment: bgAttachment,
-          } : {}),
         }}
         className="relative text-center py-20 px-6 overflow-hidden"
       >
+        <SectionBackground url={formattedBgUrl} behavior={bgScrollBehavior} positionX={bgPositionX} positionY={bgPositionY} zoom={bgZoom} />
         {formattedBgUrl && <div className="absolute inset-0 bg-white/75 backdrop-blur-[2px] z-0" />}
         <div className="relative z-10 max-w-lg mx-auto">
           <ScrollReveal direction="up" duration={0.7}>
@@ -242,15 +231,10 @@ export default function FechaLugar({
       style={{
         backgroundColor: t.secondary,
         color: t.paper,
-        ...(formattedBgUrl ? {
-          backgroundImage: `url(${formattedBgUrl})`,
-          backgroundSize: bgSize,
-          backgroundPosition: bgPosition,
-          backgroundAttachment: bgAttachment,
-        } : {}),
       }}
       className="relative text-center py-20 px-6 overflow-hidden"
     >
+      <SectionBackground url={formattedBgUrl} behavior={bgScrollBehavior} positionX={bgPositionX} positionY={bgPositionY} zoom={bgZoom} />
       {formattedBgUrl && <div className="absolute inset-0 bg-black/55 z-0" />}
       <div className="relative z-10 max-w-lg mx-auto">
         <ScrollReveal direction="up" duration={0.7}>

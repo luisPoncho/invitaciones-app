@@ -4,6 +4,7 @@ import { AppIcon } from "@/components/icons";
 import type { InvitationTheme, PhotoScrollBehavior, StylePreset } from "@/lib/mock-data";
 import { defaultTheme, getFontDisplayVar, getFontBodyVar } from "@/lib/mock-data";
 import { formatImageUrl } from "@/lib/image-utils";
+import SectionBackground from "./SectionBackground";
 import { LeafDivider } from "./Ornaments";
 import { ScrollReveal, MotionLink } from "@/components/motion";
 
@@ -38,28 +39,16 @@ export default function MesaRegalos({
   const formattedBgUrl = formatImageUrl(bgUrl);
   const isRomantico = stylePreset === "romantico";
 
-  const bgAttachment =
-    bgScrollBehavior === "fija" ? "fixed" :
-    bgScrollBehavior === "movimiento" ? "fixed" :
-    "scroll";
-  const bgSize = bgZoom && bgZoom > 100 ? `${bgZoom}% auto` : bgScrollBehavior === "movimiento" ? "120%" : "cover";
-  const bgPosition = `${bgPositionX ?? 50}% ${bgPositionY ?? 50}%`;
-
   if (isRomantico) {
     return (
       <section
         style={{
           backgroundColor: t.paper || "#FAF6EE",
           color: t.primary,
-          ...(formattedBgUrl ? {
-            backgroundImage: `url(${formattedBgUrl})`,
-            backgroundSize: bgSize,
-            backgroundPosition: bgPosition,
-            backgroundAttachment: bgAttachment,
-          } : {}),
         }}
         className="relative text-center py-20 px-6 overflow-hidden"
       >
+        <SectionBackground url={formattedBgUrl} behavior={bgScrollBehavior} positionX={bgPositionX} positionY={bgPositionY} zoom={bgZoom} />
         {formattedBgUrl && <div className="absolute inset-0 bg-white/75 z-0" />}
         <div className="relative z-10 max-w-md mx-auto">
           <ScrollReveal direction="up" duration={0.7}>
@@ -116,15 +105,10 @@ export default function MesaRegalos({
       style={{
         backgroundColor: t.secondary,
         color: t.paper,
-        ...(formattedBgUrl ? {
-          backgroundImage: `url(${formattedBgUrl})`,
-          backgroundSize: bgSize,
-          backgroundPosition: bgPosition,
-          backgroundAttachment: bgAttachment,
-        } : {}),
       }}
       className="relative text-center"
     >
+      <SectionBackground url={formattedBgUrl} behavior={bgScrollBehavior} positionX={bgPositionX} positionY={bgPositionY} zoom={bgZoom} />
       {bgUrl && <div className="absolute inset-0 bg-black/50 z-0" />}
       <div className="relative z-10 py-20 px-6">
         <h2 style={{ fontFamily: fontDisplay }} className="italic text-3xl mb-6">

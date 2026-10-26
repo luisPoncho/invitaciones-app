@@ -6,6 +6,7 @@ import type { InvitationTheme, PhotoScrollBehavior, StylePreset } from "@/lib/mo
 import { defaultTheme, getFontDisplayVar, getFontBodyVar } from "@/lib/mock-data";
 import { saveRSVP } from "@/lib/storage";
 import { formatImageUrl } from "@/lib/image-utils";
+import SectionBackground from "./SectionBackground";
 import { LeafDivider } from "./Ornaments";
 import { ScrollReveal, MotionButton } from "@/components/motion";
 
@@ -39,13 +40,6 @@ export default function RSVP({
   const fontBody = getFontBodyVar(t.fontBody);
   const formattedBgUrl = formatImageUrl(bgUrl);
   const isRomantico = stylePreset === "romantico";
-
-  const bgAttachment =
-    bgScrollBehavior === "fija" ? "fixed" :
-    bgScrollBehavior === "movimiento" ? "fixed" :
-    "scroll";
-  const bgSize = bgZoom && bgZoom > 100 ? `${bgZoom}% auto` : bgScrollBehavior === "movimiento" ? "120%" : "cover";
-  const bgPosition = `${bgPositionX ?? 50}% ${bgPositionY ?? 50}%`;
 
   const isGuestLink = !!prefilledName;
   const maxPasesAllowed = guestMaxPasses ?? 20;
@@ -85,17 +79,12 @@ export default function RSVP({
     const sectionStyle = {
       backgroundColor: t.paper || "#FAF6EE",
       color: t.primary,
-      ...(formattedBgUrl ? {
-        backgroundImage: `url(${formattedBgUrl})`,
-        backgroundSize: bgSize,
-        backgroundPosition: bgPosition,
-        backgroundAttachment: bgAttachment,
-      } : {}),
     };
 
     if (enviado) {
       return (
         <section style={sectionStyle} className="relative text-center py-20 px-6 overflow-hidden">
+          <SectionBackground url={formattedBgUrl} behavior={bgScrollBehavior} positionX={bgPositionX} positionY={bgPositionY} zoom={bgZoom} />
           {formattedBgUrl && <div className="absolute inset-0 bg-white/80 z-0" />}
           <div className="relative z-10 max-w-sm mx-auto bg-white/90 p-8 rounded-3xl border border-amber-200 shadow-sm">
             <p style={{ fontFamily: fontDisplay, color: t.primary }} className="italic text-3xl mb-2 font-normal">
@@ -114,6 +103,7 @@ export default function RSVP({
 
     return (
       <section style={sectionStyle} className="relative py-20 px-6 overflow-hidden">
+        <SectionBackground url={formattedBgUrl} behavior={bgScrollBehavior} positionX={bgPositionX} positionY={bgPositionY} zoom={bgZoom} />
         {formattedBgUrl && <div className="absolute inset-0 bg-white/80 z-0" />}
         <div className="relative z-10 max-w-md mx-auto">
           <p
@@ -262,17 +252,12 @@ export default function RSVP({
   const sectionStyle = {
     backgroundColor: t.primary,
     color: t.paper,
-    ...(formattedBgUrl ? {
-      backgroundImage: `url(${formattedBgUrl})`,
-      backgroundSize: bgSize,
-      backgroundPosition: bgPosition,
-      backgroundAttachment: bgAttachment,
-    } : {}),
   };
 
   if (enviado) {
     return (
       <section style={sectionStyle} className="relative text-center">
+        <SectionBackground url={formattedBgUrl} behavior={bgScrollBehavior} positionX={bgPositionX} positionY={bgPositionY} zoom={bgZoom} />
         {bgUrl && <div className="absolute inset-0 bg-black/50 z-0" />}
         <div className="relative z-10 py-20 px-6">
           <p style={{ fontFamily: fontDisplay }} className="italic text-2xl">¡Gracias, {nombre}!</p>
@@ -288,6 +273,7 @@ export default function RSVP({
 
   return (
     <section style={sectionStyle} className="relative">
+      <SectionBackground url={formattedBgUrl} behavior={bgScrollBehavior} positionX={bgPositionX} positionY={bgPositionY} zoom={bgZoom} />
       {bgUrl && <div className="absolute inset-0 bg-black/50 z-0" />}
       <div className="relative z-10 py-20 px-6">
         <h2 style={{ fontFamily: fontDisplay }} className="italic text-3xl text-center mb-8">
