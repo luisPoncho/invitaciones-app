@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import {
   Fraunces,
   Work_Sans,
@@ -82,6 +82,13 @@ const josefin = Josefin_Sans({
 export const metadata: Metadata = {
   title: "Invitación",
   description: "Invitación virtual",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({

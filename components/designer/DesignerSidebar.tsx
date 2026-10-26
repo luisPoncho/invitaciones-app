@@ -525,8 +525,9 @@ export default function DesignerSidebar({
                     const newEl: FreeElement = {
                       id: Math.random().toString(36).slice(2, 9),
                       type: "image",
-                      url: "https://via.placeholder.com/150",
-                      width: 100,
+                      url: "https://placehold.co/220x220/png",
+                      width: 220,
+                      height: 220,
                       x: 50,
                       y: 50,
                       zIndex: maxZ + 1,
@@ -632,8 +633,8 @@ export default function DesignerSidebar({
                               </div>
                               <input
                                 type="range"
-                                min="12"
-                                max="72"
+                                min="10"
+                                max="120"
                                 value={el.fontSize || 24}
                                 onChange={(e) => {
                                   const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, fontSize: Number(e.target.value) } : e2);
@@ -651,8 +652,8 @@ export default function DesignerSidebar({
                               </div>
                               <input
                                 type="range"
-                                min="80"
-                                max="380"
+                                min="30"
+                                max="390"
                                 value={el.width || 260}
                                 onChange={(e) => {
                                   const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, width: Number(e.target.value) } : e2);
@@ -680,20 +681,63 @@ export default function DesignerSidebar({
                           </div>
                           <div className="flex flex-col gap-1">
                             <div className="flex justify-between text-[10px] text-white/50 uppercase">
-                              <span>Ancho de Imagen</span>
-                              <span className="text-amber-300 font-mono">{el.width || 220}px</span>
+                              <span>Tamaño (proporcional)</span>
+                              <span className="text-amber-300 font-mono">{el.width || 220}×{el.height || 220}px</span>
                             </div>
                             <input
                               type="range"
-                              min="60"
-                              max="380"
+                              min="40"
+                              max="390"
                               value={el.width || 220}
                               onChange={(e) => {
-                                const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, width: Number(e.target.value) } : e2);
+                                // Escala ancho y alto juntos para mantener la proporción del marco
+                                const nextW = Number(e.target.value);
+                                const newElements = config.freeElements!.map(e2 => {
+                                  if (e2.id !== el.id) return e2;
+                                  const w = e2.width || 220;
+                                  const h = e2.height || 220;
+                                  return { ...e2, width: nextW, height: Math.max(20, Math.round((h * nextW) / w)) };
+                                });
                                 update({ freeElements: newElements });
                               }}
                               className="accent-amber-400"
                             />
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="flex flex-col gap-1">
+                              <div className="flex justify-between text-[10px] text-white/50 uppercase">
+                                <span>Ancho</span>
+                                <span className="text-amber-300 font-mono">{el.width || 220}px</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="30"
+                                max="390"
+                                value={el.width || 220}
+                                onChange={(e) => {
+                                  const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, width: Number(e.target.value) } : e2);
+                                  update({ freeElements: newElements });
+                                }}
+                                className="accent-amber-400"
+                              />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <div className="flex justify-between text-[10px] text-white/50 uppercase">
+                                <span>Alto</span>
+                                <span className="text-amber-300 font-mono">{el.height || 220}px</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="20"
+                                max="800"
+                                value={el.height || 220}
+                                onChange={(e) => {
+                                  const newElements = config.freeElements!.map(e2 => e2.id === el.id ? { ...e2, height: Number(e.target.value) } : e2);
+                                  update({ freeElements: newElements });
+                                }}
+                                className="accent-amber-400"
+                              />
+                            </div>
                           </div>
                         </>
                       )}

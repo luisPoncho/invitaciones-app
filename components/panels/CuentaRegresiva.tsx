@@ -84,7 +84,7 @@ export default function CuentaRegresiva({ fechaISO, theme, stylePreset = "clasic
               >
                 <span
                   style={{ color: t.accent, fontFamily: fontDisplay }}
-                  className="text-3xl sm:text-4xl font-semibold leading-none"
+                  className="text-3xl font-semibold leading-none"
                 >
                   {String(valor).padStart(2, "0")}
                 </span>
@@ -115,12 +115,12 @@ export default function CuentaRegresiva({ fechaISO, theme, stylePreset = "clasic
         Falta poco
       </p>
       <ScrollReveal direction="up" delay={0.1} duration={0.5}>
-      <div className="flex justify-center gap-6 sm:gap-10">
+      <div className="flex justify-center gap-6">
         {unidades.map(([etiqueta, valor]) => (
           <div key={etiqueta} className="flex flex-col items-center">
             <span
               style={{ color: t.primary }}
-              className="font-display text-4xl sm:text-5xl"
+              className="font-display text-4xl"
             >
               {String(valor).padStart(2, "0")}
             </span>

@@ -6,7 +6,7 @@ export default function PhotoBackground({ config, theme, children }: { config: P
   const formattedUrl = formatImageUrl(config.url);
   
   return (
-    <section className="relative w-full min-h-[60vh] flex items-center justify-center overflow-hidden">
+    <section className="relative w-full min-h-[calc(var(--inv-vh,100vh)*0.6)] flex items-center justify-center overflow-hidden">
        <div 
          className="absolute inset-0 w-full h-full bg-center bg-cover"
          style={{

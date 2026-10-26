@@ -87,7 +87,7 @@ export default function MesaRegalos({
               backgroundColor: "rgba(255, 255, 255, 0.85)",
               borderColor: `${t.accent}30`,
             }}
-            className="mt-6 p-6 sm:p-8 rounded-3xl border shadow-sm space-y-6"
+            className="mt-6 p-6 rounded-3xl border shadow-sm space-y-6"
           >
             <p style={{ fontFamily: fontBody, color: `${t.primary}cc` }} className="text-sm leading-relaxed">
               {body || "El mejor regalo es tu presencia. Sin embargo, si deseas tener un detalle con nosotros, puedes ver nuestra mesa de regalos aquí."}

@@ -2,13 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Base resets & viewport fixes ──────────────────────────── */
+
 html {
   scroll-behavior: smooth;
+  /* Prevenir zoom accidental en inputs de formulario en iOS */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   color: #1C1C1A;
+  /* Asegurar que el body ocupe toda la pantalla en mobile */
+  min-height: 100svh;
+  /* Prevenir scroll horizontal accidental */
+  overflow-x: hidden;
 }
+
+/* ── iOS background-attachment: fixed fallback ─────────────── 
+   iOS Safari no soporta background-attachment: fixed dentro
+   de contenedores con overflow. Se reemplaza por un efecto
+   similar usando -webkit-overflow-scrolling. */
+@supports (-webkit-touch-callout: none) {
+  .bg-fixed-ios-fix {
+    background-attachment: scroll !important;
+  }
+}
+
+/* ── Animaciones de entrada ────────────────────────────────── */
 
 @keyframes envelope-open {
   0% { transform: rotateX(0deg); }
@@ -30,6 +51,17 @@ body {
   100% { transform: translateX(40%) rotate(720deg) scale(3); opacity: 0; }
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* ── Accesibilidad: movimiento reducido ────────────────────── */
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -39,4 +71,15 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ── Ocultar scrollbar en toda la invitación ───────────────── */
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

@@ -135,7 +135,7 @@ export default function RSVP({
               backgroundColor: "rgba(255, 255, 255, 0.85)",
               borderColor: `${t.accent}30`,
             }}
-            className="mt-6 p-6 sm:p-8 rounded-3xl border shadow-sm flex flex-col gap-4"
+            className="mt-6 p-6 rounded-3xl border shadow-sm flex flex-col gap-4"
           >
             {isGuestLink ? (
               <div className="text-center py-2">

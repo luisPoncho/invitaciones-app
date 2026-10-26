@@ -183,13 +183,13 @@ export function FloralFrame({ color = "#C4897D", className = "" }: OrnamentProps
   return (
     <div className={`absolute inset-0 pointer-events-none ${className}`}>
       {/* Top-left */}
-      <FloralCorner color={color} className="absolute top-2 left-2 w-16 h-16 sm:w-20 sm:h-20" />
+      <FloralCorner color={color} className="absolute top-2 left-2 w-16 h-16" />
       {/* Top-right */}
-      <FloralCorner color={color} className="absolute top-2 right-2 w-16 h-16 sm:w-20 sm:h-20 -scale-x-100" />
+      <FloralCorner color={color} className="absolute top-2 right-2 w-16 h-16 -scale-x-100" />
       {/* Bottom-left */}
-      <FloralCorner color={color} className="absolute bottom-2 left-2 w-16 h-16 sm:w-20 sm:h-20 -scale-y-100" />
+      <FloralCorner color={color} className="absolute bottom-2 left-2 w-16 h-16 -scale-y-100" />
       {/* Bottom-right */}
-      <FloralCorner color={color} className="absolute bottom-2 right-2 w-16 h-16 sm:w-20 sm:h-20 -scale-x-100 -scale-y-100" />
+      <FloralCorner color={color} className="absolute bottom-2 right-2 w-16 h-16 -scale-x-100 -scale-y-100" />
     </div>
   );
 }

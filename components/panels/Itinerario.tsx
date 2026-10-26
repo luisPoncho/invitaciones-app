@@ -83,7 +83,7 @@ export default function Itinerario({
 
           <h2
             style={{ fontFamily: fontDisplay, color: t.primary }}
-            className="italic text-4xl sm:text-5xl mb-2 font-normal"
+            className="italic text-4xl mb-2 font-normal"
           >
             {title || "Itinerario"}
           </h2>
@@ -130,7 +130,7 @@ export default function Itinerario({
                             backgroundColor: "rgba(255, 255, 255, 0.92)",
                             borderColor: `${t.accent}30`,
                           }}
-                          className="w-full max-w-sm p-4 sm:p-5 rounded-2xl border shadow-sm transition-all group-hover:shadow-md group-hover:-translate-y-0.5"
+                          className="w-full max-w-sm p-4 rounded-2xl border shadow-sm transition-all group-hover:shadow-md group-hover:-translate-y-0.5"
                         >
                           <span
                             style={{
@@ -208,7 +208,7 @@ export default function Itinerario({
                             backgroundColor: "rgba(255, 255, 255, 0.9)",
                             borderColor: `${t.accent}30`,
                           }}
-                          className="flex-1 p-4 sm:p-5 rounded-2xl border shadow-sm transition-all group-hover:shadow-md group-hover:-translate-y-0.5"
+                          className="flex-1 p-4 rounded-2xl border shadow-sm transition-all group-hover:shadow-md group-hover:-translate-y-0.5"
                         >
                           <div className="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
                             <span
@@ -279,7 +279,7 @@ export default function Itinerario({
 
         <h2
           style={{ fontFamily: fontDisplay, color: t.paper }}
-          className="italic text-4xl sm:text-5xl mb-4 font-normal tracking-wide"
+          className="italic text-4xl mb-4 font-normal tracking-wide"
         >
           {title || "Itinerario"}
         </h2>
@@ -328,7 +328,7 @@ export default function Itinerario({
                           backgroundColor: `${t.secondary}CC`,
                           borderColor: `${t.accentLight}25`,
                         }}
-                        className="w-full max-w-sm p-4 sm:p-5 rounded-2xl border backdrop-blur-md transition-all group-hover:border-white/30 group-hover:bg-white/[0.08]"
+                        className="w-full max-w-sm p-4 rounded-2xl border backdrop-blur-md transition-all group-hover:border-white/30 group-hover:bg-white/[0.08]"
                       >
                         <span
                           style={{
@@ -344,7 +344,7 @@ export default function Itinerario({
 
                         <h3
                           style={{ fontFamily: fontDisplay, color: t.paper }}
-                          className="text-lg sm:text-xl font-medium tracking-wide leading-tight mb-1"
+                          className="text-lg font-medium tracking-wide leading-tight mb-1"
                         >
                           {item.title}
                         </h3>
@@ -405,7 +405,7 @@ export default function Itinerario({
                           backgroundColor: `${t.secondary}B3`,
                           borderColor: `${t.accentLight}25`,
                         }}
-                        className="flex-1 p-4 sm:p-5 rounded-2xl border backdrop-blur-md transition-all group-hover:border-white/30 group-hover:bg-white/[0.08]"
+                        className="flex-1 p-4 rounded-2xl border backdrop-blur-md transition-all group-hover:border-white/30 group-hover:bg-white/[0.08]"
                       >
                         <div className="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
                           <span
@@ -423,7 +423,7 @@ export default function Itinerario({
 
                         <h3
                           style={{ fontFamily: fontDisplay, color: t.paper }}
-                          className="text-lg sm:text-xl font-medium tracking-wide leading-tight mb-1"
+                          className="text-lg font-medium tracking-wide leading-tight mb-1"
                         >
                           {item.title}
                         </h3>

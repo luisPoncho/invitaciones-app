@@ -109,7 +109,7 @@ export default function FechaLugar({
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-center">
+          <div className="grid grid-cols-1 gap-6 text-center">
             <ScrollReveal direction="up" delay={0.1} duration={0.6}>
             {/* Card 1: Boda Religiosa */}
             <div
@@ -274,7 +274,7 @@ export default function FechaLugar({
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-left">
+        <div className="grid grid-cols-1 gap-6 text-left">
           <ScrollReveal direction="up" delay={0.1} duration={0.6}>
           {/* Card 1: Boda Religiosa */}
           <div

@@ -55,7 +55,7 @@ export default function EntryWrapper({
         initial={animation !== "none" ? { opacity: 0 } : { opacity: 1 }}
         animate={opened ? { opacity: 1 } : { opacity: 0 }}
         transition={{ duration: 1, ease: "easeInOut" }}
-        style={!opened ? { maxHeight: "100vh", overflow: "hidden" } : undefined}
+        style={!opened ? { maxHeight: "var(--inv-vh, 100vh)", overflow: "hidden" } : undefined}
       >
         {children}
       </motion.div>

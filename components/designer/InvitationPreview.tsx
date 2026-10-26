@@ -15,6 +15,7 @@ import Separador from "@/components/panels/Separador";
 import Divider from "@/components/Divider";
 import EntryWrapper from "@/components/entry/EntryWrapper";
 import FreeElementsLayer from "./FreeElementsLayer";
+import DesignCanvas, { DESIGN_WIDTH, DESIGN_VIEWPORT_HEIGHT } from "./DesignCanvas";
 
 interface InvitationPreviewProps {
   config: FullInvitationConfig;
@@ -71,8 +72,8 @@ export default function InvitationPreview({ config, onChange }: InvitationPrevie
       <div
         className="relative shadow-2xl overflow-hidden flex-shrink-0 transition-all duration-500 bg-white"
         style={{
-          width: viewMode === "mobile" ? 390 : "100%",
-          maxWidth: viewMode === "mobile" ? 390 : 480,
+          width: viewMode === "mobile" ? DESIGN_WIDTH : "100%",
+          maxWidth: viewMode === "mobile" ? DESIGN_WIDTH : 480,
           borderRadius: viewMode === "mobile" ? 32 : 16,
           boxShadow: `0 0 0 ${viewMode === "mobile" ? "6px" : "2px"} #1a1a1a, 0 0 0 ${viewMode === "mobile" ? "8px" : "4px"} #333, 0 40px 80px rgba(0,0,0,0.6)`,
         }}
@@ -81,49 +82,52 @@ export default function InvitationPreview({ config, onChange }: InvitationPrevie
         <div
           className="overflow-y-auto relative"
           style={{
-            height: viewMode === "mobile" ? 720 : "75vh",
+            // En modo celular el marco mide exactamente una "pantalla" de diseño
+            height: viewMode === "mobile" ? DESIGN_VIEWPORT_HEIGHT : "75vh",
             maxHeight: 850,
             scrollbarWidth: "none",
           }}
         >
           <style>{`div::-webkit-scrollbar { display: none; }`}</style>
           
-          <div className="relative w-full h-max">
+          <DesignCanvas>
             <EntryWrapper animation={config.entryAnimation || "carta"} theme={theme}>
-              <FreeElementsLayer 
-                 elements={config.freeElements || []} 
-                 isDesigner={true} 
-                 onUpdateElement={handleUpdateFreeElement} 
-                 onDeleteElement={handleDeleteFreeElement}
-              />
-              {config.sections?.map(section => {
-                switch (section.type) {
-                  case "portada":
-                    return <Portada key={section.id} event={config} theme={theme} stylePreset={config.stylePreset} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
-                  case "cuenta-regresiva":
-                    return <CuentaRegresiva key={section.id} fechaISO={config.fechaISO} theme={theme} stylePreset={config.stylePreset} />;
-                  case "fecha-lugar":
-                    return <FechaLugar key={section.id} event={config} theme={theme} stylePreset={config.stylePreset} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
-                  case "itinerario":
-                    return <Itinerario key={section.id} theme={theme} stylePreset={config.stylePreset} title={section.itineraryTitle} subtitle={section.itinerarySubtitle} items={section.itineraryItems && section.itineraryItems.length > 0 ? section.itineraryItems : (config.itinerary && config.itinerary.length > 0 ? config.itinerary : undefined)} iconSize={section.itineraryIconSize} itineraryLayout={section.itineraryLayout} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
-                  case "galeria":
-                    return <Galeria key={section.id} photoConfigs={config.photoConfigs || []} fotos={config.fotos || []} theme={theme} stylePreset={config.stylePreset} />;
-                  case "rsvp":
-                    return <RSVP key={section.id} slug={config.slug} theme={theme} stylePreset={config.stylePreset} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
-                  case "foto-fondo":
-                    return <FotoFondo key={section.id} theme={theme} photoUrl={section.photoUrl || section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
-                  case "mesa-regalos":
-                    return <MesaRegalos key={section.id} theme={theme} stylePreset={config.stylePreset} title={section.giftRegistryTitle} url={section.giftRegistryUrl} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
-                  case "separador":
-                    return <Separador key={section.id} theme={theme} stylePreset={config.stylePreset} />;
-                  case "texto-libre":
-                    return <TextoLibrePanel key={section.id} theme={theme} stylePreset={config.stylePreset} title={section.customTitle} body={section.customBody} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
-                  default:
-                    return null;
-                }
-              })}
+              <div className="relative w-full">
+                <FreeElementsLayer 
+                   elements={config.freeElements || []} 
+                   isDesigner={true} 
+                   onUpdateElement={handleUpdateFreeElement} 
+                   onDeleteElement={handleDeleteFreeElement}
+                />
+                {config.sections?.map(section => {
+                  switch (section.type) {
+                    case "portada":
+                      return <Portada key={section.id} event={config} theme={theme} stylePreset={config.stylePreset} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+                    case "cuenta-regresiva":
+                      return <CuentaRegresiva key={section.id} fechaISO={config.fechaISO} theme={theme} stylePreset={config.stylePreset} />;
+                    case "fecha-lugar":
+                      return <FechaLugar key={section.id} event={config} theme={theme} stylePreset={config.stylePreset} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+                    case "itinerario":
+                      return <Itinerario key={section.id} theme={theme} stylePreset={config.stylePreset} title={section.itineraryTitle} subtitle={section.itinerarySubtitle} items={section.itineraryItems && section.itineraryItems.length > 0 ? section.itineraryItems : (config.itinerary && config.itinerary.length > 0 ? config.itinerary : undefined)} iconSize={section.itineraryIconSize} itineraryLayout={section.itineraryLayout} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+                    case "galeria":
+                      return <Galeria key={section.id} photoConfigs={config.photoConfigs || []} fotos={config.fotos || []} theme={theme} stylePreset={config.stylePreset} />;
+                    case "rsvp":
+                      return <RSVP key={section.id} slug={config.slug} theme={theme} stylePreset={config.stylePreset} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+                    case "foto-fondo":
+                      return <FotoFondo key={section.id} theme={theme} photoUrl={section.photoUrl || section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+                    case "mesa-regalos":
+                      return <MesaRegalos key={section.id} theme={theme} stylePreset={config.stylePreset} title={section.giftRegistryTitle} url={section.giftRegistryUrl} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+                    case "separador":
+                      return <Separador key={section.id} theme={theme} stylePreset={config.stylePreset} />;
+                    case "texto-libre":
+                      return <TextoLibrePanel key={section.id} theme={theme} stylePreset={config.stylePreset} title={section.customTitle} body={section.customBody} bgUrl={section.bgUrl} bgScrollBehavior={section.bgScrollBehavior} bgPositionX={section.bgPositionX} bgPositionY={section.bgPositionY} bgZoom={section.bgZoom} />;
+                    default:
+                      return null;
+                  }
+                })}
+              </div>
             </EntryWrapper>
-          </div>
+          </DesignCanvas>
         </div>
 
         {/* Bottom bar (only for mobile) */}

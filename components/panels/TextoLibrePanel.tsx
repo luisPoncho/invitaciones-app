@@ -73,7 +73,7 @@ export default function TextoLibrePanel({
                 color: `${t.primary}cc`,
                 whiteSpace: "pre-line",
               }}
-              className="text-sm sm:text-base leading-relaxed italic max-w-md mx-auto"
+              className="text-sm leading-relaxed italic max-w-md mx-auto"
             >
               {body}
             </p>

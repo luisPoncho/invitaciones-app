@@ -3,6 +3,13 @@
 import type { FreeElement } from "@/lib/mock-data";
 import DraggableElement from "./DraggableElement";
 
+/**
+ * Capa de elementos libres. Debe renderizarse dentro de <DesignCanvas>:
+ * los valores absolutos (width, height, fontSize, imageX, imageY) están en
+ * px de diseño y el canvas se encarga de escalarlos uniformemente junto con
+ * el resto de la invitación. x/y son porcentajes de esta capa.
+ */
+
 interface FreeElementsLayerProps {
   elements: FreeElement[];
   isDesigner: boolean;
@@ -22,13 +29,12 @@ export default function FreeElementsLayer({
     (a, b) => (a.zIndex ?? 50) - (b.zIndex ?? 50)
   );
 
+  // La capa nunca captura clics: solo los elementos (en el diseñador) los reciben,
+  // así las secciones de abajo siguen siendo interactivas.
   return (
     <div
       data-free-layer
-      className={`absolute inset-0 w-full h-full ${
-        isDesigner ? "" : "pointer-events-none"
-      } z-40 overflow-visible`}
-      style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, minHeight: "100%" }}
+      className="absolute inset-0 pointer-events-none z-40 overflow-visible"
     >
       {sortedElements.map((el) => (
         <DraggableElement

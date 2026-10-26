@@ -7,6 +7,7 @@ import {
   FONT_BODY_OPTIONS,
 } from "@/lib/mock-data";
 import { formatImageUrl } from "@/lib/image-utils";
+import { DESIGN_WIDTH } from "./DesignCanvas";
 
 interface DraggableElementProps {
   element: FreeElement;
@@ -36,6 +37,17 @@ function getFreeLayer(el: HTMLElement | null): HTMLElement | null {
     current = current.parentElement;
   }
   return null;
+}
+
+/**
+ * Relación px de pantalla / px de diseño de la capa. El canvas escala la
+ * invitación con `zoom`, así que los deltas del puntero (px de pantalla)
+ * deben dividirse por este valor para obtener px de diseño.
+ */
+function getScreenScale(layer: HTMLElement | null): number {
+  if (!layer) return 1;
+  const w = layer.getBoundingClientRect().width;
+  return w > 0 ? w / DESIGN_WIDTH : 1;
 }
 
 const ALL_FONT_OPTIONS = [
@@ -219,9 +231,17 @@ export default function DraggableElement({
       const rect = layer.getBoundingClientRect();
       if (rect.width <= 0 || rect.height <= 0) return;
 
+      // Calculate the current scale factor from the layer width so resize
+      // deltas in screen-pixels are converted to design-pixels correctly.
+      const currentScale = rect.width / DESIGN_WIDTH;
+
       const { mouseX, mouseY, width, height, direction, posX, posY } = resizeStartRef.current;
       const deltaX = e.clientX - mouseX;
       const deltaY = e.clientY - mouseY;
+
+      // Convert screen-space deltas to design-space deltas
+      const designDeltaX = deltaX / currentScale;
+      const designDeltaY = deltaY / currentScale;
 
       let newWidth = width;
       let newHeight = height;
@@ -230,24 +250,24 @@ export default function DraggableElement({
 
       // Resizing horizontally from one side: opposite side stays pinned
       if (direction.includes("right")) {
-        newWidth = Math.max(30, width + deltaX);
+        newWidth = Math.max(30, width + designDeltaX);
         const actualDeltaW = newWidth - width;
-        deltaCenterX_px = actualDeltaW / 2;
+        deltaCenterX_px = (actualDeltaW * currentScale) / 2;
       } else if (direction.includes("left")) {
-        newWidth = Math.max(30, width - deltaX);
+        newWidth = Math.max(30, width - designDeltaX);
         const actualDeltaW = newWidth - width;
-        deltaCenterX_px = -actualDeltaW / 2;
+        deltaCenterX_px = -(actualDeltaW * currentScale) / 2;
       }
 
       // Resizing vertically from one side: opposite side stays pinned
       if (direction.includes("bottom")) {
-        newHeight = Math.max(20, height + deltaY);
+        newHeight = Math.max(20, height + designDeltaY);
         const actualDeltaH = newHeight - height;
-        deltaCenterY_px = actualDeltaH / 2;
+        deltaCenterY_px = (actualDeltaH * currentScale) / 2;
       } else if (direction.includes("top")) {
-        newHeight = Math.max(20, height - deltaY);
+        newHeight = Math.max(20, height - designDeltaY);
         const actualDeltaH = newHeight - height;
-        deltaCenterY_px = -actualDeltaH / 2;
+        deltaCenterY_px = -(actualDeltaH * currentScale) / 2;
       }
 
       newWidth = Math.round(newWidth);
@@ -265,8 +285,9 @@ export default function DraggableElement({
       setSize({ width: newWidth, height: newHeight });
       setPos({ x: nextX, y: nextY });
     } else if (action === "pan") {
-      const deltaX = e.clientX - panStartRef.current.mouseX;
-      const deltaY = e.clientY - panStartRef.current.mouseY;
+      const screenScale = getScreenScale(getFreeLayer(containerRef.current));
+      const deltaX = (e.clientX - panStartRef.current.mouseX) / screenScale;
+      const deltaY = (e.clientY - panStartRef.current.mouseY) / screenScale;
 
       const newImageX = Math.round(panStartRef.current.imageX + deltaX);
       const newImageY = Math.round(panStartRef.current.imageY + deltaY);
@@ -428,9 +449,9 @@ export default function DraggableElement({
       }}
       className={`absolute select-none group ${
         isDesigner
-          ? isSelected
+          ? "pointer-events-auto " + (isSelected
             ? "ring-2 ring-amber-400 ring-offset-2 ring-offset-black/50"
-            : "hover:ring-1 hover:ring-white/40 cursor-pointer"
+            : "hover:ring-1 hover:ring-white/40 cursor-pointer")
           : ""
       }`}
       style={{

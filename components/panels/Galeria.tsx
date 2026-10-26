@@ -114,7 +114,7 @@ export default function Galeria({ photoConfigs, fotos, theme, stylePreset = "cla
             </ScrollReveal>
           ) : (
             /* ── GRID FALLBACK ─── If photos don't have URLs yet, show grid placeholders */
-            <div className={`grid grid-cols-2 md:grid-cols-3 gap-3 max-w-2xl mx-auto ${isRomantico ? 'p-2' : ''}`}>
+            <div className={`grid grid-cols-2 gap-3 max-w-2xl mx-auto ${isRomantico ? 'p-2' : ''}`}>
               {galeriaPhotos.map((p, i) => (
                 <ScrollReveal key={i} direction="up" delay={i * 0.08} duration={0.5}>
                   <div
